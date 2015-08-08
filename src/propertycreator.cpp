@@ -466,7 +466,7 @@ QString PropertyCreator::createCode()
         if (!prop->write.isEmpty()) {
 
             result += QLatin1String("/*!\n") % partOf % QLatin1String(" */\n");
-            result += QLatin1String("void ") % m_className % dc % writeFunc % QLatin1String("s\n{\n");
+            result += QLatin1String("void ") % m_className % dc % writeFunc % QLatin1String("\n{\n");
 
             if (prop->privateClass) {
                 result += m_indent % getPointerMacro();
