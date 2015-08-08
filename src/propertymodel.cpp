@@ -346,13 +346,15 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
 
     if (r) {
         QString read = name;
+        read[0] = read[0].toUpper();
         if (type == QLatin1String("bool")) {
-            read[0] = read[0].toUpper();
             if (name.contains(QStringLiteral("enabled"), Qt::CaseInsensitive)) {
                 read.prepend(QStringLiteral("is"));
             } else {
                 read.prepend(QStringLiteral("has"));
             }
+        } else {
+            read.prepend(QStringLiteral("get"));
         }
 
         prop->read = read;
