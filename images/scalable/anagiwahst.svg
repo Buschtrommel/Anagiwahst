@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg3925"
+   sodipodi:docname="anagiwahst_icon.svg"
+   viewBox="0 0 756.39 756.39"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   inkscape:export-filename="/home/buschmann/Dokumente/Entwicklung/Projekte/Anagiwahst/images/hi64-app-anagiwahst.png"
+   inkscape:export-xdpi="7.615119"
+   inkscape:export-ydpi="7.615119">
+  <defs
+     id="defs9" />
+  <sodipodi:namedview
+     id="base"
+     bordercolor="#666666"
+     inkscape:pageshadow="2"
+     inkscape:window-y="0"
+     fit-margin-left="0"
+     pagecolor="#ffffff"
+     fit-margin-top="0"
+     inkscape:window-maximized="1"
+     inkscape:zoom="0.7"
+     inkscape:window-x="1276"
+     inkscape:window-height="991"
+     showgrid="false"
+     borderopacity="1.0"
+     inkscape:current-layer="g5083"
+     inkscape:cx="140.88301"
+     inkscape:cy="267.06501"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1680"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px" />
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     transform="translate(158.19 -37.025)">
+    <g
+       id="g5083"
+       transform="matrix(2.7014 0 0 2.7014 19423 -7021)">
+      <path
+         id="path4942"
+         d="m -7247.932,2613.3306 0,55.759 111.518,0 0,55.7591 -111.518,0 0,55.759 111.518,0 0,55.7591 -111.518,0 0,55.759 278.7951,0 0,-55.759 -111.5181,0 0,-55.7591 111.5181,0 0,-55.759 -111.5181,0 0,-55.7591 111.5181,0 0,-55.759 -111.5181,0 -55.759,0 -111.518,0 z"
+         style="fill:#66b036;fill-opacity:1"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

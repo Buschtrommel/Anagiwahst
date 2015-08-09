@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Anagiwahst
+GenericName=Qt Property Editor
+Exec=anagiwahst
+Comment=A simple Qt property creator and editor
+Terminal=false
+Categories=Qt;Development;IDE;
