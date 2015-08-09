@@ -43,5 +43,7 @@ struct Property {
     QString defaultValue;
 };
 
+Q_DECLARE_TYPEINFO(Property, Q_PRIMITIVE_TYPE);
+
 #endif // PROPERTY
 

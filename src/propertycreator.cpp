@@ -292,8 +292,6 @@ QString PropertyCreator::createCode()
     // prepared stuff
     QLatin1String dc("::");
     QString doubleIndent = m_indent % m_indent;
-    QString partOf = QLatin1String(" * \\brief Part of the \\link ") % m_className % dc % prop->name % QLatin1String(" ") % prop->name % QLatin1String(" \\endlink property.\n");
-
 
 
 
@@ -356,6 +354,7 @@ QString PropertyCreator::createCode()
         QString readFunc = prop->read % QLatin1String("() const");
         QString writeFunc = prop->write % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")");
         QString resetFunc = prop->reset % QLatin1String("()");
+        QString partOf = QLatin1String(" * \\brief Part of the \\link ") % m_className % dc % prop->name % QLatin1String(" ") % prop->name % QLatin1String(" \\endlink property.\n");
 
 
         result += QLatin1String("/*!\n * \\property ") % m_className % dc % prop->name % QLatin1String("\n");
