@@ -33,31 +33,31 @@ unix{
     }
 
     desktopiconsvg.files = images/scalable/*.svg
-    desktopiconsvg.path = $$DESKTOPICON_PATH/scalable/apps
+    desktopiconsvg.path = $$DESKTOPICONS_PATH/scalable/apps
     INSTALLS += desktopiconsvg
 
     desktopicon128.files = images/128x128/*.png
-    desktopicon128.path = $$DESKTOPICON_PATH/128x128/apps
+    desktopicon128.path = $$DESKTOPICONS_PATH/128x128/apps
     INSTALLS += desktopicon128
 
     desktopicon64.files = images/64x64/*.png
-    desktopicon64.path = $$DESKTOPICON_PATH/64x64/apps
+    desktopicon64.path = $$DESKTOPICONS_PATH/64x64/apps
     INSTALLS += desktopicon64
 
     desktopicon48.files = images/48x48/*.png
-    desktopicon48.path = $$DESKTOPICON_PATH/48x48/apps
+    desktopicon48.path = $$DESKTOPICONS_PATH/48x48/apps
     INSTALLS += desktopicon48
 
     desktopicon32.files = images/32x32/*.png
-    desktopicon32.path = $$DESKTOPICON_PATH/32x32/apps
+    desktopicon32.path = $$DESKTOPICONS_PATH/32x32/apps
     INSTALLS += desktopicon32
 
     desktopicon22.files = images/22x22/*.png
-    desktopicon22.path = $$DESKTOPICON_PATH/22x22/apps
+    desktopicon22.path = $$DESKTOPICONS_PATH/22x22/apps
     INSTALLS += desktopicon22
 
     desktopicon16.files = images/16x16/*.png
-    desktopicon16.path = $$DESKTOPICON_PATH/16x16/apps
+    desktopicon16.path = $$DESKTOPICONS_PATH/16x16/apps
     INSTALLS += desktopicon16
 
     isEmpty(DESKTOPFILE_PATH) {
