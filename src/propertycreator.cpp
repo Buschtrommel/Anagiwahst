@@ -244,7 +244,7 @@ QString PropertyCreator::createPrivate()
 
 
     QString result("\n");
-    result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_P_H\n#define ") % uClassName % QLatin1String("_P_H\n\n#include ") % m_className.toLower() % QLatin1String(".h\n\nclass ") % m_className % QLatin1String("Private\n{\npublic:\n");
+    result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_P_H\n#define ") % uClassName % QLatin1String("_P_H\n\n#include \"") % m_className.toLower() % QLatin1String(".h\"\n\nclass ") % m_className % QLatin1String("Private\n{\npublic:\n");
 
     for (int i = 0; i < m_propertiesCount; ++i) {
 
@@ -297,19 +297,21 @@ QString PropertyCreator::createCode()
 
     QString result("\n");
 
-    result += QLatin1String("#include ") % m_className.toLower();
+    result += QLatin1String("#include \"") % m_className.toLower();
     if (privateClass) {
-        result += QLatin1String("_p.h\n");
+        result += QLatin1String("_p.h\"\n");
     } else {
-        result += QLatin1String(".h\n");
+        result += QLatin1String(".h\"\n");
     }
 
     result += QLatin1String("#ifdef QT_DEBUG\n#include <QtDebug>\n#endif\n\n/*!\n * \\brief Constructs an empty ") % m_className % QLatin1String(".\n */\n");
 
-    result += m_className % dc % m_className % QLatin1String("()\n");
+    result += m_className % dc % m_className % QLatin1String("()");
 
     if (privateClass) {
-        result += m_indent % QLatin1String("d_ptr(new ") % m_className % QLatin1String("Private)\n");
+        result += QLatin1String(" :\n") % m_indent % QLatin1String("d_ptr(new ") % m_className % QLatin1String("Private)\n");
+    } else {
+        result += QLatin1String("\n");
     }
 
     result += QLatin1String("{\n");
