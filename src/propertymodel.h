@@ -69,7 +69,7 @@ public:
     bool isPrivateClass() const;
 
     void loadData();
-    Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r, bool w, bool m, bool u, bool n, bool p);
+    Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
     Q_INVOKABLE void deleteProperty(int idx);
     Q_INVOKABLE QString createHeader() const;
     Q_INVOKABLE QString createPrivate() const;

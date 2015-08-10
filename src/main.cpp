@@ -20,6 +20,9 @@
 #include <QQmlApplicationEngine>
 #include <QtQml>
 #include <QQmlEngine>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
+#include <QTextStream>
 
 #include "propertymodel.h"
 
@@ -27,10 +30,127 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationDisplayName(QStringLiteral("Anagiwahst"));
-    app.setApplicationName(QStringLiteral("anagiwahst"));
+    app.setApplicationName(QStringLiteral("Anagiwahst"));
     app.setOrganizationDomain(QStringLiteral("buschmann23.de"));
     app.setOrganizationName(QStringLiteral("Buschtrommel"));
     app.setApplicationVersion(QString(APP_VERSION));
+
+    if (argc > 1) {
+
+        QCommandLineParser clparser;
+        clparser.setApplicationDescription("Anagiwahst is a Qt property creator/editor.");
+        clparser.addHelpOption();
+        clparser.addVersionOption();
+        clparser.addPositionalArgument("<class name>", QCoreApplication::translate("main", "The class name."));
+        clparser.addPositionalArgument("<type>", QCoreApplication::translate("main", "Default type for all properties or list of types according to each property."));
+        clparser.addPositionalArgument("<property>", QCoreApplication::translate("main", "The name of the property or properties."));
+
+        QCommandLineOption privateOption(QStringList() << "p" << "private", QCoreApplication::translate("main", "The class has a private section in a separate file."));
+        clparser.addOption(privateOption);
+
+        QCommandLineOption noReadOption(QStringLiteral("no-read"), QCoreApplication::translate("main", "Do not create a read accessor function."));
+        clparser.addOption(noReadOption);
+
+        QCommandLineOption noWriteOption(QStringLiteral("no-write"), QCoreApplication::translate("main", "Do not create a write accessor function."));
+        clparser.addOption(noWriteOption);
+
+        QCommandLineOption noNotifyOption(QStringLiteral("no-notify"), QCoreApplication::translate("main", "Do not add a notify signal."));
+        clparser.addOption(noNotifyOption);
+
+        QCommandLineOption memberOption(QStringList() << "m" << "member", QCoreApplication::translate("main", "Use a member variable association."));
+        clparser.addOption(memberOption);
+
+        QCommandLineOption unsetOption(QStringList() << "u" << "unset", QCoreApplication::translate("main", "Create a reset/unset function."));
+        clparser.addOption(unsetOption);
+
+        QCommandLineOption outputOption(QStringList() << "o" << "output", QCoreApplication::translate("main", "Generates the output files directly in <director>."), QCoreApplication::translate("main", "directory"));
+        clparser.addOption(outputOption);
+
+        clparser.process(app);
+
+        const QStringList args = clparser.positionalArguments();
+
+        if (args.size() < 3) {
+            clparser.showHelp();
+        }
+
+        const QString className = args.at(0);
+        const QString typeString = args.at(1);
+        const QString propString = args.at(2);
+
+        QStringList types = typeString.split(" ");
+        const QStringList props = propString.split(" ");
+
+        if (!props.isEmpty()) {
+
+            if (types.size() < props.size()) {
+
+                quint8 diffSize = props.size() - types.size();
+                QString lastType = types.last();
+
+                for (quint8 i = 0; i < diffSize; ++i) {
+                    types.append(lastType);
+                }
+
+            }
+
+            QString outputDir = clparser.value(outputOption);
+
+            bool privateClass = clparser.isSet(privateOption);
+            bool read = !clparser.isSet(noReadOption);
+            bool write = !clparser.isSet(noWriteOption);
+            bool notify = !clparser.isSet(noNotifyOption);
+            bool member = clparser.isSet(memberOption);
+            bool unset = clparser.isSet(unsetOption);
+
+            if (!read) {
+                member = true;
+            }
+
+            if (read && write) {
+                member = false;
+            }
+
+            PropertyModel propModel;
+
+            for (int i = 0; i < props.size(); ++i) {
+
+                propModel.setClassName(className);
+                propModel.addProperty(props.at(i),types.at(i), read, write, member, unset, notify, privateClass);
+
+            }
+
+            if (outputDir.isEmpty()) {
+                QTextStream out(stdout, QIODevice::WriteOnly);
+                out << "=========================================================================\n";
+                out << "||                          Header file                                ||\n";
+                out << "=========================================================================\n";
+                out << propModel.createHeader() << "\n";
+                out.flush();
+
+                if (privateClass) {
+                    out << "\n\n\n";
+                    out << "=========================================================================\n";
+                    out << "||                         Private eader file                          ||\n";
+                    out << "=========================================================================\n";
+                    out << propModel.createPrivate() << "\n";
+                    out.flush();
+                }
+                out << "\n\n\n";
+                out << "=========================================================================\n";
+                out << "||                            Code file                                ||\n";
+                out << "=========================================================================\n";
+                out << propModel.createCode();
+                out.flush();
+
+            } else {
+
+
+            }
+        }
+
+        return 0;
+    }
 
     qmlRegisterType<PropertyModel>("Buschtrommel.Anagiwahst.Models", 1, 0, "PropertyModel");
 

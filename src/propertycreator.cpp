@@ -62,7 +62,7 @@ QString PropertyCreator::createHeader()
 
     }
 
-    QString result("\n");
+    QString result("");
     QString uClassName = m_className.toUpper();
 
     result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_H\n#define ") % uClassName % QLatin1String("_H\n\n#include <QObject>\n\n");
@@ -82,6 +82,10 @@ QString PropertyCreator::createHeader()
         prop = m_properties.at(i);
 
         result += m_indent % QLatin1String("Q_PROPERTY(") % prop->type % QLatin1String(" ") % prop->name;
+
+        if (!prop->member.isEmpty()) {
+            result += QLatin1String(" MEMBER ") % prop->member;
+        }
 
         if (!prop->read.isEmpty()) {
             result += QLatin1String(" READ ") % prop->read;
@@ -243,7 +247,7 @@ QString PropertyCreator::createPrivate()
     QString uClassName = m_className.toUpper();
 
 
-    QString result("\n");
+    QString result("");
     result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_P_H\n#define ") % uClassName % QLatin1String("_P_H\n\n#include \"") % m_className.toLower() % QLatin1String(".h\"\n\nclass ") % m_className % QLatin1String("Private\n{\npublic:\n");
 
     for (int i = 0; i < m_propertiesCount; ++i) {
@@ -295,7 +299,7 @@ QString PropertyCreator::createCode()
 
 
 
-    QString result("\n");
+    QString result("");
 
     result += QLatin1String("#include \"") % m_className.toLower();
     if (privateClass) {
