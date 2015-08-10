@@ -4,6 +4,9 @@
 #include <QString>
 #include <QCoreApplication>
 
+/*!
+ * \brief The PropertyWriter class
+ */
 class PropertyWriter
 {
     Q_DECLARE_TR_FUNCTIONS(PropertyWriter)

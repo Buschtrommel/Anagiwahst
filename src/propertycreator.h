@@ -24,6 +24,9 @@
 
 struct Property;
 
+/*!
+ * \brief The PropertyCreator class
+ */
 class PropertyCreator
 {
 public:

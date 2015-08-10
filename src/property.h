@@ -20,7 +20,11 @@
 #define PROPERTY
 
 #include <QString>
+#include <QtGlobal>
 
+/*!
+ * \brief The Property struct
+ */
 struct Property {
     int id;
     QString name;

@@ -41,6 +41,10 @@ const int PropertyModel::CommentRole = Qt::UserRole + 17;
 const int PropertyModel::PrivateRole = Qt::UserRole + 18;
 const int PropertyModel::DefaultRole = Qt::UserRole + 19;
 
+
+/*!
+ * \brief Constructs an empty PropertyModel object.
+ */
 PropertyModel::PropertyModel()
 {
     m_properties = QList<Property*>();
@@ -76,6 +80,9 @@ PropertyModel::PropertyModel()
 }
 
 
+/*!
+ * \brief Destroys the PropertyModel object and frres u its resources.
+ */
 PropertyModel::~PropertyModel()
 {
     while (!m_properties.isEmpty()) {

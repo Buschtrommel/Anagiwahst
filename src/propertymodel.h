@@ -27,6 +27,9 @@
 
 struct Property;
 
+/*!
+ * \brief The PropertyModel class
+ */
 class PropertyModel : public QAbstractListModel
 {
     Q_OBJECT
