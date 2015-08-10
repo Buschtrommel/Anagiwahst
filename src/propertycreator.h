@@ -19,7 +19,6 @@
 #ifndef PROPERTYCREATOR_H
 #define PROPERTYCREATOR_H
 
-//#include <QObject>
 #include <QString>
 #include <QList>
 
@@ -27,18 +26,13 @@ struct Property;
 
 class PropertyCreator
 {
-//    Q_OBJECT
 public:
-    PropertyCreator(QList<Property*> properties, const QString &className, int tabSize = 4);
+    explicit PropertyCreator(QList<Property*> properties, const QString &className, int tabSize = 4);
     ~PropertyCreator();
 
     QString createHeader();
     QString createPrivate();
     QString createCode();
-
-//signals:
-
-//public slots:
 
 private:
     void setIndent();

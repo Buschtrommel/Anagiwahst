@@ -13,7 +13,8 @@ QT += qml quick widgets
 SOURCES += \
     src/main.cpp \
     src/propertymodel.cpp \
-    src/propertycreator.cpp
+    src/propertycreator.cpp \
+    src/propertywriter.cpp
 
 RESOURCES += \
     qml.qrc
@@ -74,4 +75,5 @@ include(deployment.pri)
 HEADERS += \
     src/propertymodel.h \
     src/propertycreator.h \
-    src/property.h
+    src/property.h \
+    src/propertywriter.h

@@ -25,6 +25,7 @@
 #include <QTextStream>
 
 #include "propertymodel.h"
+#include "propertywriter.h"
 
 int main(int argc, char *argv[])
 {
@@ -38,12 +39,12 @@ int main(int argc, char *argv[])
     if (argc > 1) {
 
         QCommandLineParser clparser;
-        clparser.setApplicationDescription("Anagiwahst is a Qt property creator/editor.");
+        clparser.setApplicationDescription(QCoreApplication::translate("main","Anagiwahst is a Qt property creator/editor."));
         clparser.addHelpOption();
         clparser.addVersionOption();
-        clparser.addPositionalArgument("<class name>", QCoreApplication::translate("main", "The class name."));
-        clparser.addPositionalArgument("<type>", QCoreApplication::translate("main", "Default type for all properties or list of types according to each property."));
-        clparser.addPositionalArgument("<property>", QCoreApplication::translate("main", "The name of the property or properties."));
+        clparser.addPositionalArgument(QStringLiteral("<class name>"), QCoreApplication::translate("main", "The class name."));
+        clparser.addPositionalArgument(QStringLiteral("<type>"), QCoreApplication::translate("main", "Default type for all properties or list of related data types."));
+        clparser.addPositionalArgument(QStringLiteral("<property>"), QCoreApplication::translate("main", "The name of the property or list of properties."));
 
         QCommandLineOption privateOption(QStringList() << "p" << "private", QCoreApplication::translate("main", "The class has a private section in a separate file."));
         clparser.addOption(privateOption);
@@ -63,15 +64,18 @@ int main(int argc, char *argv[])
         QCommandLineOption unsetOption(QStringList() << "u" << "unset", QCoreApplication::translate("main", "Create a reset/unset function."));
         clparser.addOption(unsetOption);
 
-        QCommandLineOption outputOption(QStringList() << "o" << "output", QCoreApplication::translate("main", "Generates the output files directly in <director>."), QCoreApplication::translate("main", "directory"));
+        QCommandLineOption outputOption(QStringList() << "o" << "output", QCoreApplication::translate("main", "Write the output directly into files in <director>."), QCoreApplication::translate("main", "directory"));
         clparser.addOption(outputOption);
+
+        QCommandLineOption forceOption(QStringList() << "f" << "force", QCoreApplication::translate("main", "Force overwriting existing files. (If output directory is specified.)"));
+        clparser.addOption(forceOption);
 
         clparser.process(app);
 
         const QStringList args = clparser.positionalArguments();
 
         if (args.size() < 3) {
-            clparser.showHelp();
+            clparser.showHelp(1);
         }
 
         const QString className = args.at(0);
@@ -125,7 +129,7 @@ int main(int argc, char *argv[])
                 out << "=========================================================================\n";
                 out << "||                          Header file                                ||\n";
                 out << "=========================================================================\n";
-                out << propModel.createHeader() << "\n";
+                out << propModel.createOutput(PropertyModel::HeaderFile) << "\n";
                 out.flush();
 
                 if (privateClass) {
@@ -133,18 +137,27 @@ int main(int argc, char *argv[])
                     out << "=========================================================================\n";
                     out << "||                         Private eader file                          ||\n";
                     out << "=========================================================================\n";
-                    out << propModel.createPrivate() << "\n";
+                    out << propModel.createOutput(PropertyModel::PrivateHeaderFile) << "\n";
                     out.flush();
                 }
                 out << "\n\n\n";
                 out << "=========================================================================\n";
                 out << "||                            Code file                                ||\n";
                 out << "=========================================================================\n";
-                out << propModel.createCode();
+                out << propModel.createOutput(PropertyModel::CodeFile) << "\n";
                 out.flush();
 
             } else {
 
+                bool force = clparser.isSet(forceOption);
+
+                if (!PropertyWriter::write(PropertyWriter::HeaderFile, outputDir, className, propModel.createOutput(PropertyModel::HeaderFile), force)) {
+                    return 2;
+                }
+                if (privateClass) {
+                    PropertyWriter::write(PropertyWriter::PrivateHeaderFile, outputDir, className, propModel.createOutput(PropertyModel::PrivateHeaderFile), force);
+                }
+                PropertyWriter::write(PropertyWriter::CodeFile, outputDir, className, propModel.createOutput(PropertyModel::CodeFile), force);
 
             }
         }

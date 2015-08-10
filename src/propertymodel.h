@@ -35,8 +35,15 @@ class PropertyModel : public QAbstractListModel
     Q_PROPERTY(QString className READ getClassName WRITE setClassName NOTIFY classNameChanged)
     Q_PROPERTY(bool privateClass READ isPrivateClass WRITE setPrivateClass NOTIFY privateClassChanged)
 public:
-    PropertyModel();
+    explicit PropertyModel();
     ~PropertyModel();
+
+    enum ResultFileType {
+        HeaderFile,
+        PrivateHeaderFile,
+        CodeFile
+    };
+    Q_ENUMS(ResultFileType)
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_FINAL;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_FINAL;
@@ -71,9 +78,8 @@ public:
     void loadData();
     Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
     Q_INVOKABLE void deleteProperty(int idx);
-    Q_INVOKABLE QString createHeader() const;
-    Q_INVOKABLE QString createPrivate() const;
-    Q_INVOKABLE QString createCode() const;
+    Q_INVOKABLE QString createOutput(ResultFileType type) const;
+    Q_INVOKABLE bool saveOutput(ResultFileType type, const QString &directory);
     Q_INVOKABLE QVariant getData(const QString &role, int idx);
     Q_INVOKABLE bool updateData(const QString &role, int idx, const QVariant &value);
 

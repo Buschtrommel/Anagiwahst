@@ -435,29 +435,31 @@ void PropertyModel::deleteProperty(int idx)
 
 
 
-
-
-
-QString PropertyModel::createHeader() const
+QString PropertyModel::createOutput(ResultFileType type) const
 {
     PropertyCreator creator(m_properties, getClassName(), 4);
-    return creator.createHeader();
+    switch(type) {
+    case HeaderFile:
+        return creator.createHeader();
+    case PrivateHeaderFile:
+        return creator.createPrivate();
+    case CodeFile:
+        return creator.createCode();
+    default:
+        return QString();
+    }
 }
 
 
 
-QString PropertyModel::createPrivate() const
+
+
+bool PropertyModel::saveOutput(ResultFileType type, const QString &directory)
 {
-    PropertyCreator creator(m_properties, getClassName(), 4);
-    return creator.createPrivate();
+    return false;
 }
 
 
-QString PropertyModel::createCode() const
-{
-    PropertyCreator creator(m_properties, getClassName(), 4);
-    return creator.createCode();
-}
 
 
 

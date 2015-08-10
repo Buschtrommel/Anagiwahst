@@ -49,7 +49,7 @@ Dialog {
                     selectByMouse: true
                     textFormat: TextEdit.PlainText
                     font.family: "mono"
-                    Component.onCompleted: text = model.createHeader()
+                    Component.onCompleted: text = model.createOutput(PropertyModel.HeaderFile)
                 }
             }
 
@@ -64,7 +64,7 @@ Dialog {
                     selectByMouse: true
                     textFormat: TextEdit.PlainText
                     font.family: "mono"
-                    Component.onCompleted: text = model.createPrivate()
+                    Component.onCompleted: text = model.createOutput(PropertyModel.PrivateHeaderFile)
                 }
             }
 
@@ -79,7 +79,7 @@ Dialog {
                     selectByMouse: true
                     textFormat: TextEdit.PlainText
                     font.family: "mono"
-                    Component.onCompleted: text = model.createCode()
+                    Component.onCompleted: text = model.createOutput(PropertyModel.CodeFile)
                 }
             }
         }
