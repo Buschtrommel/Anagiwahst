@@ -4,7 +4,7 @@ TARGET = anagiwahst
 
 CONFIG += c++11
 
-VERSION = 0.1.2
+VERSION = 0.1.3
 
 DEFINES += APP_VERSION=\"\\\"$${VERSION}\\\"\"
 
