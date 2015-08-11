@@ -23,6 +23,8 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QTextStream>
+#include <QLocale>
+#include <QTranslator>
 
 #include "propertymodel.h"
 #include "propertywriter.h"
@@ -35,6 +37,13 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain(QStringLiteral("buschmann23.de"));
     app.setOrganizationName(QStringLiteral("Buschtrommel"));
     app.setApplicationVersion(QString(APP_VERSION));
+
+    QString locale = QLocale::system().name();
+
+    QTranslator *translator = new QTranslator;
+    if (translator->load(QStringLiteral("anagiwahst_")+locale, QString(L10N_DIR))) {
+        app.installTranslator(translator);
+    }
 
     if (argc > 1) {
 

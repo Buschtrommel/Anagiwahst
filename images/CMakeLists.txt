@@ -1,0 +1,7 @@
+install(FILES hi16-apps-anagiwahst.png DESTINATION ${ICONS_DIR}/hicolor/16x16/apps RENAME anagiwahst.png)
+install(FILES hi22-apps-anagiwahst.png DESTINATION ${ICONS_DIR}/hicolor/22x22/apps RENAME anagiwahst.png)
+install(FILES hi32-apps-anagiwahst.png DESTINATION ${ICONS_DIR}/hicolor/32x32/apps RENAME anagiwahst.png)
+install(FILES hi48-apps-anagiwahst.png DESTINATION ${ICONS_DIR}/hicolor/48x48/apps RENAME anagiwahst.png)
+install(FILES hi64-apps-anagiwahst.png DESTINATION ${ICONS_DIR}/hicolor/64x64/apps RENAME anagiwahst.png)
+install(FILES hi128-apps-anagiwahst.png DESTINATION ${ICONS_DIR}/hicolor/128x128/apps RENAME anagiwahst.png)
+install(FILES hisc-apps-anagiwahst.svg DESTINATION ${ICONS_DIR}/hicolor/scalable/apps RENAME anagiwahst.svg)
