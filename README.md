@@ -42,7 +42,7 @@ On Ubuntu:
     
 ### License
 
-Copyright (c) 2015 Buschtrommel <kontakt@buschmann23.de>
+Copyright (c) 2015 Buschtrommel
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
