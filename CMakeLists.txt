@@ -11,10 +11,10 @@ set(ANAGIWAHST_VERSION "${ANAGIWAHST_VERSION_MAJOR}.${ANAGIWAHST_VERSION_MINOR}.
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(PkgConfig REQUIRED)
 find_package(Qt5 5.2.0 COMPONENTS
-    Core
     Qml
     Quick
     Widgets
@@ -28,22 +28,28 @@ endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 set (PREFIXDIR "${CMAKE_INSTALL_PREFIX}")
 set (BINDIR "${CMAKE_INSTALL_PREFIX}/bin")
-set (DATADIR "${CMAKE_INSTALL_PREFIX}/share/anagiwahst")
-set (L10N_DIR "${DATADIR}/l10n")
-set (QML_DIR "${DATADIR}/qml")
-set (ICONS_DIR "${CMAKE_INSTALL_PREFIX}/share/icons")
+set (DATADIR "${CMAKE_INSTALL_PREFIX}/share")
+set (ICONS_DIR "${DATADIR}/icons")
+set (DESKTOPFILE_DIR "${DATADIR}/applications")
+set (APP_DIR "${DATADIR}/anagiwahst")
+set (L10N_DIR "${APP_DIR}/l10n")
 set (VERSION "${ANAGIWAHST_VERSION}")
 
 add_definitions("-DAPP_VERSION=\"${ANAGIWAHST_VERSION}\"")
 add_definitions("-DL10N_DIR=\"${L10N_DIR}\"")
 
 set (QT_DEBUG "-DQT_NO_DEBUG")
-option (DEBUG_ENABLED "Enabled debug output" OFF)
+option (DEBUG_ENABLED "Enabling debug output" OFF)
 if (DEBUG_ENABLED)
     set (QT_DEBUG "-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG -DQT_DEBUG")
+    message(STATUS "Enabling debug output")
+else(DEBUG_ENABLED)
+    message(STATUS "Disabling debug output")
 endif (DEBUG_ENABLED)
 
 add_definitions(${QT_DEBUG})
+
+install(FILES anagiwahst.desktop DESTINATION ${DESKTOPFILE_DIR})
 
 add_subdirectory(src)
 add_subdirectory(images)
