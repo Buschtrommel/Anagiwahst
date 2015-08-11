@@ -19,28 +19,9 @@ PropertyWriter::~PropertyWriter()
 
 bool PropertyWriter::write(WriteFileType type, QString path, const QString &className, const QString &data, bool forceOverwrite)
 {
-    QTextStream errOut(stdout, QIODevice::WriteOnly);
-
-    if (!forceOverwrite) {
-
-        QDir destDir(path);
-
-        QStringList filters;
-        filters << className.toLower().append(".cpp");
-        filters << className.toLower().append("_p.h");
-        filters << className.toLower().append(".h");
-
-        QStringList entries = destDir.entryList(filters, QDir::Files);
-
-        if (!entries.isEmpty()) {
-
-            errOut << tr("There are already files using the specified class name as file name. Use the -f option if you want to overwrite these files.") << "\n";
-            errOut.flush();
-            return false;
-        }
-
+    if (data.isEmpty()) {
+        return true;
     }
-
 
     if (!path.endsWith("/")) {
         path.append("/");
@@ -62,10 +43,32 @@ bool PropertyWriter::write(WriteFileType type, QString path, const QString &clas
         break;
     }
 
-    QFile outFile(path);
+    return writeFile(path, data, forceOverwrite);
+}
+
+
+
+
+bool PropertyWriter::writeFile(const QString &fileName, const QString &data, bool forceOverwrite)
+{
+    if (data.isEmpty()) {
+        return true;
+    }
+
+    QTextStream errOut(stdout, QIODevice::WriteOnly);
+
+    QFile outFile(fileName);
+
+    if (!forceOverwrite) {
+        if (outFile.exists()) {
+            errOut << tr("There is already a file with that name. Use the -f option if you want to overwrite this file.") << "\n";
+            errOut.flush();
+            return false;
+        }
+    }
+
     if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << outFile.errorString();
-        qFatal("Can not write to file.");
+        qWarning() << outFile.errorString();
         return false;
     }
 
@@ -75,7 +78,7 @@ bool PropertyWriter::write(WriteFileType type, QString path, const QString &clas
 
     outFile.close();
 
-    errOut << tr("Successfully wrote file %1").arg(path) << "\n";
+    errOut << tr("Successfully wrote file %1").arg(fileName) << "\n";
 
     return true;
 }

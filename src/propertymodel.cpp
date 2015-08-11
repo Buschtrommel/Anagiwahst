@@ -18,6 +18,7 @@
 
 #include "propertymodel.h"
 #include "propertycreator.h"
+#include "propertywriter.h"
 #include "property.h"
 #include <QtDebug>
 
@@ -461,16 +462,64 @@ QString PropertyModel::createOutput(ResultFileType type) const
 
 
 
-bool PropertyModel::saveOutput(ResultFileType type, const QString &directory)
+bool PropertyModel::saveToDirectory(ResultFileType type, const QString &directory) const
 {
-    return false;
+    QString data = createOutput(type);
+
+    if (data.isEmpty()) {
+        return true;
+    }
+
+    switch(type) {
+    case HeaderFile:
+        return PropertyWriter::write(PropertyWriter::HeaderFile, directory, getClassName(), data);
+    case PrivateHeaderFile:
+        return PropertyWriter::write(PropertyWriter::PrivateHeaderFile, directory, getClassName(), data);
+    case CodeFile:
+        return PropertyWriter::write(PropertyWriter::CodeFile, directory, getClassName(), data);
+    default:
+        return false;
+    }
 }
 
 
 
 
 
-QVariant PropertyModel::getData(const QString &role, int idx)
+bool PropertyModel::saveToFile(ResultFileType type, const QUrl &file) const
+{
+    QString data = createOutput(type);
+
+    return PropertyWriter::writeFile(file.toLocalFile(), data);
+}
+
+
+
+
+
+bool PropertyModel::saveAll(const QUrl &directory) const
+{
+    QString path = directory.toLocalFile();
+
+    if (saveToDirectory(HeaderFile, path)) {
+        if(saveToDirectory(PrivateHeaderFile, path)) {
+            if (saveToDirectory(CodeFile, path)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+
+
+
+QVariant PropertyModel::getData(const QString &role, int idx) const
 {
     return data(index(idx), roleNames().key(role.toUtf8()));
 }

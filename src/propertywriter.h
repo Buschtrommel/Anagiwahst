@@ -22,6 +22,7 @@ public:
     };
 
     static bool write(WriteFileType type, QString path, const QString &className, const QString &data, bool forceOverwrite = false);
+    static bool writeFile(const QString &fileName, const QString &data, bool forceOverwrite = false);
 };
 
 #endif // PROPERTYWRITER_H

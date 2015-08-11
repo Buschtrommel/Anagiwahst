@@ -40,6 +40,7 @@ Dialog {
 
             Tab {
                 title: qsTr("Header")
+                readonly property int type: PropertyModel.HeaderFile
 
                 TextArea {
                     id: headerText
@@ -55,6 +56,7 @@ Dialog {
 
             Tab {
                 title: qsTr("Private")
+                readonly property int type: PropertyModel.PrivateHeaderFile
 
                 TextArea {
                     id: privateText
@@ -70,6 +72,7 @@ Dialog {
 
             Tab {
                 title: qsTr("Code")
+                readonly property int type: PropertyModel.CodeFile
 
                 TextArea {
                     id: codeText
@@ -90,13 +93,52 @@ Dialog {
             layoutDirection: Qt.RightToLeft
 
             Button {
-                text: qsTr("Test")
+                text: qsTr("Save")
+                iconName: "document-save"
+                onClicked: {
+                    fd.selectFolder = false
+                    fd.selectExisting = false
+                    fd.title = qsTr("Save file")
+                    fd.visible = true
+                }
             }
 
             Button {
-                text: qsTr("Test 2")
+                text: qsTr("Save all")
+                iconName: "document-save-all"
+                onClicked: {
+                    fd.selectFolder = true
+                    fd.title = qsTr("Save all to folder")
+                    fd.visible = true
+                }
             }
         }
+    }
+
+    FileDialog {
+        id: fd
+        selectMultiple: false
+        onAccepted: {
+            if (fd.selectFolder) {
+                if (!model.saveAll(fd.fileUrl)) {
+                    md.icon = StandardIcon.Warning
+                    md.title = qsTr("Error")
+                    md.text = qsTr("Could not save files to folder.")
+                    md.visible = true
+                }
+            } else {
+                if (!model.saveToFile(resultTabs.getTab(resultTabs.currentIndex).type, fd.fileUrl)) {
+                    md.icon = StandardIcon.Warning
+                    md.title = qsTr("Error")
+                    md.text = qsTr("Could not save file.")
+                    md.visible = true
+                }
+            }
+        }
+    }
+
+    MessageDialog {
+        id: md
     }
 }
 

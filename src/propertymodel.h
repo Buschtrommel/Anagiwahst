@@ -82,8 +82,10 @@ public:
     Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
     Q_INVOKABLE void deleteProperty(int idx);
     Q_INVOKABLE QString createOutput(ResultFileType type) const;
-    Q_INVOKABLE bool saveOutput(ResultFileType type, const QString &directory);
-    Q_INVOKABLE QVariant getData(const QString &role, int idx);
+    Q_INVOKABLE bool saveToDirectory(ResultFileType type, const QString &directory) const;
+    Q_INVOKABLE bool saveToFile(ResultFileType type, const QUrl &file) const;
+    Q_INVOKABLE bool saveAll(const QUrl &directory) const;
+    Q_INVOKABLE QVariant getData(const QString &role, int idx) const;
     Q_INVOKABLE bool updateData(const QString &role, int idx, const QVariant &value);
 
 signals:
