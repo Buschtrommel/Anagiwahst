@@ -79,6 +79,7 @@ public:
     static const int CommentRole;
     static const int PrivateRole;
     static const int DefaultRole;
+    static const int PointerRole;
 
     QUrl getFileUrl() const;
     QString getFileName() const;

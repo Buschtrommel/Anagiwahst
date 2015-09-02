@@ -46,6 +46,7 @@ struct Property {
     QString comment;
     bool privateClass;
     QString defaultValue;
+    bool pointer;
 };
 
 Q_DECLARE_TYPEINFO(Property, Q_PRIMITIVE_TYPE);

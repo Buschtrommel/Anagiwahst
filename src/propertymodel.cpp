@@ -41,6 +41,7 @@ const int PropertyModel::BriefRole = Qt::UserRole + 16;
 const int PropertyModel::CommentRole = Qt::UserRole + 17;
 const int PropertyModel::PrivateRole = Qt::UserRole + 18;
 const int PropertyModel::DefaultRole = Qt::UserRole + 19;
+const int PropertyModel::PointerRole = Qt::UserRole + 20;
 
 
 /*!
@@ -70,6 +71,7 @@ PropertyModel::PropertyModel()
     m_roles.insert(CommentRole, QByteArrayLiteral("comment"));
     m_roles.insert(PrivateRole, QByteArrayLiteral("private"));
     m_roles.insert(DefaultRole, QByteArrayLiteral("default"));
+    m_roles.insert(PointerRole, QByteArrayLiteral("pointer"));
 
     m_fileUrl = QUrl();
     m_className = QStringLiteral("");
@@ -176,6 +178,8 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue(prop->privateClass);
     case DefaultRole:
         return QVariant::fromValue(prop->defaultValue);
+    case PointerRole:
+        return QVariant::fromValue(prop->pointer);
     default:
         return QVariant();
     }
@@ -261,6 +265,7 @@ void PropertyModel::loadData()
             bool final = false;
             QString brief("This property holds");
             QString comment("");
+            bool pointer = false;
 
 
             for (quint8 i = 2; i < propertyPartsCount; i++) {
@@ -323,6 +328,7 @@ void PropertyModel::loadData()
             prop->comment = comment;
             prop->privateClass = isPrivateClass();
             prop->defaultValue = QStringLiteral("");
+            prop->pointer = pointer;
 
             m_properties.append(prop);
 
@@ -413,6 +419,7 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
     prop->comment = QString();
     prop->privateClass = p;
     prop->defaultValue = QString();
+    prop->pointer = false;
 
     m_properties.append(prop);
 
@@ -618,6 +625,10 @@ bool PropertyModel::updateData(const QString &role, int idx, const QVariant &val
     case DefaultRole:
         prop->defaultValue = value.toString();
         emit dataChanged(index(idx), index(idx), QVector<int>(1, DefaultRole));
+        return true;
+    case PointerRole:
+        prop->pointer = value.toBool();
+        emit dataChanged(index(idx), index(idx), QVector<int>(1, PointerRole));
         return true;
     default:
         return false;

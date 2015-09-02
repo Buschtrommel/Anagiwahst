@@ -33,7 +33,7 @@ SplitView {
     property alias model: propModel
     property alias table: propertyTable
     property alias rowCount: propertyTable.rowCount
-    property bool editChanged: editName.changed || editType.changed || editRead.changed || editWrite.changed || editMember.changed || editReset.changed || editNotify.changed || editRevision.changed || editDesignable.changed || editScriptable.changed || editStored.changed || editUser.changed || editConstant.changed || editFinal.changed || editPrivate.changed || editBrief.changed || editComment.changed || editDefaultValue.changed
+    property bool editChanged: editName.changed || editType.changed || editRead.changed || editWrite.changed || editMember.changed || editReset.changed || editNotify.changed || editRevision.changed || editDesignable.changed || editScriptable.changed || editStored.changed || editUser.changed || editConstant.changed || editFinal.changed || editPrivate.changed || editPointer.changed || editBrief.changed || editComment.changed || editDefaultValue.changed
 
     onEditChangedChanged: anagiwahst.editChanged = tabRoot.editChanged
 
@@ -106,6 +106,7 @@ SplitView {
         editConstant.init(propModel.getData("constant", rowIndex))
         editFinal.init(propModel.getData("final", rowIndex))
         editPrivate.init(propModel.getData("private", rowIndex))
+        editPointer.init(propModel.getData("pointer", rowIndex))
         editDefaultValue.init(propModel.getData("default", rowIndex))
         editBrief.init(propModel.getData("brief", rowIndex))
         editComment.initialText = propModel.getData("comment", rowIndex)
@@ -131,6 +132,7 @@ SplitView {
         propModel.updateData("constant", rowIndex, editConstant.apply())
         propModel.updateData("final", rowIndex, editFinal.apply())
         propModel.updateData("private", rowIndex, editPrivate.apply())
+        propModel.updateData("pointer", rowIndex, editPointer.apply())
         propModel.updateData("default", rowIndex, editDefaultValue.apply())
         propModel.updateData("brief", rowIndex, editBrief.apply())
         propModel.updateData("comment", rowIndex, editComment.text)
@@ -154,6 +156,7 @@ SplitView {
         editConstant.reset()
         editFinal.reset()
         editPrivate.reset()
+        editPointer.reset()
         editDefaultValue.reset()
         editBrief.reset()
         editComment.text = editComment.initialText
@@ -270,6 +273,15 @@ SplitView {
         TableViewColumn {
             role: "private"
             title: qsTr("Private")
+            delegate: CheckBox {
+                checked: styleData.value
+                enabled: false
+            }
+        }
+
+        TableViewColumn {
+            role: "pointer"
+            title: qsTr("Pointer")
             delegate: CheckBox {
                 checked: styleData.value
                 enabled: false
@@ -567,6 +579,11 @@ SplitView {
                         CheckBoxWithReset {
                             id: editPrivate
                             text: qsTr("Private")
+                        }
+
+                        CheckBoxWithReset {
+                            id: editPointer
+                            text: qsTr("Pointer")
                         }
 
                     }

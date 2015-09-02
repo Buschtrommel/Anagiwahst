@@ -41,7 +41,7 @@ public:
 private:
     void setIndent();
     QLatin1String getVariablePrefix(bool privateClass);
-    QString getDefaultValue(const QString &type);
+    QString getDefaultValue(const QString &type, bool pointer = false);
     QString getPointerMacro(bool constant = false, bool newLine = true);
     QString buildTableRow(const QString &firstCol, const QString &secondCol);
 

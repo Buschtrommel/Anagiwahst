@@ -87,7 +87,13 @@ QString PropertyCreator::createHeader()
 
         prop = m_properties.at(i);
 
-        result += m_indent % QLatin1String("Q_PROPERTY(") % prop->type % QLatin1String(" ") % prop->name;
+        result += m_indent % QLatin1String("Q_PROPERTY(") % prop->type % QLatin1String(" ");
+
+        if (prop->pointer) {
+            result += QLatin1String("*");
+        }
+
+        result += prop->name;
 
         if (!prop->member.isEmpty()) {
             result += QLatin1String(" MEMBER ") % prop->member;
@@ -147,7 +153,13 @@ QString PropertyCreator::createHeader()
         prop = m_properties.at(i);
 
         if (!prop->read.isEmpty()) {
-            result += m_indent % prop->type % QLatin1String(" ") % prop->read % QLatin1String("() const;\n");
+            result += m_indent % prop->type % QLatin1String(" ");
+
+            if (prop->pointer) {
+                result += QLatin1String("*");
+            }
+
+            result += prop->read % QLatin1String("() const;\n");
         }
 
     }
@@ -161,7 +173,12 @@ QString PropertyCreator::createHeader()
         prop = m_properties.at(i);
 
         if (!prop->write.isEmpty()) {
-            result += m_indent % QLatin1String("void ") % prop->write % QLatin1String("(const ") % prop->type % QLatin1String(" &") % prop->name % QLatin1String(");\n");
+
+            if (prop->pointer) {
+                result += m_indent % QLatin1String("void ") % prop->write % QLatin1String("(") % prop->type % QLatin1String(" *") % prop->name % QLatin1String(");\n");
+            } else {
+                result += m_indent % QLatin1String("void ") % prop->write % QLatin1String("(const ") % prop->type % QLatin1String(" &") % prop->name % QLatin1String(");\n");
+            }
         }
 
     }
@@ -190,7 +207,12 @@ QString PropertyCreator::createHeader()
         prop = m_properties.at(i);
 
         if (!prop->notify.isEmpty()) {
-            result += m_indent % QLatin1String("void ") % prop->notify % QLatin1String("(const ") % prop->type % QLatin1String(" &") % prop->name % QLatin1String(");\n");
+
+            if (prop->pointer) {
+                result += m_indent % QLatin1String("void ") % prop->notify % QLatin1String("(") % prop->type % QLatin1String(" *") % prop->name % QLatin1String(");\n");
+            } else {
+                result += m_indent % QLatin1String("void ") % prop->notify % QLatin1String("(const ") % prop->type % QLatin1String(" &") % prop->name % QLatin1String(");\n");
+            }
         }
 
     }
@@ -206,7 +228,13 @@ QString PropertyCreator::createHeader()
         prop = m_properties.at(i);
 
         if (!prop->privateClass) {
-            result += m_indent % prop->type % QLatin1String(" m_") % prop->name % QLatin1String(";\n");
+            result += m_indent % prop->type;
+            if (prop->pointer) {
+                result += QLatin1String(" *m_");
+            } else {
+                result += QLatin1String(" m_");
+            }
+            result += prop->name % QLatin1String(";\n");
         }
     }
 
@@ -287,7 +315,13 @@ QString PropertyCreator::createPrivate()
             prop = m_properties.at(i);
 
             if (prop->privateClass) {
-                result += m_indent % prop->type % QLatin1String(" ") % prop->name % QLatin1String(";\n");
+                result += m_indent % prop->type % QLatin1String(" ");
+
+                if (prop->pointer) {
+                    result += QLatin1String("*");
+                }
+
+                result += prop->name % QLatin1String(";\n");
             }
 
         }
@@ -308,7 +342,7 @@ QString PropertyCreator::createPrivate()
                 if (!prop->defaultValue.isEmpty()) {
                     result += prop->defaultValue % QLatin1String("),\n");
                 } else {
-                    result += getDefaultValue(prop->type) % QLatin1String("),\n");
+                    result += getDefaultValue(prop->type, prop->pointer) % QLatin1String("),\n");
                 }
             }
 
@@ -339,7 +373,13 @@ QString PropertyCreator::createPrivate()
             prop = m_properties.at(i);
 
             if (prop->privateClass) {
-                result += m_indent % prop->type % QLatin1String(" ") % prop->name % QLatin1String(";\n");
+                result += m_indent % prop->type % QLatin1String(" ");
+
+                if (prop->pointer) {
+                    result += QLatin1String("*");
+                }
+
+                result += prop->name % QLatin1String(";\n");
             }
 
         }
@@ -426,7 +466,7 @@ QString PropertyCreator::createCode()
             if (!prop->defaultValue.isEmpty()) {
                 result += prop->defaultValue % QLatin1String(";\n");
             } else {
-                result += getDefaultValue(prop->type) % QLatin1String(";\n");
+                result += getDefaultValue(prop->type, prop->pointer) % QLatin1String(";\n");
             }
 
         }
@@ -453,7 +493,15 @@ QString PropertyCreator::createCode()
         // prepared stuff
         QLatin1String varPrefix = getVariablePrefix(prop->privateClass);
         QString readFunc = prop->read % QLatin1String("() const");
-        QString writeFunc = prop->write % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")");
+
+        QString writeFunc;
+
+        if (prop->pointer) {
+            writeFunc = prop->write % QLatin1String("(") % prop->type % QLatin1String(" * ") % prop->name % QLatin1String(")");
+        } else {
+            writeFunc = prop->write % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")");
+        }
+
         QString resetFunc = prop->reset % QLatin1String("()");
         QString partOf = QLatin1String(" * \\brief Part of the \\link ") % m_className % dc % prop->name % QLatin1String(" ") % prop->name % QLatin1String(" \\endlink property.\n");
 
@@ -514,18 +562,19 @@ QString PropertyCreator::createCode()
             result += QLatin1String(" * \\par Access functions:\n * <TABLE>");
 
             if (!prop->read.isEmpty()) {
-                result += buildTableRow(prop->type, readFunc);
-//                result += QLatin1String("<TR><TD>") % prop->type % QLatin1String("</TD><TD>") % prop->read % QLatin1String("() const</TD></TR>");
+                if (prop->pointer) {
+                    result += buildTableRow(prop->type % QStringLiteral("*"), readFunc);
+                } else {
+                    result += buildTableRow(prop->type, readFunc);
+                }
             }
 
             if (!prop->write.isEmpty()) {
                 result += buildTableRow(QStringLiteral("void"), writeFunc);
-//                result += QLatin1String("<TR><TD>void</TD><TD>") % prop->write % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")</TD></TR>");
             }
 
             if (!prop->reset.isEmpty()) {
                 result += buildTableRow(QStringLiteral("void"), resetFunc);
-//                result += QLatin1String("<TR><TD>void</TD><TD>") % prop->reset % QLatin1String("()</TD></TR>");
             }
 
             result += QLatin1String("</TABLE>\n");
@@ -533,8 +582,15 @@ QString PropertyCreator::createCode()
 
         if (!prop->notify.isEmpty()) {
 
-            result += QLatin1String(" * \\par Notifier signal:\n * <TABLE>") % buildTableRow(QStringLiteral("void"), prop->notify % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")")) % QLatin1String("</TABLE>\n");
-//            result += QLatin1String(" * \\par Notifier signal:\n * <TABLE><TR><TD>void</TD><TD>") % prop->notify % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")</TD></TR></TABLE>\n");
+            result += QLatin1String(" * \\par Notifier signal:\n * <TABLE>");
+
+            if (prop->pointer) {
+                result += buildTableRow(QStringLiteral("void"), prop->notify % QLatin1String("(") % prop->type % QLatin1String(" * ") % prop->name % QLatin1String(")"));
+            } else {
+                result += buildTableRow(QStringLiteral("void"), prop->notify % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")"));
+            }
+
+            result += QLatin1String("</TABLE>\n");
 
         }
 
@@ -552,7 +608,16 @@ QString PropertyCreator::createCode()
         if (!prop->read.isEmpty()) {
 
             result += QLatin1String("/*!\n") % partOf % QLatin1String(" */\n");
-            result += prop->type % QLatin1String(" ") % m_className % dc % readFunc % QLatin1String(" { ");
+            result += prop->type;
+
+            if (prop->pointer) {
+                result += QLatin1String(" *");
+            } else {
+                result += QLatin1String(" ");
+            }
+
+
+            result += m_className % dc % readFunc % QLatin1String(" { ");
 
             if (prop->privateClass && m_type == PropertyModel::PrivateClass) {
                 result += getPointerMacro(true, false);
@@ -616,7 +681,7 @@ QString PropertyCreator::createCode()
                 result += m_indent % getPointerMacro();
             }
 
-            QString defValue = prop->defaultValue.isEmpty() ? getDefaultValue(prop->type) : prop->defaultValue;
+            QString defValue = prop->defaultValue.isEmpty() ? getDefaultValue(prop->type, prop->pointer) : prop->defaultValue;
 
 
             if (!prop->notify.isEmpty()) {
@@ -687,8 +752,12 @@ QLatin1String PropertyCreator::getVariablePrefix(bool privateClass)
 
 
 
-QString PropertyCreator::getDefaultValue(const QString &type)
+QString PropertyCreator::getDefaultValue(const QString &type, bool pointer)
 {
+    if (pointer) {
+        return QString("nullptr");
+    }
+
     QStringList ints = {"unsigned char", "signed char", "short", "short int", "signed short", "signed short int", "unsigned short", "unsigned short int", "int", "signed", "signed int", "unsigned int", "long", "long int", "signed long", "signed long int", "unsigned long", "unsigned long int", "long long", "long long int", "signed long long", "signed long long int", "unsigned long long", "unsigned long long int", "qint8", "qint16", "qint32", "qint64", "qintptr", "qlonglong", "quint8", "quint16", "quint32", "quint64", "quintptr", "qulonglong", "uchar", "uint", "ulong", "ushort"};
 
     QStringList floats = {"float", "double", "long double", "qreal"};
