@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <QtGlobal>
+#include "propertymodel.h"
 
 /*!
  * \brief The Property struct

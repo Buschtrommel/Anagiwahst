@@ -22,8 +22,8 @@
 #include <QStringBuilder>
 #include <QRegularExpression>
 
-PropertyCreator::PropertyCreator(QList<Property *> properties, const QString &className, int tabSize) :
-    m_properties(properties), m_className(className), m_tabSize(tabSize)
+PropertyCreator::PropertyCreator(QList<Property *> properties, const QString &className, PropertyModel::ClassType type, int tabSize) :
+    m_properties(properties), m_className(className), m_type(type), m_tabSize(tabSize)
 {
 #ifdef QT_DEBUG
     qDebug() << "Constructing a PropertyCreator for class" << m_className << "with an indent of" << m_tabSize;
@@ -65,7 +65,13 @@ QString PropertyCreator::createHeader()
     QString result("");
     QString uClassName = m_className.toUpper();
 
-    result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_H\n#define ") % uClassName % QLatin1String("_H\n\n#include <QObject>\n\n");
+    result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_H\n#define ") % uClassName % QLatin1String("_H\n\n#include <QObject>\n");
+
+    if (m_type == PropertyModel::SharedData && privateClass) {
+        result += QLatin1String("#include <QSharedDataPointer>\n");
+    }
+
+    result += QLatin1String("\n");
 
     if (privateClass) {
         result += QLatin1String("class ") % m_className % QLatin1String("Private;\n\n");
@@ -73,7 +79,7 @@ QString PropertyCreator::createHeader()
 
     result += QLatin1String("/*!\n * \\brief The ") % m_className % QLatin1String(" class.\n */\nclass ") % m_className % QLatin1String(" : public QObject\n{\n") % m_indent % QLatin1String("Q_OBJECT\n");
 
-    if (privateClass) {
+    if (m_type == PropertyModel::PrivateClass && privateClass) {
         result += m_indent % QLatin1String("Q_DECLARE_PRIVATE(") % m_className % QLatin1String(")\n");
     }
 
@@ -207,7 +213,16 @@ QString PropertyCreator::createHeader()
     result += QLatin1String("\n");
 
     if (privateClass) {
-        result += QLatin1String("protected:\n") % m_indent % m_className % QLatin1String("Private *d_ptr;\n\n");
+        switch (m_type) {
+        case PropertyModel::PrivateClass:
+            result += m_indent % m_className % QLatin1String("Private *d_ptr;\n\n");
+            break;
+        case PropertyModel::SharedData:
+            result += m_indent % QLatin1String("QSharedDataPointer<") % m_className % QLatin1String("Private> d;\n\n");
+            break;
+        default:
+            break;
+        }
     }
 
     result += QLatin1String("};\n\n#endif // ") % uClassName % QLatin1String("_H\n");
@@ -248,15 +263,87 @@ QString PropertyCreator::createPrivate()
 
 
     QString result("");
-    result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_P_H\n#define ") % uClassName % QLatin1String("_P_H\n\n#include \"") % m_className.toLower() % QLatin1String(".h\"\n\nclass ") % m_className % QLatin1String("Private\n{\npublic:\n");
 
-    for (int i = 0; i < m_propertiesCount; ++i) {
+    result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_P_H\n#define ") % uClassName % QLatin1String("_P_H\n\n");
 
-        prop = m_properties.at(i);
+    if (m_type == PropertyModel::SharedData) {
+        result += QLatin1String("#include <QSharedData>\n");
+    }
 
-        if (prop->privateClass) {
-            result += m_indent % prop->type % QLatin1String(" ") % prop->name % QLatin1String(";\n");
+    result += QLatin1String("#include \"") % m_className.toLower() % QLatin1String(".h\"\n\n");
+
+    result += QLatin1String("class ") % m_className % QLatin1String("Private");
+
+    if (m_type == PropertyModel::SharedData) {
+        result += QLatin1String(" : public QSharedData");
+    }
+
+    result += QLatin1String("\n{\npublic:\n");
+
+    if (m_type == PropertyModel::PrivateClass) {
+
+        for (int i = 0; i < m_propertiesCount; ++i) {
+
+            prop = m_properties.at(i);
+
+            if (prop->privateClass) {
+                result += m_indent % prop->type % QLatin1String(" ") % prop->name % QLatin1String(";\n");
+            }
+
         }
+
+    } else if (m_type == PropertyModel::SharedData) {
+
+        QString x2Indent;
+        x2Indent += m_indent % m_indent;
+
+        result += m_indent % m_className % QLatin1String("Private() :\n");
+
+        for (int i = 0; i < m_propertiesCount; ++i) {
+
+            prop = m_properties.at(i);
+
+            if (prop->privateClass) {
+                result += x2Indent % prop->name % QLatin1String("(");
+                if (!prop->defaultValue.isEmpty()) {
+                    result += prop->defaultValue % QLatin1String("),\n");
+                } else {
+                    result += getDefaultValue(prop->type) % QLatin1String("),\n");
+                }
+            }
+
+        }
+
+
+        result.chop(2);
+        result += QLatin1String("\n") % m_indent % QLatin1String("{}\n\n");
+
+        result += m_indent % m_className % QLatin1String("Private(const ") % m_className % QLatin1String("Private &other) :\n") % x2Indent % QLatin1String("QSharedData(other),\n");
+
+        for (int i = 0; i < m_propertiesCount; ++i) {
+
+            prop = m_properties.at(i);
+
+            if (prop->privateClass) {
+                result += x2Indent % prop->name % QLatin1String("(other.") % prop->name % QLatin1String("),\n");
+            }
+
+        }
+
+        result.chop(2);
+        result += QLatin1String("\n") % m_indent % QLatin1String("{}\n\n") % m_indent % QLatin1String("~") % m_className % QLatin1String("Private() {}\n\n");
+
+
+        for (int i = 0; i < m_propertiesCount; ++i) {
+
+            prop = m_properties.at(i);
+
+            if (prop->privateClass) {
+                result += m_indent % prop->type % QLatin1String(" ") % prop->name % QLatin1String(";\n");
+            }
+
+        }
+
 
     }
 
@@ -312,7 +399,7 @@ QString PropertyCreator::createCode()
 
     result += m_className % dc % m_className % QLatin1String("()");
 
-    if (privateClass) {
+    if (privateClass && m_type == PropertyModel::PrivateClass) {
         result += QLatin1String(" :\n") % m_indent % QLatin1String("d_ptr(new ") % m_className % QLatin1String("Private)\n");
     } else {
         result += QLatin1String("\n");
@@ -321,19 +408,27 @@ QString PropertyCreator::createCode()
     result += QLatin1String("{\n");
 
     if (privateClass) {
-        result += m_indent % getPointerMacro();
+        if (m_type == PropertyModel::PrivateClass) {
+            result += m_indent % getPointerMacro();
+        } else if (m_type == PropertyModel::SharedData) {
+            result += m_indent % QLatin1String("d = new ") % m_className % QLatin1String("Private;\n");
+        }
     }
 
     for (int i = 0; i < m_propertiesCount; ++i) {
 
         prop = m_properties.at(i);
 
-        result += m_indent % getVariablePrefix(prop->privateClass) % prop->name % QLatin1String(" = ");
+        if ((prop->privateClass && m_type == PropertyModel::PrivateClass) || !prop->privateClass) {
 
-        if (!prop->defaultValue.isEmpty()) {
-            result += prop->defaultValue % QLatin1String(";\n");
-        } else {
-            result += getDefaultValue(prop->type) % QLatin1String(";\n");
+            result += m_indent % getVariablePrefix(prop->privateClass) % prop->name % QLatin1String(" = ");
+
+            if (!prop->defaultValue.isEmpty()) {
+                result += prop->defaultValue % QLatin1String(";\n");
+            } else {
+                result += getDefaultValue(prop->type) % QLatin1String(";\n");
+            }
+
         }
 
     }
@@ -344,7 +439,7 @@ QString PropertyCreator::createCode()
 
     result += m_className % QLatin1String("::~") % m_className % QLatin1String("()\n{\n");
 
-    if (privateClass) {
+    if (privateClass && m_type == PropertyModel::PrivateClass) {
         result += m_indent % QLatin1String("delete d_ptr;\n");
     }
 
@@ -459,7 +554,7 @@ QString PropertyCreator::createCode()
             result += QLatin1String("/*!\n") % partOf % QLatin1String(" */\n");
             result += prop->type % QLatin1String(" ") % m_className % dc % readFunc % QLatin1String(" { ");
 
-            if (prop->privateClass) {
+            if (prop->privateClass && m_type == PropertyModel::PrivateClass) {
                 result += getPointerMacro(true, false);
             }
 
@@ -473,7 +568,7 @@ QString PropertyCreator::createCode()
             result += QLatin1String("/*!\n") % partOf % QLatin1String(" */\n");
             result += QLatin1String("void ") % m_className % dc % writeFunc % QLatin1String("\n{\n");
 
-            if (prop->privateClass) {
+            if (prop->privateClass && m_type == PropertyModel::PrivateClass) {
                 result += m_indent % getPointerMacro();
             }
 

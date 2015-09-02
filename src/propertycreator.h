@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <QList>
+#include "propertymodel.h"
 
 struct Property;
 
@@ -30,7 +31,7 @@ struct Property;
 class PropertyCreator
 {
 public:
-    explicit PropertyCreator(QList<Property*> properties, const QString &className, int tabSize = 4);
+    explicit PropertyCreator(QList<Property*> properties, const QString &className, PropertyModel::ClassType type = PropertyModel::PrivateClass, int tabSize = 4);
     ~PropertyCreator();
 
     QString createHeader();
@@ -49,6 +50,7 @@ private:
     QString m_className;
     QString m_indent;
     int m_tabSize;
+    PropertyModel::ClassType m_type;
 };
 
 #endif // PROPERTYCREATOR_H

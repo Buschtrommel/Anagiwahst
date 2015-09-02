@@ -350,6 +350,17 @@ SplitView {
                 }
             }
 
+            ComboBox {
+                currentIndex: 0
+                Layout.fillWidth: true
+                model: ListModel {
+                    id: classTypeValues
+                    ListElement { value: PropertyModel.PrivateClass; text: "Q_DECLARE_PRIVATE" }
+                    ListElement { value: PropertyModel.SharedData; text: "QSharedPointer/Data" }
+                }
+                onCurrentIndexChanged: propModel.type = classTypeValues.get(currentIndex).value
+            }
+
             GroupBox {
                 id: newPropBox
                 title: qsTr("Add property")

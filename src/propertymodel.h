@@ -37,6 +37,7 @@ class PropertyModel : public QAbstractListModel
     Q_PROPERTY(QString fileName READ getFileName NOTIFY fileNameChanged)
     Q_PROPERTY(QString className READ getClassName WRITE setClassName NOTIFY classNameChanged)
     Q_PROPERTY(bool privateClass READ isPrivateClass WRITE setPrivateClass NOTIFY privateClassChanged)
+    Q_PROPERTY(ClassType type READ getType WRITE setType NOTIFY typeChanged)
 public:
     explicit PropertyModel();
     ~PropertyModel();
@@ -47,6 +48,12 @@ public:
         CodeFile
     };
     Q_ENUMS(ResultFileType)
+
+    enum ClassType {
+        PrivateClass    = 0,
+        SharedData      = 1
+    };
+    Q_ENUMS(ClassType)
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_FINAL;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_FINAL;
@@ -77,6 +84,7 @@ public:
     QString getFileName() const;
     QString getClassName() const;
     bool isPrivateClass() const;
+    ClassType getType() const;
 
     void loadData();
     Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
@@ -93,11 +101,13 @@ signals:
     void fileNameChanged(const QString &nFileName);
     void classNameChanged(const QString &nClassName);
     void privateClassChanged(const bool &nPrivateClass);
+    void typeChanged(const ClassType &type);
 
 public slots:
     void setFileUrl(const QUrl &nFileUrl);
     void setClassName(const QString &nClassName);
     void setPrivateClass(const bool &nPrivateClass);
+    void setType(const ClassType &type);
 
 private:
     QList<Property*> m_properties;
@@ -106,6 +116,7 @@ private:
     QUrl m_fileUrl;
     QString m_className;
     bool m_privateClass;
+    ClassType m_type;
 };
 
 #endif // PROPERTYMODEL_H
