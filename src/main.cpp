@@ -125,11 +125,20 @@ int main(int argc, char *argv[])
             }
 
             PropertyModel propModel;
+            propModel.setClassName(className);
 
             for (int i = 0; i < props.size(); ++i) {
 
-                propModel.setClassName(className);
-                propModel.addProperty(props.at(i),types.at(i), read, write, member, unset, notify, privateClass);
+                QString propName(props.at(i));
+                bool pointer = false;
+                pointer = propName.startsWith("*");
+
+                if (pointer) {
+                    propName.remove(0,1);
+                }
+
+                propModel.addProperty(propName,types.at(i), read, write, member, unset, notify, privateClass);
+                propModel.updateData("pointer", propModel.rowCount()-1, pointer);
 
             }
 

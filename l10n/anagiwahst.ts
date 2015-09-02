@@ -4,110 +4,116 @@
 <context>
     <name>FileTab</name>
     <message>
-        <location filename="../qml/FileTab.qml" line="+186"/>
-        <location line="+187"/>
+        <location filename="../qml/FileTab.qml" line="+189"/>
+        <location line="+207"/>
         <location line="+105"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-287"/>
-        <location line="+190"/>
+        <location line="-307"/>
+        <location line="+210"/>
         <location line="+104"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-289"/>
-        <location line="+118"/>
-        <location line="+80"/>
+        <location line="-309"/>
+        <location line="+127"/>
+        <location line="+91"/>
         <location line="+97"/>
         <source>Read</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-290"/>
-        <location line="+119"/>
-        <location line="+80"/>
+        <location line="-310"/>
+        <location line="+128"/>
+        <location line="+91"/>
         <location line="+96"/>
         <source>Write</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-290"/>
-        <location line="+120"/>
-        <location line="+80"/>
+        <location line="-310"/>
+        <location line="+129"/>
+        <location line="+91"/>
         <location line="+100"/>
         <source>Member</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-295"/>
-        <location line="+121"/>
-        <location line="+81"/>
+        <location line="-315"/>
+        <location line="+130"/>
+        <location line="+92"/>
         <location line="+98"/>
-        <location line="+91"/>
+        <location line="+96"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-386"/>
-        <location line="+122"/>
-        <location line="+81"/>
+        <location line="-411"/>
+        <location line="+131"/>
+        <location line="+92"/>
         <location line="+82"/>
         <source>Notify</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-280"/>
-        <location line="+295"/>
+        <location line="-300"/>
+        <location line="+315"/>
         <source>Revision</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-290"/>
-        <location line="+297"/>
+        <location line="-310"/>
+        <location line="+317"/>
         <source>Designable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-292"/>
-        <location line="+297"/>
+        <location line="-312"/>
+        <location line="+317"/>
         <source>Scriptable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-292"/>
-        <location line="+302"/>
+        <location line="-312"/>
+        <location line="+322"/>
         <source>Stored</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-293"/>
-        <location line="+298"/>
+        <location line="-313"/>
+        <location line="+318"/>
         <source>User</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-289"/>
-        <location line="+294"/>
+        <location line="-309"/>
+        <location line="+314"/>
         <source>Constant</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-285"/>
-        <location line="+290"/>
+        <location line="-305"/>
+        <location line="+310"/>
         <source>Final</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-281"/>
-        <location line="+286"/>
+        <location line="-301"/>
+        <location line="+306"/>
         <source>Private</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-262"/>
+        <location line="-297"/>
+        <location line="+302"/>
+        <source>Pointer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-278"/>
         <source>Class name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -118,7 +124,7 @@
     </message>
     <message>
         <location line="+39"/>
-        <location line="+81"/>
+        <location line="+92"/>
         <source>Private class</source>
         <translation type="unfinished"></translation>
     </message>
@@ -129,12 +135,12 @@
     </message>
     <message>
         <location line="+81"/>
-        <location line="+173"/>
+        <location line="+178"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-156"/>
+        <location line="-161"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
@@ -144,7 +150,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+99"/>
+        <location line="+104"/>
         <source>Default value</source>
         <translation type="unfinished"></translation>
     </message>
@@ -339,7 +345,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="+42"/>
+        <location filename="../src/main.cpp" line="+51"/>
         <source>Anagiwahst is a Qt property creator/editor.</source>
         <translation type="unfinished"></translation>
     </message>
