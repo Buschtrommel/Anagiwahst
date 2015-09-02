@@ -129,16 +129,7 @@ int main(int argc, char *argv[])
 
             for (int i = 0; i < props.size(); ++i) {
 
-                QString propName(props.at(i));
-                bool pointer = false;
-                pointer = propName.startsWith("*");
-
-                if (pointer) {
-                    propName.remove(0,1);
-                }
-
-                propModel.addProperty(propName,types.at(i), read, write, member, unset, notify, privateClass);
-                propModel.updateData("pointer", propModel.rowCount()-1, pointer);
+                propModel.addProperty(props.at(i),types.at(i), read, write, member, unset, notify, privateClass);
 
             }
 

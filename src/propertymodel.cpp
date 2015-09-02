@@ -355,12 +355,23 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
 
     Property *prop = new Property;
 
+    QString propName(name);
+
+    if (propName.startsWith("*")) {
+        prop->pointer = true;
+        prop->defaultValue = QStringLiteral("nullptr");
+        propName.remove(0,1);
+    } else {
+        prop->pointer = false;
+        prop->defaultValue = QString();
+    }
+
     prop->id = rowCount();
-    prop->name = name;
+    prop->name = propName;
     prop->type = type;
 
     if (r) {
-        QString read = name;
+        QString read = propName;
         read[0] = read[0].toUpper();
         if (type == QLatin1String("bool")) {
             if (name.contains(QStringLiteral("enabled"), Qt::CaseInsensitive)) {
@@ -377,7 +388,7 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
     }
 
     if (w) {
-        QString write = name;
+        QString write = propName;
         write[0] = write[0].toUpper();
         write.prepend("set");
 
@@ -386,14 +397,14 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
 
 
     if (m) {
-        QString member = name;
+        QString member = propName;
         member.prepend(QStringLiteral("m_"));
 
         prop->member = member;
     }
 
     if (u) {
-        QString reset = name;
+        QString reset = propName;
         reset[0] = reset[0].toUpper();
         reset.prepend(QStringLiteral("unset"));
 
@@ -402,7 +413,7 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
 
 
     if (n) {
-        QString notify = name;
+        QString notify = propName;
         notify.append("Changed");
 
         prop->notify = notify;
@@ -418,8 +429,6 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
     prop->brief = QString();
     prop->comment = QString();
     prop->privateClass = p;
-    prop->defaultValue = QString();
-    prop->pointer = false;
 
     m_properties.append(prop);
 
