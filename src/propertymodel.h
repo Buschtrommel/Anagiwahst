@@ -118,6 +118,8 @@ private:
     QString m_className;
     bool m_privateClass;
     ClassType m_type;
+
+    QString getDefaultValue(const QString &type, bool pointer = false);
 };
 
 #endif // PROPERTYMODEL_H

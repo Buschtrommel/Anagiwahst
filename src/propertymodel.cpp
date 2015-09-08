@@ -298,7 +298,7 @@ void PropertyModel::loadData()
                     constant = true;
                 }
 
-                if (part == QLatin1String("FIANL")) {
+                if (part == QLatin1String("FINAL")) {
                     final = true;
                 }
 
@@ -363,7 +363,7 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
         propName.remove(0,1);
     } else {
         prop->pointer = false;
-        prop->defaultValue = QString();
+        prop->defaultValue = getDefaultValue(type);
     }
 
     prop->id = rowCount();
@@ -845,5 +845,32 @@ void PropertyModel::setType(const ClassType & type)
         qDebug() << "Changed type to " << m_type;
 #endif
         emit typeChanged(getType());
+    }
+}
+
+
+
+QString PropertyModel::getDefaultValue(const QString &type, bool pointer)
+{
+    if (pointer) {
+        return QString("nullptr");
+    }
+
+    QStringList ints = {"unsigned char", "signed char", "short", "short int", "signed short", "signed short int", "unsigned short", "unsigned short int", "int", "signed", "signed int", "unsigned int", "long", "long int", "signed long", "signed long int", "unsigned long", "unsigned long int", "long long", "long long int", "signed long long", "signed long long int", "unsigned long long", "unsigned long long int", "qint8", "qint16", "qint32", "qint64", "qintptr", "qlonglong", "quint8", "quint16", "quint32", "quint64", "quintptr", "qulonglong", "uchar", "uint", "ulong", "ushort"};
+
+    QStringList floats = {"float", "double", "long double", "qreal"};
+
+    if (ints.contains(type, Qt::CaseInsensitive)) {
+        return QStringLiteral("0");
+    } else if (floats.contains(type, Qt::CaseInsensitive)) {
+        return QStringLiteral("0.0");
+    } else if (type == QLatin1String("QString")) {
+        return QStringLiteral("QString()");
+    } else if (type == QLatin1String("bool")) {
+        return QStringLiteral("false");
+    } else {
+        QString result = type;
+        result.append(QStringLiteral("()"));
+        return result;
     }
 }

@@ -643,7 +643,7 @@ QString PropertyCreator::createCode()
 
                 result += doubleIndent % varPrefix % prop->name % QLatin1String(" = ") % prop->name % QLatin1String(";\n");
 
-                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Changed ") % prop->name % QLatin1String(" to \" << ") % varPrefix % prop->name % QLatin1String(";\n#endif\n");
+                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Changed ") % prop->name % QLatin1String(" to\" << ") % varPrefix % prop->name % QLatin1String(";\n#endif\n");
 
                 result += doubleIndent % QLatin1String("emit ") % prop->notify % QLatin1String("(");
 
@@ -659,7 +659,7 @@ QString PropertyCreator::createCode()
 
                 result += m_indent % varPrefix % prop->name % QLatin1String(" = ") % prop->name % QLatin1String(";\n");
 
-                result += QLatin1String("#ifdef QT_DEBUG\n") % m_indent % QLatin1String("qDebug() << \" Set ") % prop->name % QLatin1String(" to \" << ") % varPrefix % prop->name % QLatin1String(";\n#endif\n");
+                result += QLatin1String("#ifdef QT_DEBUG\n") % m_indent % QLatin1String("qDebug() << \" Set ") % prop->name % QLatin1String(" to\" << ") % varPrefix % prop->name % QLatin1String(";\n#endif\n");
 
             }
 
@@ -690,7 +690,7 @@ QString PropertyCreator::createCode()
 
                 result += doubleIndent % varPrefix % prop->name % QLatin1String(" = ") % defValue % QLatin1String(";\n");
 
-                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % prop->name % QLatin1String(" to its default value \" << ") % defValue % QLatin1String(";\n#endfi\n");
+                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % prop->name % QLatin1String(" to its default value\" << ") % defValue % QLatin1String(";\n#endfi\n");
 
                 result += doubleIndent % QLatin1String("emit ") % prop->notify % QLatin1String("(");
 
@@ -707,7 +707,7 @@ QString PropertyCreator::createCode()
 
                 result += m_indent % varPrefix % prop->name % QLatin1String(" = ") % defValue % QLatin1String(";\n");
 
-                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % prop->name % QLatin1String(" to its default value \" << ") % defValue % QLatin1String(";\n#endfi\n");
+                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % prop->name % QLatin1String(" to its default value\" << ") % defValue % QLatin1String(";\n#endfi\n");
 
             }
 
