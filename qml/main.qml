@@ -102,10 +102,10 @@ ApplicationWindow {
 
         Menu {
             title: qsTr("&Edit")
+            enabled: mainContent.count > 0
 
             MenuItem {
                 text: qsTr("New property")
-                enabled: mainContent.count > 0
                 iconName: "document-new"
                 shortcut: StandardKey.New
                 onTriggered: mainContent.getTab(mainContent.currentIndex).item.newProperty()
@@ -113,7 +113,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Delete property")
-                enabled: mainContent.count > 0 && anagiwahst.currentRow > -1
+                enabled: anagiwahst.currentRow > -1
                 iconName: "edit-delete"
                 shortcut: StandardKey.Delete
                 onTriggered: mainContent.getTab(mainContent.currentIndex).item.deleteProperty()
@@ -121,7 +121,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Apply changes")
-                enabled: mainContent.count > 0 && anagiwahst.editChanged
+                enabled: anagiwahst.editChanged
                 iconName: "dialog-ok-apply"
                 shortcut: StandardKey.Save
                 onTriggered: mainContent.getTab(mainContent.currentIndex).item.updateProperty()
@@ -131,7 +131,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Previous property")
-                enabled: mainContent.count > 0 && anagiwahst.currentRow > 0
+                enabled: anagiwahst.currentRow > 0
                 iconName: "go-previous"
                 shortcut: StandardKey.Back
                 onTriggered: mainContent.getTab(mainContent.currentIndex).item.previousProperty(saveOnChange.checked)
@@ -139,24 +139,17 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("Next property")
-                enabled: mainContent.count > 0 && anagiwahst.currentRow < anagiwahst.rowCount-1 && anagiwahst.rowCount > 0
+                enabled: anagiwahst.currentRow < anagiwahst.rowCount-1 && anagiwahst.rowCount > 0
                 iconName: "go-next"
                 shortcut: StandardKey.Forward
                 onTriggered: mainContent.getTab(mainContent.currentIndex).item.nextProperty(saveOnChange.checked)
-            }
-
-            MenuItem {
-                id: saveOnChange
-                text: qsTr("Save on change")
-                checkable: true
-                checked: true
             }
 
             MenuSeparator {}
 
             MenuItem {
                 text: qsTr("Generate properties")
-                enabled: mainContent.count > 0 && anagiwahst.rowCount > 0
+                enabled: anagiwahst.rowCount > 0
                 iconName: "run-build"
                 onTriggered: {
                     var component = Qt.createComponent("ResultDialog.qml")
@@ -165,6 +158,17 @@ ApplicationWindow {
                         dialog.open()
                     }
                 }
+            }
+        }
+        
+        Menu {
+            title: qsTr("&Settings")
+            
+            MenuItem {
+                id: saveOnChange
+                text: qsTr("Save on change")
+                checkable: true
+                checked: true
             }
         }
     }

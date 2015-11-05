@@ -3,3 +3,6 @@
 .directory
 *.qm
 *.user
+build
+*.kdev4
+.kdev4
