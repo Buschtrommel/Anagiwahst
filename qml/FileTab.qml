@@ -81,11 +81,6 @@ SplitView {
             newPropReset.checked = defaultResetFunction.checked
             newPropNotify.checked = defaultNotifyFunction.checked
             newPropPrivate.checked = defaultPrivateClass.checked
-            propertyTable.selection.clear()
-            propertyTable.selection.select(propertyTable.rowCount-1)
-            propertyTable.currentRow = propertyTable.rowCount-1
-            propertyTable.positionViewAtRow(propertyTable.rowCount-1)
-            editName.forceActiveFocus()
         }
     }
 
@@ -176,6 +171,12 @@ SplitView {
         onRowCountChanged: {
             anagiwahst.rowCount = propertyTable.rowCount
             resizeColumnsToContents()
+            if (propertyTable.rowCount > 0) {
+                propertyTable.selection.clear()
+                propertyTable.selection.select(propertyTable.rowCount-1)
+                propertyTable.currentRow = propertyTable.rowCount-1
+                propertyTable.positionViewAtRow(propertyTable.rowCount-1)
+            }
         }
         onCurrentRowChanged: {
             anagiwahst.currentRow = propertyTable.currentRow
