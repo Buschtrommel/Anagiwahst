@@ -42,6 +42,7 @@ class PropertyModel : public QAbstractListModel
     Q_PROPERTY(bool privateClass READ isPrivateClass WRITE setPrivateClass NOTIFY privateClassChanged)
     Q_PROPERTY(ClassType type READ getType WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(CommentsPosition commentsPosition READ getCommentsPosition WRITE setCommentsPosition NOTIFY commentsPositionChanged)
+    Q_PROPERTY(bool usePropertyName READ hasUsePropertyName WRITE setUsePropertyName NOTIFY usePropertyNameChanged)
 public:
     explicit PropertyModel();
     ~PropertyModel();
@@ -95,6 +96,14 @@ public:
     bool isPrivateClass() const;
     ClassType getType() const;
     CommentsPosition getCommentsPosition() const;
+    bool hasUsePropertyName() const;
+    
+    void setFileUrl(const QUrl &nFileUrl);
+    void setClassName(const QString &nClassName);
+    void setPrivateClass(const bool &nPrivateClass);
+    void setType(const ClassType &type);
+    void setCommentsPosition(const CommentsPosition &commentsPosition);
+    void setUsePropertyName(const bool &usePropertyName);
 
     void loadData();
     Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
@@ -113,13 +122,7 @@ signals:
     void privateClassChanged(const bool &nPrivateClass);
     void typeChanged(const ClassType &type);
     void commentsPositionChanged(const CommentsPosition &commentsPosition);
-
-public slots:
-    void setFileUrl(const QUrl &nFileUrl);
-    void setClassName(const QString &nClassName);
-    void setPrivateClass(const bool &nPrivateClass);
-    void setType(const ClassType &type);
-    void setCommentsPosition(const CommentsPosition &commentsPosition);
+    void usePropertyNameChanged(const bool &usePropertyName);
 
 private:
     QList<Property*> m_properties;
@@ -130,6 +133,7 @@ private:
     bool m_privateClass;
     ClassType m_type;
     CommentsPosition m_commentsPosition;
+    bool m_usePropertyName;
 
     QString getDefaultValue(const QString &type, bool pointer = false);
 };

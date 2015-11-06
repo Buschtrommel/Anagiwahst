@@ -577,6 +577,13 @@ QString PropertyCreator::createCode()
                 result += buildWriteComment(prop);
             }
             
+            QString argName = prop->name;
+            
+            if (prop->name == prop->read) {
+                argName[0] = argName[0].toUpper();
+                argName.prepend(QLatin1String("n"));
+            }
+            
             result += QLatin1String("void ") % m_className % m_dc % buildWriteFunction(prop) % QLatin1String("\n{\n");
 
             if (prop->privateClass && m_type == PropertyModel::PrivateClass) {
@@ -585,9 +592,9 @@ QString PropertyCreator::createCode()
 
             if (!prop->notify.isEmpty()) {
 
-                result += m_indent % QLatin1String("if (") % prop->name % QLatin1String(" != ") % varPrefix % prop->name % QLatin1String(") {\n");
+                result += m_indent % QLatin1String("if (") % argName % QLatin1String(" != ") % varPrefix % prop->name % QLatin1String(") {\n");
 
-                result += doubleIndent % varPrefix % prop->name % QLatin1String(" = ") % prop->name % QLatin1String(";\n");
+                result += doubleIndent % varPrefix % prop->name % QLatin1String(" = ") % argName % QLatin1String(";\n");
 
                 result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Changed ") % prop->name % QLatin1String(" to\" << ") % varPrefix % prop->name % QLatin1String(";\n#endif\n");
 
@@ -951,11 +958,12 @@ QString PropertyCreator::buildWriteFunction(Property *prop)
 {
     QString writeFunc;
 
-    if (prop->pointer) {
-        writeFunc = prop->write % QLatin1String("(") % prop->type % QLatin1String(" * ") % prop->name % QLatin1String(")");
-    } else {
-        writeFunc = prop->write % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")");
-    }
+//     if (prop->pointer) {
+//         writeFunc = prop->write % QLatin1String("(") % prop->type % QLatin1String(" * ") % prop->name % QLatin1String(")");
+//     } else {
+//         writeFunc = prop->write % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")");
+//     }
+    writeFunc = prop->write % buildFuncArg(prop);
     
     return writeFunc;
 }
@@ -1135,7 +1143,14 @@ QString PropertyCreator::buildFuncArg(Property *prop, bool notify)
         result += QLatin1String(" *");
     }
     
-    result += prop->name % QLatin1String(")");
+    if ((prop->name != prop->read) || notify) {
+        result += prop->name % QLatin1String(")");
+    } else {
+        QString name = prop->name;
+        name[0] = name[0].toUpper();
+        name.prepend(QLatin1String("n"));
+        result += name % QLatin1String(")");
+    }
     
     return result;
 }

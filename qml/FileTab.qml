@@ -18,6 +18,7 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.3
+// import QtQuick.Controls.Styles 1.3
 import QtQuick.Layouts 1.1
 import Buschtrommel.Anagiwahst.Models 1.0
 
@@ -299,361 +300,367 @@ SplitView {
         Layout.preferredWidth: 350
 
 
+        contentItem: Flickable {
+            id: editorFlick
+            contentHeight: editorMainCol.height
 
-        ColumnLayout {
-            id: editorMainCol
-            spacing: 7
-            anchors { left: parent.left; right: parent.right; leftMargin: 7; rightMargin: 7 }
+            ColumnLayout {
+                id: editorMainCol
+                spacing: 7
+                width: parent.width
 
-            TextField {
-                id: className
-                placeholderText: qsTr("Class name")
-                Layout.fillWidth: true
-                text: propModel.className
-                onTextChanged: tabRoot.parent.title = text
-            }
-
-            Binding { target: propModel; property: "className"; value: className.text }
-
-            GroupBox {
-                title: qsTr("Defaults")
-                Layout.fillWidth: true
-
-                GridLayout {
-                    columns: editorView.width > 600 ? 6 : 3
-                    width: parent.width
-
-                    CheckBox {
-                        id: defaultReadFunction
-                        text:qsTr("Read")
-                        checked: true
-                    }
-
-                    CheckBox {
-                        id: defaultWriteFunction
-                        text: qsTr("Write")
-                        checked: true
-                    }
-
-                    CheckBox {
-                        id: defaultMemeberFunction
-                        text: qsTr("Member")
-                        checked: false
-                    }
-
-                    CheckBox {
-                        id: defaultResetFunction
-                        text: qsTr("Reset")
-                        checked: false
-                    }
-
-                    CheckBox {
-                        id: defaultNotifyFunction
-                        text: qsTr("Notify")
-                        checked: true
-                    }
-
-                    CheckBox {
-                        id: defaultPrivateClass
-                        text: qsTr("Private class")
-                        checked: propModel.privateClass
-                    }
-
-                    Binding { target: propModel; property: "privateClass"; value: defaultPrivateClass.checked }
-
-                }
-            }
-
-            ComboBox {
-                currentIndex: 0
-                Layout.fillWidth: true
-                model: ListModel {
-                    id: classTypeValues
-                    ListElement { value: PropertyModel.PrivateClass; text: "Q_DECLARE_PRIVATE" }
-                    ListElement { value: PropertyModel.SharedData; text: "QSharedPointer/Data" }
-                }
-                onCurrentIndexChanged: propModel.type = classTypeValues.get(currentIndex).value
-            }
-
-            GroupBox {
-                id: newPropBox
-                title: qsTr("Add property")
-                visible: false
-                Layout.fillWidth: true
-                onVisibleChanged: {
-                    if (visible) {
-                        newPropName.forceActiveFocus()
-
-                    } else {
-                        newPropName.focus = false
-                    }
+                TextField {
+                    id: className
+                    placeholderText: qsTr("Class name")
+                    Layout.fillWidth: true
+                    text: propModel.className
+                    onTextChanged: tabRoot.parent.title = text
                 }
 
-                ColumnLayout {
+                Binding { target: propModel; property: "className"; value: className.text }
 
-                    RowLayout {
-
-                        TextField {
-                            id: newPropName
-                            placeholderText: qsTr("Name")
-                            validator: nameTypeValidator
-                            Layout.fillWidth: true
-                            onAccepted: addProperty()
-                        }
-
-                        TextField {
-                            id: newPropType
-                            placeholderText: qsTr("Type")
-                            validator: nameTypeValidator
-                            Layout.fillWidth: true
-                            onAccepted: addProperty()
-                        }
-
-                    }
+                GroupBox {
+                    title: qsTr("Defaults")
+                    Layout.fillWidth: true
 
                     GridLayout {
+                        id: defaultsGrid
                         columns: editorView.width > 600 ? 6 : 3
-
-                        CheckBox {
-                            id: newPropRead
-                            text: qsTr("Read")
-                            checked: defaultReadFunction.checked
-                        }
-
-                        CheckBox {
-                            id: newPropWrite
-                            text: qsTr("Write")
-                            checked: defaultWriteFunction.checked
-                        }
-
-                        CheckBox {
-                            id: newPropMember
-                            text: qsTr("Member")
-                            checked: defaultMemeberFunction.checked
-                        }
-
-
-                        CheckBox {
-                            id: newPropReset
-                            text: qsTr("Reset")
-                            checked: defaultResetFunction.checked
-                        }
-
-                        CheckBox {
-                            id: newPropNotify
-                            text: qsTr("Notify")
-                            checked: defaultNotifyFunction.checked
-                        }
-
-                        CheckBox {
-                            id: newPropPrivate
-                            text: qsTr("Private class")
-                            checked: defaultPrivateClass.checked
-                            Layout.fillWidth: true
-                        }
-
-                    }
-
-                    RowLayout {
-
-                        Button {
-                            iconName: "dialog-cancel"
-                            text: qsTr("Cancel")
-                            onClicked: {
-                                newPropBox.visible = false
-                                newPropName.text = ""
-                                newPropType.text = ""
-                                newPropRead.checked = defaultReadFunction.checked
-                                newPropWrite.checked = defaultWriteFunction.checked
-                                newPropMember.checked = defaultMemeberFunction.checked
-                                newPropReset.checked = defaultResetFunction.checked
-                                newPropNotify.checked = defaultNotifyFunction.checked
-                                newPropPrivate.checked = defaultPrivateClass.checked
-                            }
-                        }
-
-                        Button {
-                            id: addPropertyButton
-                            iconName: "list-add"
-                            text: qsTr("Add")
-                            onClicked: addProperty()
-                        }
-
-                    }
-
-                }
-
-            }
-
-
-            GroupBox {
-                id: editBox
-                title: qsTr("Edit property")
-                Layout.fillWidth: true
-                visible: propertyTable.currentRow > -1
-
-                ColumnLayout {
-
-                    GridLayout {
-                        width: editBox.width
-                        columns: 2
-
-                        LabeledTextField {
-                            id: editName
-                            label: qsTr("Name")
-                            width: parent.width/parent.columns
-                            validator: nameTypeValidator
-                        }
-
-                        LabeledTextField {
-                            id: editType
-                            label: qsTr("Type")
-                            validator: nameTypeValidator
-                        }
-
-                        LabeledTextField {
-                            id: editRead
-                            label: qsTr("Read")
-                        }
-
-                        LabeledTextField {
-                            id: editWrite
-                            label: qsTr("Write")
-                        }
-
-                        LabeledTextField {
-                            id: editNotify
-                            label: qsTr("Notify")
-                        }
-
-                        LabeledTextField{
-                            id: editMember
-                            label: qsTr("Member")
-                        }
-
-                        LabeledTextField {
-                            id: editReset
-                            label: qsTr("Reset")
-                        }
-
-                        LabeledTextField {
-                            id: editRevision
-                            label: qsTr("Revision")
-                            inputMethodHints: Qt.ImhDigitsOnly
-                            validator: IntValidator { bottom: 0; top: 255 }
-                        }
-
-                        LabeledTextField {
-                            id: editDesignable
-                            label: qsTr("Designable")
-                        }
-
-                        LabeledTextField {
-                            id: editScriptable
-                            label: qsTr("Scriptable")
-                        }
-                    }
-
-                    GridLayout {
-                        columns: 3
                         width: parent.width
 
-                        CheckBoxWithReset {
-                            id: editStored
-                            text: qsTr("Stored")
+                        CheckBox {
+                            id: defaultReadFunction
+                            text:qsTr("Read")
+                            checked: true
                         }
 
-                        CheckBoxWithReset {
-                            id: editUser
-                            text: qsTr("User")
+                        CheckBox {
+                            id: defaultWriteFunction
+                            text: qsTr("Write")
+                            checked: true
                         }
 
-                        CheckBoxWithReset {
-                            id: editConstant
-                            text: qsTr("Constant")
+                        CheckBox {
+                            id: defaultMemeberFunction
+                            text: qsTr("Member")
+                            checked: false
                         }
 
-                        CheckBoxWithReset {
-                            id: editFinal
-                            text: qsTr("Final")
-                        }
-
-                        CheckBoxWithReset {
-                            id: editPrivate
-                            text: qsTr("Private")
-                        }
-
-                        CheckBoxWithReset {
-                            id: editPointer
-                            text: qsTr("Pointer")
-                        }
-
-                    }
-
-                    LabeledTextField {
-                        id: editDefaultValue
-                        label: qsTr("Default value")
-                        Layout.fillWidth: true
-                    }
-
-                    LabeledTextField {
-                        id: editBrief
-                        label: qsTr("Brief description")
-                        Layout.fillWidth: true
-                    }
-
-                    Label {
-                        text: qsTr("Detailed description")
-                        Layout.fillWidth: true
-                    }
-
-                    TextArea {
-                        id: editComment
-                        property string initialText: ""
-                        property bool changed: false
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 300
-                        selectByMouse: true
-                        text: ""
-                        onTextChanged: editCommentTimer.restart()
-
-                        Timer {
-                            id: editCommentTimer
-                            interval: 500
-                            onTriggered: {
-                                editComment.changed = editComment.initialText !== editComment.text
-                            }
-                        }
-                    }
-
-                    RowLayout {
-
-                        Button {
+                        CheckBox {
+                            id: defaultResetFunction
                             text: qsTr("Reset")
-                            iconName: "edit-undo"
-                            enabled: tabRoot.editChanged
-                            onClicked: resetProperty()
+                            checked: false
                         }
 
-                        Button {
-                            text: qsTr("Cancel")
-                            iconName: "dialog-cancel"
-                            onClicked: {
-                                propertyTable.selection.clear()
-                                propertyTable.currentRow = -1
+                        CheckBox {
+                            id: defaultNotifyFunction
+                            text: qsTr("Notify")
+                            checked: true
+                        }
+
+                        CheckBox {
+                            id: defaultPrivateClass
+                            text: qsTr("Private class")
+                            checked: propModel.privateClass
+                        }
+
+                        Binding { target: propModel; property: "privateClass"; value: defaultPrivateClass.checked }
+                        
+                        CheckBox {
+                            id: defaultReadFuncName
+                            text: qsTr("Use property name for Read")
+                            checked: propModel.usePropertyName
+                            Layout.columnSpan: defaultsGrid.columns
+                        }
+                        
+                        Binding { target: propModel; property: "usePropertyName"; value: defaultReadFuncName.checked }
+
+                    }
+                    
+                    
+                }
+
+
+                GroupBox {
+                    id: newPropBox
+                    title: qsTr("Add property")
+                    visible: false
+                    Layout.fillWidth: true
+                    onVisibleChanged: {
+                        if (visible) {
+                            newPropName.forceActiveFocus()
+
+                        } else {
+                            newPropName.focus = false
+                        }
+                    }
+
+                    ColumnLayout {
+                        width: parent.width
+
+                        RowLayout {
+
+                            TextField {
+                                id: newPropName
+                                placeholderText: qsTr("Name")
+                                validator: nameTypeValidator
+                                Layout.fillWidth: true
+                                onAccepted: addProperty()
+                            }
+
+                            TextField {
+                                id: newPropType
+                                placeholderText: qsTr("Type")
+                                validator: nameTypeValidator
+                                Layout.fillWidth: true
+                                onAccepted: addProperty()
+                            }
+
+                        }
+
+                        GridLayout {
+                            columns: editorView.width > 600 ? 6 : 3
+
+                            CheckBox {
+                                id: newPropRead
+                                text: qsTr("Read")
+                                checked: defaultReadFunction.checked
+                            }
+
+                            CheckBox {
+                                id: newPropWrite
+                                text: qsTr("Write")
+                                checked: defaultWriteFunction.checked
+                            }
+
+                            CheckBox {
+                                id: newPropMember
+                                text: qsTr("Member")
+                                checked: defaultMemeberFunction.checked
+                            }
+
+
+                            CheckBox {
+                                id: newPropReset
+                                text: qsTr("Reset")
+                                checked: defaultResetFunction.checked
+                            }
+
+                            CheckBox {
+                                id: newPropNotify
+                                text: qsTr("Notify")
+                                checked: defaultNotifyFunction.checked
+                            }
+
+                            CheckBox {
+                                id: newPropPrivate
+                                text: qsTr("Private class")
+                                checked: defaultPrivateClass.checked
+                                Layout.fillWidth: true
+                            }
+
+                        }
+
+                        RowLayout {
+
+                            Button {
+                                iconName: "dialog-cancel"
+                                text: qsTr("Cancel")
+                                onClicked: {
+                                    newPropBox.visible = false
+                                    newPropName.text = ""
+                                    newPropType.text = ""
+                                    newPropRead.checked = defaultReadFunction.checked
+                                    newPropWrite.checked = defaultWriteFunction.checked
+                                    newPropMember.checked = defaultMemeberFunction.checked
+                                    newPropReset.checked = defaultResetFunction.checked
+                                    newPropNotify.checked = defaultNotifyFunction.checked
+                                    newPropPrivate.checked = defaultPrivateClass.checked
+                                }
+                            }
+
+                            Button {
+                                id: addPropertyButton
+                                iconName: "list-add"
+                                text: qsTr("Add")
+                                onClicked: addProperty()
+                            }
+
+                        }
+
+                    }
+
+                }
+
+
+                GroupBox {
+                    id: editBox
+                    title: qsTr("Edit property")
+                    Layout.fillWidth: true
+                    visible: propertyTable.currentRow > -1
+
+                    ColumnLayout {
+                        width: parent.width
+
+                        GridLayout {
+                            Layout.fillWidth: true
+                            columns: 2
+
+                            LabeledTextField {
+                                id: editName
+                                label: qsTr("Name")
+                                validator: nameTypeValidator
+                            }
+
+                            LabeledTextField {
+                                id: editType
+                                label: qsTr("Type")
+                                validator: nameTypeValidator
+                            }
+
+                            LabeledTextField {
+                                id: editRead
+                                label: qsTr("Read")
+                            }
+
+                            LabeledTextField {
+                                id: editWrite
+                                label: qsTr("Write")
+                            }
+
+                            LabeledTextField {
+                                id: editNotify
+                                label: qsTr("Notify")
+                            }
+
+                            LabeledTextField{
+                                id: editMember
+                                label: qsTr("Member")
+                            }
+
+                            LabeledTextField {
+                                id: editReset
+                                label: qsTr("Reset")
+                            }
+
+                            LabeledTextField {
+                                id: editRevision
+                                label: qsTr("Revision")
+                                inputMethodHints: Qt.ImhDigitsOnly
+                                validator: IntValidator { bottom: 0; top: 255 }
+                            }
+
+                            LabeledTextField {
+                                id: editDesignable
+                                label: qsTr("Designable")
+                            }
+
+                            LabeledTextField {
+                                id: editScriptable
+                                label: qsTr("Scriptable")
                             }
                         }
 
-                        Button {
-                            text: qsTr("Apply")
-                            iconName: "dialog-ok-apply"
-                            enabled: tabRoot.editChanged
-                            onClicked: updateProperty()
+                        GridLayout {
+                            columns: editorView.width > 600 ? 6 : 3
+
+                            CheckBoxWithReset {
+                                id: editStored
+                                text: qsTr("Stored")
+                            }
+
+                            CheckBoxWithReset {
+                                id: editUser
+                                text: qsTr("User")
+                            }
+
+                            CheckBoxWithReset {
+                                id: editConstant
+                                text: qsTr("Constant")
+                            }
+
+                            CheckBoxWithReset {
+                                id: editFinal
+                                text: qsTr("Final")
+                            }
+
+                            CheckBoxWithReset {
+                                id: editPrivate
+                                text: qsTr("Private")
+                            }
+
+                            CheckBoxWithReset {
+                                id: editPointer
+                                text: qsTr("Pointer")
+                            }
+
+                        }
+
+                        LabeledTextField {
+                            id: editDefaultValue
+                            label: qsTr("Default value")
+                            Layout.fillWidth: true
+                        }
+
+                        LabeledTextField {
+                            id: editBrief
+                            label: qsTr("Brief description")
+                            Layout.fillWidth: true
+                        }
+
+                        Label {
+                            text: qsTr("Detailed description")
+                            Layout.fillWidth: true
+                        }
+
+                        TextArea {
+                            id: editComment
+                            property string initialText: ""
+                            property bool changed: false
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 300
+                            selectByMouse: true
+                            text: ""
+                            onTextChanged: editCommentTimer.restart()
+
+                            Timer {
+                                id: editCommentTimer
+                                interval: 500
+                                onTriggered: {
+                                    editComment.changed = editComment.initialText !== editComment.text
+                                }
+                            }
+                        }
+
+                        RowLayout {
+
+                            Button {
+                                text: qsTr("Reset")
+                                iconName: "edit-undo"
+                                enabled: tabRoot.editChanged
+                                onClicked: resetProperty()
+                            }
+
+                            Button {
+                                text: qsTr("Cancel")
+                                iconName: "dialog-cancel"
+                                onClicked: {
+                                    propertyTable.selection.clear()
+                                    propertyTable.currentRow = -1
+                                }
+                            }
+
+                            Button {
+                                text: qsTr("Apply")
+                                iconName: "dialog-ok-apply"
+                                enabled: tabRoot.editChanged
+                                onClicked: updateProperty()
+                            }
                         }
                     }
                 }
-            }
-        }
+            }        
+        }        
     }
 }
 

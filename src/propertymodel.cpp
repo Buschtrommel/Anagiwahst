@@ -78,6 +78,7 @@ PropertyModel::PropertyModel()
     m_privateClass = false;
     m_type = PrivateClass;
     m_commentsPosition = InCode;
+    m_usePropertyName = false;
 
 #ifdef QT_DEBUG
     qDebug() << "Constructed PropertyModel" << this;
@@ -373,15 +374,20 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
 
     if (r) {
         QString read = propName;
-        read[0] = read[0].toUpper();
-        if (type == QLatin1String("bool")) {
-            if (name.contains(QStringLiteral("enabled"), Qt::CaseInsensitive)) {
-                read.prepend(QStringLiteral("is"));
+        
+        if (!m_usePropertyName) {
+        
+            read[0] = read[0].toUpper();
+            if (type == QLatin1String("bool")) {
+                if (name.contains(QStringLiteral("enabled"), Qt::CaseInsensitive)) {
+                    read.prepend(QStringLiteral("is"));
+                } else {
+                    read.prepend(QStringLiteral("has"));
+                }
             } else {
-                read.prepend(QStringLiteral("has"));
+                read.prepend(QStringLiteral("get"));
             }
-        } else {
-            read.prepend(QStringLiteral("get"));
+        
         }
 
         prop->read = read;
@@ -887,6 +893,39 @@ void PropertyModel::setCommentsPosition(const CommentsPosition & commentsPositio
 
 
 
+/*!
+ * \property PropertyModel::usePropertyName
+ * \brief Set to true to use the name of the property for the read function.
+ *
+ * \par Access functions:
+ * <TABLE><TR><TD>bool</TD><TD>hasUsePropertyName() const</TD></TR><TR><TD>void</TD><TD>setUsePropertyName(const bool & usePropertyName)</TD></TR></TABLE>
+ * \par Notifier signal:
+ * <TABLE><TR><TD>void</TD><TD>usePropertyNameChanged(const bool & usePropertyName)</TD></TR></TABLE>
+ */
+
+/*!
+ * \fn void PropertyModel::usePropertyNameChanged(const bool &usePropertyName)
+ * \brief Part of the \link PropertyModel::usePropertyName usePropertyName \endlink property.
+ */
+
+/*!
+ * \brief Part of the \link PropertyModel::usePropertyName usePropertyName \endlink property.
+ */
+bool PropertyModel::hasUsePropertyName() const { return m_usePropertyName; }
+
+/*!
+ * \brief Part of the \link PropertyModel::usePropertyName usePropertyName \endlink property.
+ */
+void PropertyModel::setUsePropertyName(const bool & usePropertyName)
+{
+    if (usePropertyName != m_usePropertyName) {
+        m_usePropertyName = usePropertyName;
+#ifdef QT_DEBUG
+        qDebug() << "Changed usePropertyName to" << m_usePropertyName;
+#endif
+        emit usePropertyNameChanged(hasUsePropertyName());
+    }
+}
 
 
 
