@@ -30,7 +30,7 @@ Dialog {
     width: 640
     height: 480
 
-    property PropertyModel model
+    property PropertyModel propsModel
 
     contentItem: ColumnLayout {
             TabView {
@@ -50,7 +50,12 @@ Dialog {
                     selectByMouse: true
                     textFormat: TextEdit.PlainText
                     font.family: "mono"
-                    Component.onCompleted: text = model.createOutput(PropertyModel.HeaderFile)
+                    Component.onCompleted: text = propsModel.createOutput(PropertyModel.HeaderFile)
+                    Connections {
+                        target: propsModel
+                        onTypeChanged: headerText.text = propsModel.createOutput(PropertyModel.HeaderFile)
+                        onCommentsPositionChanged: headerText.text = propsModel.createOutput(PropertyModel.HeaderFile)
+                    }
                 }
             }
 
@@ -66,7 +71,12 @@ Dialog {
                     selectByMouse: true
                     textFormat: TextEdit.PlainText
                     font.family: "mono"
-                    Component.onCompleted: text = model.createOutput(PropertyModel.PrivateHeaderFile)
+                    Component.onCompleted: text = propsModel.createOutput(PropertyModel.PrivateHeaderFile)
+                    Connections {
+                        target: propsModel
+                        onTypeChanged: privateText.text = propsModel.createOutput(PropertyModel.PrivateHeaderFile)
+                        onCommentsPositionChanged: privateText.text = propsModel.createOutput(PropertyModel.PrivateHeaderFile)
+                    }
                 }
             }
 
@@ -82,7 +92,12 @@ Dialog {
                     selectByMouse: true
                     textFormat: TextEdit.PlainText
                     font.family: "mono"
-                    Component.onCompleted: text = model.createOutput(PropertyModel.CodeFile)
+                    Component.onCompleted: text = propsModel.createOutput(PropertyModel.CodeFile)
+                    Connections {
+                        target: propsModel
+                        onTypeChanged: codeText.text = propsModel.createOutput(PropertyModel.CodeFile)
+                        onCommentsPositionChanged: codeText.text = propsModel.createOutput(PropertyModel.CodeFile)
+                    }
                 }
             }
         }
@@ -112,6 +127,32 @@ Dialog {
                     fd.visible = true
                 }
             }
+            
+            ComboBox {
+                id: privTypeChooser
+                currentIndex: 0
+                model: ListModel {
+                    id: classTypeValues
+                    ListElement { value: PropertyModel.PrivateClass; text: qsTr("Private class (d_ptr)") }
+                    ListElement { value: PropertyModel.SharedData; text: "QSharedPointer/Data" }
+                }
+//                 onCurrentIndexChanged: {
+//                     propsModel.type = classTypeValues.get(currentIndex).value
+//                 }
+                Binding { target: propsModel; property: "type"; value: classTypeValues.get(privTypeChooser.currentIndex).value }
+            }
+            
+            ComboBox {
+                id: commentsPlaceChooser
+                currentIndex: 0
+                model: ListModel {
+                    id: commentsPlaceModel
+                    ListElement { value: PropertyModel.InCode; text: qsTr("In the code") }
+                    ListElement { value: PropertyModel.InHeader; text: qsTr("In the header") }
+                    ListElement { value: PropertyModel.InFronOfHeader; text: qsTr("In front of header") }
+                }
+                Binding { target: propsModel; property: "commentsPosition"; value: commentsPlaceModel.get(commentsPlaceChooser.currentIndex).value }
+            }
         }
     }
 
@@ -120,14 +161,14 @@ Dialog {
         selectMultiple: false
         onAccepted: {
             if (fd.selectFolder) {
-                if (!model.saveAll(fd.fileUrl)) {
+                if (!propsModel.saveAll(fd.fileUrl)) {
                     md.icon = StandardIcon.Warning
                     md.title = qsTr("Error")
                     md.text = qsTr("Could not save files to folder.")
                     md.visible = true
                 }
             } else {
-                if (!model.saveToFile(resultTabs.getTab(resultTabs.currentIndex).type, fd.fileUrl)) {
+                if (!propsModel.saveToFile(resultTabs.getTab(resultTabs.currentIndex).type, fd.fileUrl)) {
                     md.icon = StandardIcon.Warning
                     md.title = qsTr("Error")
                     md.text = qsTr("Could not save file.")

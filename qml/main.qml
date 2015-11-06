@@ -154,7 +154,7 @@ ApplicationWindow {
                 onTriggered: {
                     var component = Qt.createComponent("ResultDialog.qml")
                     if (component.status === Component.Ready) {
-                        var dialog = component.createObject(anagiwahst, {model: mainContent.getTab(mainContent.currentIndex).item.model})
+                        var dialog = component.createObject(anagiwahst, {propsModel: mainContent.getTab(mainContent.currentIndex).item.model})
                         dialog.open()
                     }
                 }

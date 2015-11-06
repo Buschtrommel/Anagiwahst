@@ -176,6 +176,7 @@ SplitView {
                 propertyTable.selection.select(propertyTable.rowCount-1)
                 propertyTable.currentRow = propertyTable.rowCount-1
                 propertyTable.positionViewAtRow(propertyTable.rowCount-1)
+                editBrief.setFocus()
             }
         }
         onCurrentRowChanged: {

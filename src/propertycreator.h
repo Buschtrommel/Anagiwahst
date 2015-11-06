@@ -31,7 +31,7 @@ struct Property;
 class PropertyCreator
 {
 public:
-    explicit PropertyCreator(QList<Property*> properties, const QString &className, PropertyModel::ClassType type = PropertyModel::PrivateClass, int tabSize = 4);
+    explicit PropertyCreator(QList<Property*> properties, const QString &className, PropertyModel::ClassType type = PropertyModel::PrivateClass, int tabSize = 4, PropertyModel::CommentsPosition commentsPosition = PropertyModel::InCode);
     ~PropertyCreator();
 
     QString createHeader();
@@ -44,6 +44,26 @@ private:
     QString getDefaultValue(const QString &type, bool pointer = false);
     QString getPointerMacro(bool constant = false, bool newLine = true);
     QString buildTableRow(const QString &firstCol, const QString &secondCol);
+    
+    QString buildClassComment();
+    QString buildPropertyComment(Property *prop);
+    
+    QString buildReadFunction(Property *prop);
+    QString buildWriteFunction(Property *prop);
+    QString buildResetFunction(Property *prop);
+    
+    QString buildReadPrototype(Property *prop);
+    QString buildWritePrototype(Property *prop);
+    QString buildResetPrototype(Property *prop);
+    QString buildNotifyPrototype(Property *prop);
+    
+    QString buildReadComment(Property *prop);
+    QString buildWriteComment(Property *prop);
+    QString buildResetComment(Property *prop);
+    QString buildNotifyComment(Property *prop);
+    
+    QString buildPartOfStatement(Property *prop);
+    QString buildFuncArg(Property *prop, bool notify = false);
 
     QList<Property*> m_properties;
     int m_propertiesCount;
@@ -51,6 +71,8 @@ private:
     QString m_indent;
     int m_tabSize;
     PropertyModel::ClassType m_type;
+    PropertyModel::CommentsPosition m_commentsPosition;
+    QString m_dc;
 };
 
 #endif // PROPERTYCREATOR_H

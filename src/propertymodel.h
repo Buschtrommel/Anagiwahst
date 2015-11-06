@@ -33,11 +33,15 @@ struct Property;
 class PropertyModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_ENUMS(ResultFileType)
+    Q_ENUMS(ClassType)
+    Q_ENUMS(CommentsPosition)
     Q_PROPERTY(QUrl fileUrl READ getFileUrl WRITE setFileUrl NOTIFY fileUrlChanged)
     Q_PROPERTY(QString fileName READ getFileName NOTIFY fileNameChanged)
     Q_PROPERTY(QString className READ getClassName WRITE setClassName NOTIFY classNameChanged)
     Q_PROPERTY(bool privateClass READ isPrivateClass WRITE setPrivateClass NOTIFY privateClassChanged)
     Q_PROPERTY(ClassType type READ getType WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(CommentsPosition commentsPosition READ getCommentsPosition WRITE setCommentsPosition NOTIFY commentsPositionChanged)
 public:
     explicit PropertyModel();
     ~PropertyModel();
@@ -47,13 +51,17 @@ public:
         PrivateHeaderFile,
         CodeFile
     };
-    Q_ENUMS(ResultFileType)
 
     enum ClassType {
         PrivateClass    = 0,
         SharedData      = 1
     };
-    Q_ENUMS(ClassType)
+    
+    enum CommentsPosition {
+        InCode          = 0,
+        InHeader        = 1,
+        InFronOfHeader  = 2
+    };
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_FINAL;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_FINAL;
@@ -86,6 +94,7 @@ public:
     QString getClassName() const;
     bool isPrivateClass() const;
     ClassType getType() const;
+    CommentsPosition getCommentsPosition() const;
 
     void loadData();
     Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
@@ -103,12 +112,14 @@ signals:
     void classNameChanged(const QString &nClassName);
     void privateClassChanged(const bool &nPrivateClass);
     void typeChanged(const ClassType &type);
+    void commentsPositionChanged(const CommentsPosition &commentsPosition);
 
 public slots:
     void setFileUrl(const QUrl &nFileUrl);
     void setClassName(const QString &nClassName);
     void setPrivateClass(const bool &nPrivateClass);
     void setType(const ClassType &type);
+    void setCommentsPosition(const CommentsPosition &commentsPosition);
 
 private:
     QList<Property*> m_properties;
@@ -118,6 +129,7 @@ private:
     QString m_className;
     bool m_privateClass;
     ClassType m_type;
+    CommentsPosition m_commentsPosition;
 
     QString getDefaultValue(const QString &type, bool pointer = false);
 };

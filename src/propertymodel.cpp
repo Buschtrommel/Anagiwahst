@@ -77,6 +77,7 @@ PropertyModel::PropertyModel()
     m_className = QStringLiteral("");
     m_privateClass = false;
     m_type = PrivateClass;
+    m_commentsPosition = InCode;
 
 #ifdef QT_DEBUG
     qDebug() << "Constructed PropertyModel" << this;
@@ -462,7 +463,7 @@ void PropertyModel::deleteProperty(int idx)
 
 QString PropertyModel::createOutput(ResultFileType type) const
 {
-    PropertyCreator creator(m_properties, getClassName(), m_type, 4);
+    PropertyCreator creator(m_properties, getClassName(), m_type, 4, m_commentsPosition);
     switch(type) {
     case HeaderFile:
         return creator.createHeader();
@@ -847,6 +848,47 @@ void PropertyModel::setType(const ClassType & type)
         emit typeChanged(getType());
     }
 }
+
+
+
+/*!
+ * \property PropertyModel::commentsPosition
+ * \brief Defines where the comments will be inserted.
+ *
+ * \par Access functions:
+ * <TABLE><TR><TD>CommentsPosition</TD><TD>getCommentsPosition() const</TD></TR><TR><TD>void</TD><TD>setCommentsPosition(const CommentsPosition & commentsPosition)</TD></TR></TABLE>
+ * \par Notifier signal:
+ * <TABLE><TR><TD>void</TD><TD>commentsPositionChanged(const CommentsPosition & commentsPosition)</TD></TR></TABLE>
+ */
+
+/*!
+ * \fn PropertyModel::commentsPositionChanged()
+ * \brief Part of the \link PropertyModel::commentsPosition commentsPosition \endlink property.
+ */
+
+/*!
+ * \brief Part of the \link PropertyModel::commentsPosition commentsPosition \endlink property.
+ */
+PropertyModel::CommentsPosition PropertyModel::getCommentsPosition() const { return m_commentsPosition; }
+
+/*!
+ * \brief Part of the \link PropertyModel::commentsPosition commentsPosition \endlink property.
+ */
+void PropertyModel::setCommentsPosition(const CommentsPosition & commentsPosition)
+{
+    if (commentsPosition != m_commentsPosition) {
+        m_commentsPosition = commentsPosition;
+#ifdef QT_DEBUG
+        qDebug() << "Changed commentsPosition to" << m_commentsPosition;
+#endif
+        emit commentsPositionChanged(getCommentsPosition());
+    }
+}
+
+
+
+
+
 
 
 

@@ -44,6 +44,10 @@ ColumnLayout {
         textField.text = iniText
         changed = false
     }
+    
+    function setFocus() {
+        textField.forceActiveFocus()
+    }
 
     signal accepted()
 
