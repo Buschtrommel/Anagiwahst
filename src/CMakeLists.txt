@@ -9,6 +9,7 @@ set (anagiwahst_SRCS
     propertycreator.cpp
     propertymodel.cpp
     propertywriter.cpp
+    configuration.cpp
 )
 
 set (anagiwahst_HEADERS
@@ -16,6 +17,7 @@ set (anagiwahst_HEADERS
     propertycreator.h
     propertymodel.h
     propertywriter.h
+    configuration.h
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CSS_FLAGS} -std=gnu++11")

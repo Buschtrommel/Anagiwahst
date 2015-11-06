@@ -111,10 +111,11 @@ Dialog {
                 text: qsTr("Save")
                 iconName: "document-save"
                 onClicked: {
+                    fd.folder = Qt.resolvedUrl(config.lastSaveAllPath)
                     fd.selectFolder = false
                     fd.selectExisting = false
                     fd.title = qsTr("Save file")
-                    fd.visible = true
+                    fd.open()
                 }
             }
 
@@ -122,9 +123,10 @@ Dialog {
                 text: qsTr("Save all")
                 iconName: "document-save-all"
                 onClicked: {
+                    fd.folder = Qt.resolvedUrl(config.lastSaveSinglePath)
                     fd.selectFolder = true
                     fd.title = qsTr("Save all to folder")
-                    fd.visible = true
+                    fd.open()
                 }
             }
             
@@ -136,9 +138,6 @@ Dialog {
                     ListElement { value: PropertyModel.PrivateClass; text: qsTr("Private class (d_ptr)") }
                     ListElement { value: PropertyModel.SharedData; text: "QSharedPointer/Data" }
                 }
-//                 onCurrentIndexChanged: {
-//                     propsModel.type = classTypeValues.get(currentIndex).value
-//                 }
                 Binding { target: propsModel; property: "type"; value: classTypeValues.get(privTypeChooser.currentIndex).value }
             }
             
@@ -161,6 +160,7 @@ Dialog {
         selectMultiple: false
         onAccepted: {
             if (fd.selectFolder) {
+                config.lastSaveAllPath = fd.folder.toString()
                 if (!propsModel.saveAll(fd.fileUrl)) {
                     md.icon = StandardIcon.Warning
                     md.title = qsTr("Error")
@@ -168,6 +168,7 @@ Dialog {
                     md.visible = true
                 }
             } else {
+                config.lastSaveSinglePath = fd.folder.toString()
                 if (!propsModel.saveToFile(resultTabs.getTab(resultTabs.currentIndex).type, fd.fileUrl)) {
                     md.icon = StandardIcon.Warning
                     md.title = qsTr("Error")

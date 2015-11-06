@@ -26,12 +26,17 @@ import Buschtrommel.Anagiwahst.Models 1.0
 ApplicationWindow {
     id: anagiwahst
     visible: true
-    width: 640
-    height: 480
+    width: config.windowWidth
+    height: config.windowHeight
 
     property int rowCount: -1
     property int currentRow: -1
     property bool editChanged: false
+    
+    Component.onDestruction: {
+        config.windowWidth = anagiwahst.width
+        config.windowHeight = anagiwahst.height
+    }
 
     menuBar: MenuBar {
         Menu {
@@ -53,6 +58,7 @@ ApplicationWindow {
                 shortcut: StandardKey.Open
                 iconName: "document-open"
                 onTriggered: openFileDialog.open()
+                visible: false
             }
 
             MenuSeparator {}
@@ -163,12 +169,19 @@ ApplicationWindow {
         
         Menu {
             title: qsTr("&Settings")
+            visible: false
             
             MenuItem {
                 id: saveOnChange
                 text: qsTr("Save on change")
                 checkable: true
                 checked: true
+                visible: false
+            }
+            
+            MenuItem {
+                text: qsTr("Confirgure Anagiwahst ...")
+                iconName: "configure"
             }
         }
     }

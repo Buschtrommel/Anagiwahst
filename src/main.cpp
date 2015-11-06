@@ -25,9 +25,11 @@
 #include <QTextStream>
 #include <QLocale>
 #include <QTranslator>
+#include <QQmlContext>
 
 #include "propertymodel.h"
 #include "propertywriter.h"
+#include "configuration.h"
 
 int main(int argc, char *argv[])
 {
@@ -173,10 +175,15 @@ int main(int argc, char *argv[])
 
         return 0;
     }
+    
+    Configuration configuration;
 
     qmlRegisterType<PropertyModel>("Buschtrommel.Anagiwahst.Models", 1, 0, "PropertyModel");
 
     QQmlApplicationEngine engine;
+    
+    engine.rootContext()->setContextProperty("config", &configuration);
+    
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
     return app.exec();
