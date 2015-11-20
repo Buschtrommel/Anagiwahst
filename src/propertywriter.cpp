@@ -10,10 +10,10 @@ PropertyWriter::PropertyWriter()
 }
 
 
-PropertyWriter::~PropertyWriter()
-{
-
-}
+// PropertyWriter::~PropertyWriter()
+// {
+// 
+// }
 
 
 
@@ -23,21 +23,21 @@ bool PropertyWriter::write(WriteFileType type, QString path, const QString &clas
         return true;
     }
 
-    if (!path.endsWith("/")) {
-        path.append("/");
+    if (!path.endsWith('/')) {
+        path.append('/');
     }
 
     path.append(className.toLower());
 
     switch (type) {
     case HeaderFile:
-        path.append(".h");
+        path.append(QLatin1String(".h"));
         break;
     case PrivateHeaderFile:
-        path.append("_p.h");
+        path.append(QLatin1String("_p.h"));
         break;
     case CodeFile:
-        path.append(".cpp");
+        path.append(QLatin1String(".cpp"));
         break;
     default:
         break;

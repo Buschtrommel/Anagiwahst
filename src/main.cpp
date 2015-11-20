@@ -38,12 +38,12 @@ int main(int argc, char *argv[])
     app.setApplicationName(QStringLiteral("Anagiwahst"));
     app.setOrganizationDomain(QStringLiteral("buschmann23.de"));
     app.setOrganizationName(QStringLiteral("Buschtrommel"));
-    app.setApplicationVersion(QString(APP_VERSION));
+    app.setApplicationVersion(QStringLiteral(APP_VERSION));
 
     QString locale = QLocale::system().name();
 
     QTranslator *translator = new QTranslator;
-    if (translator->load(QStringLiteral("anagiwahst_")+locale, QString(L10N_DIR))) {
+    if (translator->load(QStringLiteral("anagiwahst_")+locale, QStringLiteral(L10N_DIR))) {
         app.installTranslator(translator);
     }
 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
         clparser.addPositionalArgument(QStringLiteral("<type>"), QCoreApplication::translate("main", "Default type for all properties or list of related data types."));
         clparser.addPositionalArgument(QStringLiteral("<property>"), QCoreApplication::translate("main", "The name of the property or list of properties."));
 
-        QCommandLineOption privateOption(QStringList() << "p" << "private", QCoreApplication::translate("main", "The class has a private section in a separate file."));
+        QCommandLineOption privateOption(QStringList() << QStringLiteral("p") << QStringLiteral("private"), QCoreApplication::translate("main", "The class has a private section in a separate file."));
         clparser.addOption(privateOption);
 
         QCommandLineOption noReadOption(QStringLiteral("no-read"), QCoreApplication::translate("main", "Do not create a read accessor function."));
@@ -69,16 +69,16 @@ int main(int argc, char *argv[])
         QCommandLineOption noNotifyOption(QStringLiteral("no-notify"), QCoreApplication::translate("main", "Do not add a notify signal."));
         clparser.addOption(noNotifyOption);
 
-        QCommandLineOption memberOption(QStringList() << "m" << "member", QCoreApplication::translate("main", "Use a member variable association."));
+        QCommandLineOption memberOption(QStringList() << QStringLiteral("m") << QStringLiteral("member"), QCoreApplication::translate("main", "Use a member variable association."));
         clparser.addOption(memberOption);
 
-        QCommandLineOption unsetOption(QStringList() << "u" << "unset", QCoreApplication::translate("main", "Create a reset/unset function."));
+        QCommandLineOption unsetOption(QStringList() << QStringLiteral("u") << QStringLiteral("unset"), QCoreApplication::translate("main", "Create a reset/unset function."));
         clparser.addOption(unsetOption);
 
-        QCommandLineOption outputOption(QStringList() << "o" << "output", QCoreApplication::translate("main", "Write the output directly into files in <director>."), QCoreApplication::translate("main", "directory"));
+        QCommandLineOption outputOption(QStringList() << QStringLiteral("o") << QStringLiteral("output"), QCoreApplication::translate("main", "Write the output directly into files in <director>."), QCoreApplication::translate("main", "directory"));
         clparser.addOption(outputOption);
 
-        QCommandLineOption forceOption(QStringList() << "f" << "force", QCoreApplication::translate("main", "Force overwriting existing files. (If output directory is specified.)"));
+        QCommandLineOption forceOption(QStringList() << QStringLiteral("f") << QStringLiteral("force"), QCoreApplication::translate("main", "Force overwriting existing files. (If output directory is specified.)"));
         clparser.addOption(forceOption);
 
         clparser.process(app);
@@ -93,8 +93,8 @@ int main(int argc, char *argv[])
         const QString typeString = args.at(1);
         const QString propString = args.at(2);
 
-        QStringList types = typeString.split(" ");
-        const QStringList props = propString.split(" ");
+        QStringList types = typeString.split(' ');
+        const QStringList props = propString.split(' ');
 
         if (!props.isEmpty()) {
 
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
                 if (privateClass) {
                     out << "\n\n\n";
                     out << "=========================================================================\n";
-                    out << "||                         Private eader file                          ||\n";
+                    out << "||                         Private header file                          ||\n";
                     out << "=========================================================================\n";
                     out << propModel.createOutput(PropertyModel::PrivateHeaderFile) << "\n";
                     out.flush();
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     
-    engine.rootContext()->setContextProperty("config", &configuration);
+    engine.rootContext()->setContextProperty(QStringLiteral("config"), &configuration);
     
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 

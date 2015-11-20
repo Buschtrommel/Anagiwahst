@@ -29,9 +29,9 @@ Configuration::~Configuration()
  * \brief Width of the window when the Application was closed.
  *
  * \par Access functions:
- * <TABLE><TR><TD>int</TD><TD>getWindowWidth() const</TD></TR><TR><TD>void</TD><TD>setWindowWidth(const int & windowWidth)</TD></TR></TABLE>
+ * <TABLE><TR><TD>int</TD><TD>getWindowWidth() const</TD></TR><TR><TD>void</TD><TD>setWindowWidth(int windowWidth)</TD></TR></TABLE>
  * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>windowWidthChanged(const int & windowWidth)</TD></TR></TABLE>
+ * <TABLE><TR><TD>void</TD><TD>windowWidthChanged(int windowWidth)</TD></TR></TABLE>
  */
 
 /*!
@@ -47,7 +47,7 @@ int Configuration::getWindowWidth() const { return m_windowWidth; }
 /*!
  * \brief Part of the \link Configuration::windowWidth windowWidth \endlink property.
  */
-void Configuration::setWindowWidth(const int & windowWidth)
+void Configuration::setWindowWidth(int windowWidth)
 {
     if (windowWidth != m_windowWidth) {
         m_windowWidth = windowWidth;
@@ -68,9 +68,9 @@ void Configuration::setWindowWidth(const int & windowWidth)
  * \brief Height of the window when the application was closed.
  *
  * \par Access functions:
- * <TABLE><TR><TD>int</TD><TD>getWindowHeight() const</TD></TR><TR><TD>void</TD><TD>setWindowHeight(const int & windowHeight)</TD></TR></TABLE>
+ * <TABLE><TR><TD>int</TD><TD>getWindowHeight() const</TD></TR><TR><TD>void</TD><TD>setWindowHeight(int windowHeight)</TD></TR></TABLE>
  * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>windowHeightChanged(const int & windowHeight)</TD></TR></TABLE>
+ * <TABLE><TR><TD>void</TD><TD>windowHeightChanged(int windowHeight)</TD></TR></TABLE>
  */
 
 /*!
@@ -86,7 +86,7 @@ int Configuration::getWindowHeight() const { return m_windowHeight; }
 /*!
  * \brief Part of the \link Configuration::windowHeight windowHeight \endlink property.
  */
-void Configuration::setWindowHeight(const int & windowHeight)
+void Configuration::setWindowHeight(int windowHeight)
 {
     if (windowHeight != m_windowHeight) {
         m_windowHeight = windowHeight;
@@ -107,9 +107,9 @@ void Configuration::setWindowHeight(const int & windowHeight)
  * \brief Stores if the window was maximized when it was closed.
  *
  * \par Access functions:
- * <TABLE><TR><TD>bool</TD><TD>hasWindowMaximized() const</TD></TR><TR><TD>void</TD><TD>setWindowMaximized(const bool & windowMaximized)</TD></TR></TABLE>
+ * <TABLE><TR><TD>bool</TD><TD>hasWindowMaximized() const</TD></TR><TR><TD>void</TD><TD>setWindowMaximized(bool windowMaximized)</TD></TR></TABLE>
  * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>windowMaximizedChanged(const bool & windowMaximized)</TD></TR></TABLE>
+ * <TABLE><TR><TD>void</TD><TD>windowMaximizedChanged(bool windowMaximized)</TD></TR></TABLE>
  */
 
 /*!
@@ -125,7 +125,7 @@ bool Configuration::hasWindowMaximized() const { return m_windowMaximized; }
 /*!
  * \brief Part of the \link Configuration::windowMaximized windowMaximized \endlink property.
  */
-void Configuration::setWindowMaximized(const bool & windowMaximized)
+void Configuration::setWindowMaximized(bool windowMaximized)
 {
     if (windowMaximized != m_windowMaximized) {
         m_windowMaximized = windowMaximized;

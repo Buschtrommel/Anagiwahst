@@ -22,7 +22,7 @@
 #include <QStringBuilder>
 #include <QRegularExpression>
 
-PropertyCreator::PropertyCreator(QList<Property *> properties, const QString &className, PropertyModel::ClassType type, int tabSize, PropertyModel::CommentsPosition commentsPosition) :
+PropertyCreator::PropertyCreator(const QList<Property *> &properties, const QString &className, PropertyModel::ClassType type, int tabSize, PropertyModel::CommentsPosition commentsPosition) :
     m_properties(properties), m_className(className), m_type(type), m_tabSize(tabSize), m_commentsPosition(commentsPosition)
 {
 #ifdef QT_DEBUG
@@ -34,12 +34,12 @@ PropertyCreator::PropertyCreator(QList<Property *> properties, const QString &cl
 }
 
 
-PropertyCreator::~PropertyCreator()
-{
-#ifdef QT_DEBUG
-    qDebug() << "Destroying a PropertyCreator for class" << m_className;
-#endif
-}
+// PropertyCreator::~PropertyCreator()
+// {
+// #ifdef QT_DEBUG
+//     qDebug() << "Destroying a PropertyCreator for class" << m_className;
+// #endif
+// }
 
 
 QString PropertyCreator::createHeader()
@@ -63,7 +63,7 @@ QString PropertyCreator::createHeader()
 
     }
 
-    QString result("");
+    QString result = QLatin1String("");
     QString uClassName = m_className.toUpper();
     
     
@@ -71,7 +71,7 @@ QString PropertyCreator::createHeader()
     
     if (m_commentsPosition == PropertyModel::InFronOfHeader) {
         
-        result += QLatin1String("\n\n") % buildClassComment() + QLatin1String("\n\n");
+        result += QLatin1String("\n\n") % buildClassComment() % QLatin1String("\n\n");
         
         for (int i = 0; i < m_propertiesCount; ++i) {
             
@@ -331,7 +331,7 @@ QString PropertyCreator::createPrivate()
     QString uClassName = m_className.toUpper();
 
 
-    QString result("");
+    QString result = QLatin1String("");
 
     result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_P_H\n#define ") % uClassName % QLatin1String("_P_H\n\n");
 
@@ -462,7 +462,7 @@ QString PropertyCreator::createCode()
 
     QString doubleIndent = m_indent % m_indent;
 
-    QString result("");
+    QString result = QLatin1String("");
 
     result += QLatin1String("#include \"") % m_className.toLower();
     if (privateClass) {
@@ -684,7 +684,7 @@ QString PropertyCreator::createCode()
 
 QString PropertyCreator::getPointerMacro(bool constant, bool newLine)
 {
-    QString result("Q_D(");
+    QString result = QStringLiteral("Q_D(");
 
     if (constant) {
         result += QLatin1String("const ");
@@ -711,12 +711,12 @@ QLatin1String PropertyCreator::getVariablePrefix(bool privateClass)
 QString PropertyCreator::getDefaultValue(const QString &type, bool pointer)
 {
     if (pointer) {
-        return QString("nullptr");
+        return QStringLiteral("nullptr");
     }
 
-    QStringList ints = {"unsigned char", "signed char", "short", "short int", "signed short", "signed short int", "unsigned short", "unsigned short int", "int", "signed", "signed int", "unsigned int", "long", "long int", "signed long", "signed long int", "unsigned long", "unsigned long int", "long long", "long long int", "signed long long", "signed long long int", "unsigned long long", "unsigned long long int", "qint8", "qint16", "qint32", "qint64", "qintptr", "qlonglong", "quint8", "quint16", "quint32", "quint64", "quintptr", "qulonglong", "uchar", "uint", "ulong", "ushort"};
+    QStringList ints = {QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")};
 
-    QStringList floats = {"float", "double", "long double", "qreal"};
+    QStringList floats = {QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")};
 
     if (ints.contains(type, Qt::CaseInsensitive)) {
         return QStringLiteral("0");
@@ -738,22 +738,22 @@ void PropertyCreator::setIndent()
 {
     switch(m_tabSize) {
     case 1:
-        m_indent = QString(" ");
+        m_indent = QStringLiteral(" ");
         break;
     case 2:
-        m_indent = QString("  ");
+        m_indent = QStringLiteral("  ");
         break;
     case 3:
-        m_indent = QString("   ");
+        m_indent = QStringLiteral("   ");
         break;
     case 4:
-        m_indent = QString("    ");
+        m_indent = QStringLiteral("    ");
         break;
     case 5:
-        m_indent = QString("     ");
+        m_indent = QStringLiteral("     ");
         break;
     case 6:
-        m_indent = QString("      ");
+        m_indent = QStringLiteral("      ");
         break;
     default:
         m_indent = QString();
@@ -778,7 +778,7 @@ QString PropertyCreator::buildTableRow(const QString &firstCol, const QString &s
 
 QString PropertyCreator::buildClassComment()
 {
-    QString result("/*!\n");
+    QString result = QStringLiteral("/*!\n");
     if (m_commentsPosition == PropertyModel::InFronOfHeader) {
         result += QLatin1String(" * \\class ") % m_className % QLatin1String("\n");
     }
@@ -790,7 +790,7 @@ QString PropertyCreator::buildClassComment()
 
 QString PropertyCreator::buildPropertyComment(Property *prop)
 {    
-    QString result("");
+    QString result = QLatin1String("");
     
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent;
@@ -837,7 +837,7 @@ QString PropertyCreator::buildPropertyComment(Property *prop)
                 }
 
                 if (prop->comment.size() > 100) {
-                    QStringList paragraphs = prop->comment.split(QRegularExpression("\\n"), QString::SkipEmptyParts);
+                    QStringList paragraphs = prop->comment.split(QRegularExpression(QStringLiteral("\\n")), QString::SkipEmptyParts);
 
                     for (int i = 0; i < paragraphs.size(); ++i) {
                         
@@ -849,7 +849,7 @@ QString PropertyCreator::buildPropertyComment(Property *prop)
 
                         int combinedSize = 0;
 
-                        QStringList words = paragraphs.at(i).split(" ");
+                        QStringList words = paragraphs.at(i).split(' ');
 
                         for (int j = 0; j < words.size(); ++j) {
 
@@ -995,7 +995,7 @@ QString PropertyCreator::buildPartOfStatement(Property *prop)
 
 QString PropertyCreator::buildReadComment(Property *prop)
 {
-    QString result("");
+    QString result = QLatin1String("");
     
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent;
@@ -1023,7 +1023,7 @@ QString PropertyCreator::buildReadComment(Property *prop)
 
 QString PropertyCreator::buildWriteComment(Property *prop)
 {
-    QString result("");
+    QString result = QLatin1String("");
     
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent;
@@ -1044,7 +1044,7 @@ QString PropertyCreator::buildWriteComment(Property *prop)
 
 QString PropertyCreator::buildResetComment(Property *prop)
 {
-    QString result("");
+    QString result = QLatin1String("");
     
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent;
@@ -1064,7 +1064,7 @@ QString PropertyCreator::buildResetComment(Property *prop)
 
 QString PropertyCreator::buildNotifyComment(Property *prop)
 {
-    QString result("");
+    QString result = QLatin1String("");
     
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent % QLatin1String("/*!\n");
@@ -1129,7 +1129,7 @@ QString PropertyCreator::buildNotifyPrototype(Property *prop)
 
 QString PropertyCreator::buildFuncArg(Property *prop, bool notify)
 {
-    QString result("(");
+    QString result = QStringLiteral("(");
     
     if (!prop->pointer) {
         result += QLatin1String("const ");

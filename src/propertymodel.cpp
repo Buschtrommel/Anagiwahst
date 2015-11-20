@@ -212,7 +212,7 @@ void PropertyModel::loadData()
 
         if (trimmed.startsWith(QLatin1String("class"), Qt::CaseInsensitive) && !trimmed.endsWith(QLatin1String(";"))) {
 
-            QStringList classPartList = trimmed.split(" ");
+            QStringList classPartList = trimmed.split(' ');
 
             if (!classPartList.isEmpty()) {
 
@@ -231,7 +231,7 @@ void PropertyModel::loadData()
         }
 
 
-        if (trimmed.startsWith("Q_DECLARE_PRIVATE")) {
+        if (trimmed.startsWith(QLatin1String("Q_DECLARE_PRIVATE"))) {
             QString privDecl = trimmed;
             privDecl.remove(0,18);
             privDecl.chop(1);
@@ -247,26 +247,26 @@ void PropertyModel::loadData()
             trimmed.remove(0,11);
             trimmed.chop(1);
 
-            QString lastPart("");
+            QString lastPart = QLatin1String("");
 
-            QStringList propertyParts = trimmed.split(" ");
+            QStringList propertyParts = trimmed.split(' ');
             quint8 propertyPartsCount = propertyParts.size();
             QString type = propertyParts.at(0);
             QString name = propertyParts.at(1);
-            QString read("");
-            QString write("");
-            QString member("");
-            QString reset("");
-            QString notify("");
+            QString read = QLatin1String("");
+            QString write = QLatin1String("");
+            QString member = QLatin1String("");
+            QString reset = QLatin1String("");
+            QString notify = QLatin1String("");
             quint8 revision = 0;
-            QString designable("true");
-            QString scriptable("true");
+            QString designable = QStringLiteral("true");
+            QString scriptable = QStringLiteral("true");
             bool stored = true;
             bool user = false;
             bool constant = false;
             bool final = false;
-            QString brief("This property holds");
-            QString comment("");
+            QString brief = QStringLiteral("This property holds");
+            QString comment = QLatin1String("");
             bool pointer = false;
 
 
@@ -359,7 +359,7 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
 
     QString propName(name);
 
-    if (propName.startsWith("*")) {
+    if (propName.startsWith('*')) {
         prop->pointer = true;
         prop->defaultValue = QStringLiteral("nullptr");
         propName.remove(0,1);
@@ -780,9 +780,9 @@ void PropertyModel::setClassName(const QString &nClassName)
  * \brief This property holds
  *
  * \par Access functions:
- * <TABLE><TR><TD>bool</TD><TD>isPrivateClass() const</TD></TR><TR><TD>void</TD><TD>setPrivateClass(const bool & nPrivateClass)</TD></TR></TABLE>
+ * <TABLE><TR><TD>bool</TD><TD>isPrivateClass() const</TD></TR><TR><TD>void</TD><TD>setPrivateClass(bool nPrivateClass)</TD></TR></TABLE>
  * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>privateClassChanged(const bool & nPrivateClass)</TD></TR></TABLE>
+ * <TABLE><TR><TD>void</TD><TD>privateClassChanged(bool nPrivateClass)</TD></TR></TABLE>
  */
 
 /*!
@@ -804,7 +804,7 @@ bool PropertyModel::isPrivateClass() const { return m_privateClass; }
  *
  * Part of the \link PropertyModel::privateClass privateClass \endlink property.
  */
-void PropertyModel::setPrivateClass(const bool &nPrivateClass)
+void PropertyModel::setPrivateClass(bool nPrivateClass)
 {
     if (nPrivateClass != m_privateClass) {
         m_privateClass = nPrivateClass;
@@ -826,9 +826,9 @@ void PropertyModel::setPrivateClass(const bool &nPrivateClass)
  * The class type manages the style of the class parts.
  *
  * \par Access functions:
- * <TABLE><TR><TD>ClassType</TD><TD>getType() const</TD></TR><TR><TD>void</TD><TD>setType(const ClassType & type)</TD></TR></TABLE>
+ * <TABLE><TR><TD>ClassType</TD><TD>getType() const</TD></TR><TR><TD>void</TD><TD>setType(ClassType type)</TD></TR></TABLE>
  * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>typeChanged(const ClassType & type)</TD></TR></TABLE>
+ * <TABLE><TR><TD>void</TD><TD>typeChanged(ClassType type)</TD></TR></TABLE>
  */
 
 /*!
@@ -844,7 +844,7 @@ PropertyModel::ClassType PropertyModel::getType() const { return m_type; }
 /*!
  * \brief Part of the \link PropertyModel::type type \endlink property.
  */
-void PropertyModel::setType(const ClassType & type)
+void PropertyModel::setType(ClassType type)
 {
     if (type != m_type) {
         m_type = type;
@@ -862,9 +862,9 @@ void PropertyModel::setType(const ClassType & type)
  * \brief Defines where the comments will be inserted.
  *
  * \par Access functions:
- * <TABLE><TR><TD>CommentsPosition</TD><TD>getCommentsPosition() const</TD></TR><TR><TD>void</TD><TD>setCommentsPosition(const CommentsPosition & commentsPosition)</TD></TR></TABLE>
+ * <TABLE><TR><TD>CommentsPosition</TD><TD>getCommentsPosition() const</TD></TR><TR><TD>void</TD><TD>setCommentsPosition(CommentsPosition commentsPosition)</TD></TR></TABLE>
  * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>commentsPositionChanged(const CommentsPosition & commentsPosition)</TD></TR></TABLE>
+ * <TABLE><TR><TD>void</TD><TD>commentsPositionChanged(CommentsPosition commentsPosition)</TD></TR></TABLE>
  */
 
 /*!
@@ -880,7 +880,7 @@ PropertyModel::CommentsPosition PropertyModel::getCommentsPosition() const { ret
 /*!
  * \brief Part of the \link PropertyModel::commentsPosition commentsPosition \endlink property.
  */
-void PropertyModel::setCommentsPosition(const CommentsPosition & commentsPosition)
+void PropertyModel::setCommentsPosition(CommentsPosition commentsPosition)
 {
     if (commentsPosition != m_commentsPosition) {
         m_commentsPosition = commentsPosition;
@@ -898,9 +898,9 @@ void PropertyModel::setCommentsPosition(const CommentsPosition & commentsPositio
  * \brief Set to true to use the name of the property for the read function.
  *
  * \par Access functions:
- * <TABLE><TR><TD>bool</TD><TD>hasUsePropertyName() const</TD></TR><TR><TD>void</TD><TD>setUsePropertyName(const bool & usePropertyName)</TD></TR></TABLE>
+ * <TABLE><TR><TD>bool</TD><TD>hasUsePropertyName() const</TD></TR><TR><TD>void</TD><TD>setUsePropertyName(bool usePropertyName)</TD></TR></TABLE>
  * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>usePropertyNameChanged(const bool & usePropertyName)</TD></TR></TABLE>
+ * <TABLE><TR><TD>void</TD><TD>usePropertyNameChanged(bool usePropertyName)</TD></TR></TABLE>
  */
 
 /*!
@@ -916,7 +916,7 @@ bool PropertyModel::hasUsePropertyName() const { return m_usePropertyName; }
 /*!
  * \brief Part of the \link PropertyModel::usePropertyName usePropertyName \endlink property.
  */
-void PropertyModel::setUsePropertyName(const bool & usePropertyName)
+void PropertyModel::setUsePropertyName(bool usePropertyName)
 {
     if (usePropertyName != m_usePropertyName) {
         m_usePropertyName = usePropertyName;
@@ -934,12 +934,12 @@ void PropertyModel::setUsePropertyName(const bool & usePropertyName)
 QString PropertyModel::getDefaultValue(const QString &type, bool pointer)
 {
     if (pointer) {
-        return QString("nullptr");
+        return QStringLiteral("nullptr");
     }
 
-    QStringList ints = {"unsigned char", "signed char", "short", "short int", "signed short", "signed short int", "unsigned short", "unsigned short int", "int", "signed", "signed int", "unsigned int", "long", "long int", "signed long", "signed long int", "unsigned long", "unsigned long int", "long long", "long long int", "signed long long", "signed long long int", "unsigned long long", "unsigned long long int", "qint8", "qint16", "qint32", "qint64", "qintptr", "qlonglong", "quint8", "quint16", "quint32", "quint64", "quintptr", "qulonglong", "uchar", "uint", "ulong", "ushort"};
+    QStringList ints = {QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")};
 
-    QStringList floats = {"float", "double", "long double", "qreal"};
+    QStringList floats = {QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")};
 
     if (ints.contains(type, Qt::CaseInsensitive)) {
         return QStringLiteral("0");

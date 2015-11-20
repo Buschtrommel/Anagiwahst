@@ -31,8 +31,8 @@ struct Property;
 class PropertyCreator
 {
 public:
-    explicit PropertyCreator(QList<Property*> properties, const QString &className, PropertyModel::ClassType type = PropertyModel::PrivateClass, int tabSize = 4, PropertyModel::CommentsPosition commentsPosition = PropertyModel::InCode);
-    ~PropertyCreator();
+    PropertyCreator(const QList<Property*> &properties, const QString &className, PropertyModel::ClassType type = PropertyModel::PrivateClass, int tabSize = 4, PropertyModel::CommentsPosition commentsPosition = PropertyModel::InCode);
+//     ~PropertyCreator();
 
     QString createHeader();
     QString createPrivate();

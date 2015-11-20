@@ -100,10 +100,10 @@ public:
     
     void setFileUrl(const QUrl &nFileUrl);
     void setClassName(const QString &nClassName);
-    void setPrivateClass(const bool &nPrivateClass);
-    void setType(const ClassType &type);
-    void setCommentsPosition(const CommentsPosition &commentsPosition);
-    void setUsePropertyName(const bool &usePropertyName);
+    void setPrivateClass(bool nPrivateClass);
+    void setType(ClassType type);
+    void setCommentsPosition(CommentsPosition commentsPosition);
+    void setUsePropertyName(bool usePropertyName);
 
     void loadData();
     Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
@@ -119,10 +119,10 @@ signals:
     void fileUrlChanged(const QUrl &nFileUrl);
     void fileNameChanged(const QString &nFileName);
     void classNameChanged(const QString &nClassName);
-    void privateClassChanged(const bool &nPrivateClass);
-    void typeChanged(const ClassType &type);
-    void commentsPositionChanged(const CommentsPosition &commentsPosition);
-    void usePropertyNameChanged(const bool &usePropertyName);
+    void privateClassChanged(bool nPrivateClass);
+    void typeChanged(ClassType type);
+    void commentsPositionChanged(CommentsPosition commentsPosition);
+    void usePropertyNameChanged(bool usePropertyName);
 
 private:
     QList<Property*> m_properties;
