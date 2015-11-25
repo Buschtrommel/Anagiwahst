@@ -21,6 +21,7 @@
 #include "propertywriter.h"
 #include "property.h"
 #include <QtDebug>
+#include <QStringList>
 
 const int PropertyModel::IdRole = Qt::UserRole + 1;
 const int PropertyModel::NameRole = Qt::UserRole + 2;
@@ -42,6 +43,7 @@ const int PropertyModel::CommentRole = Qt::UserRole + 17;
 const int PropertyModel::PrivateRole = Qt::UserRole + 18;
 const int PropertyModel::DefaultRole = Qt::UserRole + 19;
 const int PropertyModel::PointerRole = Qt::UserRole + 20;
+const int PropertyModel::ArgsByRefRole = Qt::UserRole + 21;
 
 
 /*!
@@ -72,6 +74,7 @@ PropertyModel::PropertyModel()
     m_roles.insert(PrivateRole, QByteArrayLiteral("private"));
     m_roles.insert(DefaultRole, QByteArrayLiteral("default"));
     m_roles.insert(PointerRole, QByteArrayLiteral("pointer"));
+    m_roles.insert(ArgsByRefRole, QByteArrayLiteral("argsByRef"));
 
     m_fileUrl = QUrl();
     m_className = QStringLiteral("");
@@ -79,6 +82,10 @@ PropertyModel::PropertyModel()
     m_type = PrivateClass;
     m_commentsPosition = InCode;
     m_usePropertyName = false;
+    
+    m_ints = QStringList({QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")});
+    
+    m_floats = QStringList{QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")};
 
 #ifdef QT_DEBUG
     qDebug() << "Constructed PropertyModel" << this;
@@ -182,6 +189,8 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue(prop->defaultValue);
     case PointerRole:
         return QVariant::fromValue(prop->pointer);
+    case ArgsByRefRole:
+        return QVariant::fromValue(prop->argsByRef);
     default:
         return QVariant();
     }
@@ -361,13 +370,13 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
 
     if (propName.startsWith('*')) {
         prop->pointer = true;
-        prop->defaultValue = QStringLiteral("nullptr");
         propName.remove(0,1);
     } else {
         prop->pointer = false;
-        prop->defaultValue = getDefaultValue(type);
     }
-
+    
+    prop->defaultValue = getDefaultValue(type, prop->pointer);
+    prop->argsByRef = getArgsByRef(type, prop->pointer);
     prop->id = rowCount();
     prop->name = propName;
     prop->type = type;
@@ -645,6 +654,10 @@ bool PropertyModel::updateData(const QString &role, int idx, const QVariant &val
     case PointerRole:
         prop->pointer = value.toBool();
         emit dataChanged(index(idx), index(idx), QVector<int>(1, PointerRole));
+        return true;
+    case ArgsByRefRole:
+        prop->argsByRef = value.toBool();
+        emit dataChanged(index(idx), index(idx), QVector<int>(1, ArgsByRefRole));
         return true;
     default:
         return false;
@@ -937,13 +950,9 @@ QString PropertyModel::getDefaultValue(const QString &type, bool pointer)
         return QStringLiteral("nullptr");
     }
 
-    QStringList ints = {QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")};
-
-    QStringList floats = {QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")};
-
-    if (ints.contains(type, Qt::CaseInsensitive)) {
+    if (m_ints.contains(type, Qt::CaseInsensitive)) {
         return QStringLiteral("0");
-    } else if (floats.contains(type, Qt::CaseInsensitive)) {
+    } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
         return QStringLiteral("0.0");
     } else if (type == QLatin1String("QString")) {
         return QStringLiteral("QString()");
@@ -953,5 +962,21 @@ QString PropertyModel::getDefaultValue(const QString &type, bool pointer)
         QString result = type;
         result.append(QStringLiteral("()"));
         return result;
+    }
+}
+
+
+bool PropertyModel::getArgsByRef(const QString &type, bool pointer)
+{
+    if (pointer) {
+        return false;
+    }
+    
+    if (m_ints.contains(type, Qt::CaseInsensitive)) {
+        return false;
+    } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
+        return false;
+    } else {
+        return true;
     }
 }

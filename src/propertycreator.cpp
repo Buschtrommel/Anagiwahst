@@ -920,11 +920,12 @@ QString PropertyCreator::buildPropertyComment(Property *prop)
             result += QLatin1String(" * \\par Notifier signal:\n * <TABLE>");
         }
 
-        if (prop->pointer) {
-            result += buildTableRow(QStringLiteral("void"), prop->notify % QLatin1String("(") % prop->type % QLatin1String(" * ") % prop->name % QLatin1String(")"));
-        } else {
-            result += buildTableRow(QStringLiteral("void"), prop->notify % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")"));
-        }
+//         if (prop->pointer) {
+//             result += buildTableRow(QStringLiteral("void"), prop->notify % QLatin1String("(") % prop->type % QLatin1String(" * ") % prop->name % QLatin1String(")"));
+//         } else {
+//             result += buildTableRow(QStringLiteral("void"), prop->notify % QLatin1String("(const ") % prop->type % QLatin1String(" & ") % prop->name % QLatin1String(")"));
+//         }
+        result += buildTableRow(QStringLiteral("void"), prop->notify % buildFuncArg(prop, true));
 
         result += QLatin1String("</TABLE>\n");
 
@@ -1131,14 +1132,18 @@ QString PropertyCreator::buildFuncArg(Property *prop, bool notify)
 {
     QString result = QStringLiteral("(");
     
-    if (!prop->pointer) {
+    if (!prop->pointer && prop->argsByRef) {
         result += QLatin1String("const ");
     }
     
     result += prop->type;
     
     if (!prop->pointer) {
-        result += QLatin1String(" &");
+        if (!prop->argsByRef) {
+            result += ' ';
+        } else {
+            result += QLatin1String(" &");
+        }
     } else {
         result += QLatin1String(" *");
     }

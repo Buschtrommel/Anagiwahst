@@ -26,6 +26,7 @@
 #include <QTextStream>
 
 struct Property;
+class QStringList;
 
 /*!
  * \brief The PropertyModel class
@@ -89,6 +90,7 @@ public:
     static const int PrivateRole;
     static const int DefaultRole;
     static const int PointerRole;
+    static const int ArgsByRefRole;
 
     QUrl getFileUrl() const;
     QString getFileName() const;
@@ -127,6 +129,8 @@ signals:
 private:
     QList<Property*> m_properties;
     QHash<int, QByteArray> m_roles;
+    QStringList m_ints;
+    QStringList m_floats;
 
     QUrl m_fileUrl;
     QString m_className;
@@ -134,8 +138,11 @@ private:
     ClassType m_type;
     CommentsPosition m_commentsPosition;
     bool m_usePropertyName;
+    
+    
 
     QString getDefaultValue(const QString &type, bool pointer = false);
+    bool getArgsByRef(const QString &type, bool pointer = false);
 };
 
 #endif // PROPERTYMODEL_H

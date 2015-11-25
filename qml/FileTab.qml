@@ -103,6 +103,7 @@ SplitView {
         editFinal.init(propModel.getData("final", rowIndex))
         editPrivate.init(propModel.getData("private", rowIndex))
         editPointer.init(propModel.getData("pointer", rowIndex))
+        editArgsByRef.init(propModel.getData("argsByRef", rowIndex))
         editDefaultValue.init(propModel.getData("default", rowIndex))
         editBrief.init(propModel.getData("brief", rowIndex))
         editComment.initialText = propModel.getData("comment", rowIndex)
@@ -129,6 +130,7 @@ SplitView {
         propModel.updateData("final", rowIndex, editFinal.apply())
         propModel.updateData("private", rowIndex, editPrivate.apply())
         propModel.updateData("pointer", rowIndex, editPointer.apply())
+        propModel.updateData("argsByRef", rowIndex, editArgsByRef.apply())
         propModel.updateData("default", rowIndex, editDefaultValue.apply())
         propModel.updateData("brief", rowIndex, editBrief.apply())
         propModel.updateData("comment", rowIndex, editComment.text)
@@ -153,6 +155,7 @@ SplitView {
         editFinal.reset()
         editPrivate.reset()
         editPointer.reset()
+        editArgsByRef.reset()
         editDefaultValue.reset()
         editBrief.reset()
         editComment.text = editComment.initialText
@@ -285,6 +288,15 @@ SplitView {
         TableViewColumn {
             role: "pointer"
             title: qsTr("Pointer")
+            delegate: CheckBox {
+                checked: styleData.value
+                enabled: false
+            }
+        }
+        
+        TableViewColumn {
+            role: "argsByRef"
+            title: qsTr("Args by Ref")
             delegate: CheckBox {
                 checked: styleData.value
                 enabled: false
@@ -592,6 +604,11 @@ SplitView {
                             CheckBoxWithReset {
                                 id: editPointer
                                 text: qsTr("Pointer")
+                            }
+                            
+                            CheckBoxWithReset {
+                                id: editArgsByRef
+                                text: qsTr("Args by Ref")
                             }
 
                         }
