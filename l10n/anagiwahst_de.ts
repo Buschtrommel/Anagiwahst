@@ -10,116 +10,122 @@
 <context>
     <name>FileTab</name>
     <message>
-        <location filename="../qml/FileTab.qml" line="+192"/>
-        <location line="+213"/>
+        <location filename="../qml/FileTab.qml" line="+195"/>
+        <location line="+222"/>
         <location line="+106"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location line="-314"/>
-        <location line="+216"/>
+        <location line="-323"/>
+        <location line="+225"/>
         <location line="+104"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location line="-315"/>
-        <location line="+131"/>
+        <location line="-324"/>
+        <location line="+140"/>
         <location line="+93"/>
         <location line="+97"/>
         <source>Read</source>
         <translation>Read</translation>
     </message>
     <message>
-        <location line="-316"/>
-        <location line="+132"/>
+        <location line="-325"/>
+        <location line="+141"/>
         <location line="+93"/>
         <location line="+96"/>
         <source>Write</source>
         <translation>Write</translation>
     </message>
     <message>
-        <location line="-316"/>
-        <location line="+133"/>
+        <location line="-325"/>
+        <location line="+142"/>
         <location line="+93"/>
         <location line="+100"/>
         <source>Member</source>
         <translation>Member</translation>
     </message>
     <message>
-        <location line="-321"/>
-        <location line="+134"/>
+        <location line="-330"/>
+        <location line="+143"/>
         <location line="+94"/>
         <location line="+98"/>
-        <location line="+95"/>
+        <location line="+100"/>
         <source>Reset</source>
         <translation>Reset</translation>
     </message>
     <message>
-        <location line="-416"/>
-        <location line="+135"/>
+        <location line="-430"/>
+        <location line="+144"/>
         <location line="+94"/>
         <location line="+82"/>
         <source>Notify</source>
         <translation>Notify</translation>
     </message>
     <message>
-        <location line="-306"/>
-        <location line="+321"/>
+        <location line="-315"/>
+        <location line="+330"/>
         <source>Revision</source>
         <translation>Revision</translation>
     </message>
     <message>
-        <location line="-316"/>
-        <location line="+323"/>
+        <location line="-325"/>
+        <location line="+332"/>
         <source>Designable</source>
         <translation>Designable</translation>
     </message>
     <message>
-        <location line="-318"/>
-        <location line="+323"/>
+        <location line="-327"/>
+        <location line="+332"/>
         <source>Scriptable</source>
         <translation>Scriptable</translation>
     </message>
     <message>
-        <location line="-318"/>
-        <location line="+327"/>
+        <location line="-327"/>
+        <location line="+336"/>
         <source>Stored</source>
         <translation>Stored</translation>
     </message>
     <message>
-        <location line="-318"/>
-        <location line="+323"/>
+        <location line="-327"/>
+        <location line="+332"/>
         <source>User</source>
         <translation>User</translation>
     </message>
     <message>
-        <location line="-314"/>
-        <location line="+319"/>
+        <location line="-323"/>
+        <location line="+328"/>
         <source>Constant</source>
         <translation>Constant</translation>
     </message>
     <message>
-        <location line="-310"/>
-        <location line="+315"/>
+        <location line="-319"/>
+        <location line="+324"/>
         <source>Final</source>
         <translation>Final</translation>
     </message>
     <message>
-        <location line="-306"/>
-        <location line="+311"/>
+        <location line="-315"/>
+        <location line="+320"/>
         <source>Private</source>
         <translation>Privat</translation>
     </message>
     <message>
-        <location line="-302"/>
-        <location line="+307"/>
+        <location line="-311"/>
+        <location line="+316"/>
         <source>Pointer</source>
         <translation>Zeiger</translation>
     </message>
     <message>
-        <location line="-280"/>
+        <location line="-307"/>
+        <location line="+312"/>
+        <source>Args by Ref</source>
+        <translation>Args via Ref</translation>
+    </message>
+    <message>
+        <location line="-285"/>
         <source>Class name</source>
         <translation>Klassenname</translation>
     </message>
@@ -146,12 +152,12 @@
     </message>
     <message>
         <location line="+82"/>
-        <location line="+177"/>
+        <location line="+182"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location line="-160"/>
+        <location line="-165"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
@@ -161,7 +167,7 @@
         <translation>Property bearbeiten</translation>
     </message>
     <message>
-        <location line="+103"/>
+        <location line="+108"/>
         <source>Default value</source>
         <translation>Standardwert</translation>
     </message>
