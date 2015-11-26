@@ -976,6 +976,8 @@ bool PropertyModel::getArgsByRef(const QString &type, bool pointer)
         return false;
     } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
         return false;
+    } else if (type == QLatin1String("bool")) {
+        return false;        
     } else {
         return true;
     }
