@@ -82,9 +82,9 @@ PropertyModel::PropertyModel()
     m_type = PrivateClass;
     m_commentsPosition = InCode;
     m_usePropertyName = false;
-    
+
     m_ints = QStringList({QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")});
-    
+
     m_floats = QStringList{QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")};
 
 #ifdef QT_DEBUG
@@ -374,7 +374,9 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
     } else {
         prop->pointer = false;
     }
-    
+
+    propName[0] = propName[0].toLower();
+
     prop->defaultValue = getDefaultValue(type, prop->pointer);
     prop->argsByRef = getArgsByRef(type, prop->pointer);
     prop->id = rowCount();
@@ -383,9 +385,9 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
 
     if (r) {
         QString read = propName;
-        
+
         if (!m_usePropertyName) {
-        
+
             read[0] = read[0].toUpper();
             if (type == QLatin1String("bool")) {
                 if (name.contains(QStringLiteral("enabled"), Qt::CaseInsensitive)) {
@@ -396,7 +398,7 @@ bool PropertyModel::addProperty(const QString &name, const QString &type, bool r
             } else {
                 read.prepend(QStringLiteral("get"));
             }
-        
+
         }
 
         prop->read = read;
@@ -971,13 +973,13 @@ bool PropertyModel::getArgsByRef(const QString &type, bool pointer)
     if (pointer) {
         return false;
     }
-    
+
     if (m_ints.contains(type, Qt::CaseInsensitive)) {
         return false;
     } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
         return false;
     } else if (type == QLatin1String("bool")) {
-        return false;        
+        return false;
     } else {
         return true;
     }
