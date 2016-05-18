@@ -32,7 +32,7 @@ ApplicationWindow {
     property int rowCount: -1
     property int currentRow: -1
     property bool editChanged: false
-    
+
     Component.onDestruction: {
         config.windowWidth = anagiwahst.width
         config.windowHeight = anagiwahst.height
@@ -157,6 +157,7 @@ ApplicationWindow {
                 text: qsTr("Generate properties")
                 enabled: anagiwahst.rowCount > 0
                 iconName: "run-build"
+				shortcut: "Ctrl+R"
                 onTriggered: {
                     var component = Qt.createComponent("ResultDialog.qml")
                     if (component.status === Component.Ready) {
@@ -166,11 +167,11 @@ ApplicationWindow {
                 }
             }
         }
-        
+
         Menu {
             title: qsTr("&Settings")
             visible: false
-            
+
             MenuItem {
                 id: saveOnChange
                 text: qsTr("Save on change")
@@ -178,7 +179,7 @@ ApplicationWindow {
                 checked: true
                 visible: false
             }
-            
+
             MenuItem {
                 text: qsTr("Confirgure Anagiwahst ...")
                 iconName: "configure"
