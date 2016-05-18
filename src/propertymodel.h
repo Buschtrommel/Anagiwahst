@@ -58,7 +58,7 @@ public:
         PrivateClass    = 0,
         SharedData      = 1
     };
-    
+
     enum CommentsPosition {
         InCode          = 0,
         InHeader        = 1,
@@ -99,7 +99,7 @@ public:
     ClassType getType() const;
     CommentsPosition getCommentsPosition() const;
     bool hasUsePropertyName() const;
-    
+
     void setFileUrl(const QUrl &nFileUrl);
     void setClassName(const QString &nClassName);
     void setPrivateClass(bool nPrivateClass);
@@ -131,6 +131,7 @@ private:
     QHash<int, QByteArray> m_roles;
     QStringList m_ints;
     QStringList m_floats;
+	QStringList m_hasDefaultConstructor;
 
     QUrl m_fileUrl;
     QString m_className;
@@ -138,8 +139,8 @@ private:
     ClassType m_type;
     CommentsPosition m_commentsPosition;
     bool m_usePropertyName;
-    
-    
+
+
 
     QString getDefaultValue(const QString &type, bool pointer = false);
     bool getArgsByRef(const QString &type, bool pointer = false);

@@ -85,7 +85,9 @@ PropertyModel::PropertyModel()
 
     m_ints = QStringList({QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")});
 
-    m_floats = QStringList{QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")};
+    m_floats = QStringList({QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")});
+
+	m_hasDefaultConstructor = QStringList({QStringLiteral("QString"), QStringLiteral("QStringList"), QStringLiteral("QUrl"), QStringLiteral("QDateTime")});
 
 #ifdef QT_DEBUG
     qDebug() << "Constructed PropertyModel" << this;
@@ -956,10 +958,10 @@ QString PropertyModel::getDefaultValue(const QString &type, bool pointer)
         return QStringLiteral("0");
     } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
         return QStringLiteral("0.0");
-    } else if (type == QLatin1String("QString")) {
-        return QStringLiteral("QString()");
     } else if (type == QLatin1String("bool")) {
         return QStringLiteral("false");
+	} else if (m_hasDefaultConstructor.contains(type, Qt::CaseInsensitive)) {
+		return QString();
     } else {
         QString result = type;
         result.append(QStringLiteral("()"));
@@ -974,11 +976,11 @@ bool PropertyModel::getArgsByRef(const QString &type, bool pointer)
         return false;
     }
 
-    if (m_ints.contains(type, Qt::CaseInsensitive)) {
+    if (type == QLatin1String("bool")) {
         return false;
     } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
         return false;
-    } else if (type == QLatin1String("bool")) {
+    } else if (m_ints.contains(type, Qt::CaseInsensitive)) {
         return false;
     } else {
         return true;
