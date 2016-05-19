@@ -184,7 +184,7 @@ QString PropertyCreator::createHeader()
         result += QLatin1String(")\n");
     }
 
-    result += QLatin1String("public:\n") % m_indent % QLatin1String("explicit ") % m_className % QLatin1String("(QObject parent = nullptr);\n") % m_indent % QLatin1String("~") % m_className % QLatin1Literal("();\n\n");
+    result += QLatin1String("public:\n") % m_indent % QLatin1String("explicit ") % m_className % QLatin1String("(QObject *parent = nullptr);\n") % m_indent % QLatin1String("~") % m_className % QLatin1Literal("();\n\n");
 
     // Start building the get funciton in the public part of the header file
 
@@ -463,10 +463,10 @@ QString PropertyCreator::createCode()
 
     result += QLatin1String("#ifdef QT_DEBUG\n#include <QtDebug>\n#endif\n\n/*!\n * \\brief Constructs a new ") % m_className % QLatin1String(" object.\n */\n");
 
-    result += m_className % m_dc % m_className % QLatin1String("()");
+    result += m_className % m_dc % m_className % QLatin1String("(QObject *parent) :\n") % m_indent % QLatin1String("QObject(parent)");
 
     if (privateClass && m_type == PropertyModel::PrivateClass) {
-        result += QLatin1String(" :\n") % m_indent % QLatin1String("d_ptr(new ") % m_className % QLatin1String("Private(this))\n");
+        result += QLatin1String(", d_ptr(new ") % m_className % QLatin1String("Private(this))\n");
     } else {
         result += QLatin1String("\n");
     }
