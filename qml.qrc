@@ -4,7 +4,7 @@
         <file>qml/FileTab.qml</file>
         <file>qml/LabeledTextField.qml</file>
         <file>qml/ResultDialog.qml</file>
-        <file>qml/CheckBoxWithReset.qml</file>
         <file>qml/Configuration.qml</file>
+        <file>qml/TableText.qml</file>
     </qresource>
 </RCC>

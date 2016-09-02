@@ -19,6 +19,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
+import Buschtrommel.Anagiwahst 1.0
 
 ColumnLayout {
     id: labeledTextField
@@ -26,30 +27,10 @@ ColumnLayout {
     property alias text: textField.text
     property alias validator: textField.validator
     property alias inputMethodHints: textField.inputMethodHints
-    property string initialText
-    property bool changed: false
 
-    function reset() {
-        textField.text = initialText
-    }
-
-    function apply() {
-        initialText = textField.text
-        changed = false
-        return textField.text
-    }
-
-    function init(iniText) {
-        labeledTextField.initialText = iniText
-        textField.text = iniText
-        changed = false
-    }
-    
     function setFocus() {
         textField.forceActiveFocus()
     }
-
-    signal accepted()
 
     Label {
         id: textLabel
@@ -61,8 +42,6 @@ ColumnLayout {
         id: textField
         width: parent.width
         Layout.fillWidth: true
-        onTextChanged: labeledTextField.changed = labeledTextField.initialText !== textField.text
-        onAccepted: labeledTextField.accepted()
     }
 }
 

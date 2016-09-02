@@ -17,29 +17,9 @@
  */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
 
-CheckBox {
-    id: checkBoxWithReset
-    property bool initialState
-    property bool changed: false
-
-    function reset() {
-        checked = initialState
-    }
-
-    function apply() {
-        initialState = checked
-        changed = false
-        return checked
-    }
-
-    function init(initState) {
-        initialState = initState
-        checked = initState
-        changed = false
-    }
-
-    onCheckedChanged: checkBoxWithReset.changed = (checkBoxWithReset.initialState !== checkBoxWithReset.checked)
+Text {
+    anchors { left: parent ? parent.left : anagiwahst.left ; leftMargin: 6; }
+    font.weight: Font.ExtraLight
+    verticalAlignment: Text.AlignVCenter
 }
-

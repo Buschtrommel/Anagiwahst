@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <QList>
+#include <QStringList>
 #include "propertymodel.h"
 
 struct Property;
@@ -31,7 +32,7 @@ struct Property;
 class PropertyCreator
 {
 public:
-    PropertyCreator(const QList<Property*> &properties, const QString &className, PropertyModel::ClassType type = PropertyModel::PrivateClass, int tabSize = 4, PropertyModel::CommentsPosition commentsPosition = PropertyModel::InCode);
+    PropertyCreator(const QList<Property*> &properties, const QString &className, PropertyModel::ClassType type = PropertyModel::PrivateClass, int tabSize = 4, PropertyModel::CommentsPosition commentsPosition = PropertyModel::InCode, const QStringList &namespaces = QStringList());
 //     ~PropertyCreator();
 
     QString createHeader();
@@ -73,6 +74,7 @@ private:
     PropertyModel::ClassType m_type;
     PropertyModel::CommentsPosition m_commentsPosition;
     QString m_dc;
+    QStringList m_namespaces;
 };
 
 #endif // PROPERTYCREATOR_H

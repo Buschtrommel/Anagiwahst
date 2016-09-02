@@ -6,6 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set (anagiwahst_SRCS
     main.cpp
+    property.cpp
     propertycreator.cpp
     propertymodel.cpp
     propertywriter.cpp
@@ -14,6 +15,7 @@ set (anagiwahst_SRCS
 
 set (anagiwahst_HEADERS
     property.h
+    property_p.h
     propertycreator.h
     propertymodel.h
     propertywriter.h

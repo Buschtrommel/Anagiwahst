@@ -25,7 +25,7 @@
 #include <QFile>
 #include <QTextStream>
 
-struct Property;
+class Property;
 class QStringList;
 
 /*!
@@ -44,8 +44,9 @@ class PropertyModel : public QAbstractListModel
     Q_PROPERTY(ClassType type READ getType WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(CommentsPosition commentsPosition READ getCommentsPosition WRITE setCommentsPosition NOTIFY commentsPositionChanged)
     Q_PROPERTY(bool usePropertyName READ hasUsePropertyName WRITE setUsePropertyName NOTIFY usePropertyNameChanged)
+    Q_PROPERTY(QString namespaces READ getNamespaces WRITE setNamespaces NOTIFY namespacesChanged)
 public:
-    explicit PropertyModel();
+    explicit PropertyModel(QObject *parent = nullptr);
     ~PropertyModel();
 
     enum ResultFileType {
@@ -65,32 +66,14 @@ public:
         InFronOfHeader  = 2
     };
 
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_FINAL;
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_FINAL;
-    virtual QHash<int, QByteArray> roleNames() const Q_DECL_FINAL;
-    virtual QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const Q_DECL_FINAL;
+	enum Roles {
+		Item	= Qt::UserRole + 1
+    };
 
-    static const int IdRole;
-    static const int NameRole;
-    static const int TypeRole;
-    static const int ReadRole;
-    static const int WriteRole;
-    static const int MemberRole;
-    static const int ResetRole;
-    static const int NotifyRole;
-    static const int RevisionRole;
-    static const int DesignableRole;
-    static const int ScriptableRole;
-    static const int StoredRole;
-    static const int UserRole;
-    static const int ConstantRole;
-    static const int FinalRole;
-    static const int BriefRole;
-    static const int CommentRole;
-    static const int PrivateRole;
-    static const int DefaultRole;
-    static const int PointerRole;
-    static const int ArgsByRefRole;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE Q_DECL_FINAL;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE Q_DECL_FINAL;
+    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE Q_DECL_FINAL;
+    QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE Q_DECL_FINAL;
 
     QUrl getFileUrl() const;
     QString getFileName() const;
@@ -99,6 +82,7 @@ public:
     ClassType getType() const;
     CommentsPosition getCommentsPosition() const;
     bool hasUsePropertyName() const;
+    QString getNamespaces() const;
 
     void setFileUrl(const QUrl &nFileUrl);
     void setClassName(const QString &nClassName);
@@ -106,16 +90,19 @@ public:
     void setType(ClassType type);
     void setCommentsPosition(CommentsPosition commentsPosition);
     void setUsePropertyName(bool usePropertyName);
+    void setNamespaces(const QString &namespaces);
 
     void loadData();
-    Q_INVOKABLE bool addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
+    Q_INVOKABLE Property *addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
     Q_INVOKABLE void deleteProperty(int idx);
     Q_INVOKABLE QString createOutput(ResultFileType type) const;
     Q_INVOKABLE bool saveToDirectory(ResultFileType type, const QString &directory) const;
     Q_INVOKABLE bool saveToFile(ResultFileType type, const QUrl &file) const;
     Q_INVOKABLE bool saveAll(const QUrl &directory) const;
     Q_INVOKABLE QVariant getData(const QString &role, int idx) const;
-    Q_INVOKABLE bool updateData(const QString &role, int idx, const QVariant &value);
+    Q_INVOKABLE Property *getItemById(int id);
+    Q_INVOKABLE Property *getItemByIndex(int idx);
+//    Q_INVOKABLE bool updateData(const QString &role, int idx, const QVariant &value);
 
 signals:
     void fileUrlChanged(const QUrl &nFileUrl);
@@ -125,10 +112,10 @@ signals:
     void typeChanged(ClassType type);
     void commentsPositionChanged(CommentsPosition commentsPosition);
     void usePropertyNameChanged(bool usePropertyName);
+    void namespacesChanged(const QString &namespaces);
 
 private:
     QList<Property*> m_properties;
-    QHash<int, QByteArray> m_roles;
     QStringList m_ints;
     QStringList m_floats;
 	QStringList m_hasDefaultConstructor;
@@ -139,8 +126,9 @@ private:
     ClassType m_type;
     CommentsPosition m_commentsPosition;
     bool m_usePropertyName;
+    QString m_namespaces;
 
-
+    int m_lastAddedId;
 
     QString getDefaultValue(const QString &type, bool pointer = false);
     bool getArgsByRef(const QString &type, bool pointer = false);

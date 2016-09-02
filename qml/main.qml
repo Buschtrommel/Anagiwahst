@@ -31,7 +31,6 @@ ApplicationWindow {
 
     property int rowCount: -1
     property int currentRow: -1
-    property bool editChanged: false
 
     Component.onDestruction: {
         config.windowWidth = anagiwahst.width
@@ -125,14 +124,6 @@ ApplicationWindow {
                 onTriggered: mainContent.getTab(mainContent.currentIndex).item.deleteProperty()
             }
 
-            MenuItem {
-                text: qsTr("Apply changes")
-                enabled: anagiwahst.editChanged
-                iconName: "dialog-ok-apply"
-                shortcut: StandardKey.Save
-                onTriggered: mainContent.getTab(mainContent.currentIndex).item.updateProperty()
-            }
-
             MenuSeparator {}
 
             MenuItem {
@@ -140,7 +131,7 @@ ApplicationWindow {
                 enabled: anagiwahst.currentRow > 0
                 iconName: "go-previous"
                 shortcut: StandardKey.Back
-                onTriggered: mainContent.getTab(mainContent.currentIndex).item.previousProperty(saveOnChange.checked)
+                onTriggered: mainContent.getTab(mainContent.currentIndex).item.previousProperty()
             }
 
             MenuItem {
@@ -148,7 +139,7 @@ ApplicationWindow {
                 enabled: anagiwahst.currentRow < anagiwahst.rowCount-1 && anagiwahst.rowCount > 0
                 iconName: "go-next"
                 shortcut: StandardKey.Forward
-                onTriggered: mainContent.getTab(mainContent.currentIndex).item.nextProperty(saveOnChange.checked)
+                onTriggered: mainContent.getTab(mainContent.currentIndex).item.nextProperty()
             }
 
             MenuSeparator {}
@@ -171,14 +162,6 @@ ApplicationWindow {
         Menu {
             title: qsTr("&Settings")
             visible: false
-
-            MenuItem {
-                id: saveOnChange
-                text: qsTr("Save on change")
-                checkable: true
-                checked: true
-                visible: false
-            }
 
             MenuItem {
                 text: qsTr("Confirgure Anagiwahst ...")

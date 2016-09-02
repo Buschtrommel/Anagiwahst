@@ -20,6 +20,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 // import QtQuick.Controls.Styles 1.3
 import QtQuick.Layouts 1.1
+import Buschtrommel.Anagiwahst 1.0
 import Buschtrommel.Anagiwahst.Models 1.0
 
 SplitView {
@@ -27,16 +28,13 @@ SplitView {
     anchors.fill: parent
     orientation: Qt.Horizontal
 
-    onVisibleChanged: if (visible) { anagiwahst.rowCount = propertyTable.rowCount; anagiwahst.currentRow = propertyTable.currentRow; anagiwahst.editChanged = tabRoot.editChanged; }
+    onVisibleChanged: if (visible) { anagiwahst.rowCount = propertyTable.rowCount; anagiwahst.currentRow = propertyTable.currentRow }
 
     property alias file: propModel.fileUrl
     property alias fileName: propModel.fileName
     property alias model: propModel
     property alias table: propertyTable
     property alias rowCount: propertyTable.rowCount
-    property bool editChanged: editName.changed || editType.changed || editRead.changed || editWrite.changed || editMember.changed || editReset.changed || editNotify.changed || editRevision.changed || editDesignable.changed || editScriptable.changed || editStored.changed || editUser.changed || editConstant.changed || editFinal.changed || editPrivate.changed || editPointer.changed || editBrief.changed || editComment.changed || editDefaultValue.changed
-
-    onEditChangedChanged: anagiwahst.editChanged = tabRoot.editChanged
 
     Component.onCompleted: {
         propertyTable.resizeColumnsToContents()
@@ -46,19 +44,19 @@ SplitView {
     }
 
     function deleteProperty() {
+        editBox.prop = null
         propModel.deleteProperty(propertyTable.currentRow)
+        propertyTable.selection.clear()
     }
 
-    function previousProperty(save) {
-        if (save && tabRoot.editChanged) updateProperty()
+    function previousProperty() {
         var targetRow = propertyTable.currentRow-1
         propertyTable.selection.clear()
         propertyTable.currentRow = targetRow
         propertyTable.selection.select(targetRow)
     }
 
-    function nextProperty(save) {
-        if (save && tabRoot.editChanged) updateProperty()
+    function nextProperty() {
         var targetRow = propertyTable.currentRow+1
         propertyTable.selection.clear()
         propertyTable.currentRow = targetRow
@@ -72,7 +70,9 @@ SplitView {
     }
 
     function addProperty() {
-        if (propModel.addProperty(newPropName.text, newPropType.text, newPropRead.checked, newPropWrite.checked, newPropMember.checked, newPropReset.checked, newPropNotify.checked, newPropPrivate.checked)) {
+        editBox.prop = propModel.addProperty(newPropName.text, newPropType.text, newPropRead.checked, newPropWrite.checked, newPropMember.checked, newPropReset.checked, newPropNotify.checked, newPropPrivate.checked)
+
+        if (editBox.prop) {
             newPropBox.visible = false
             newPropName.text = ""
             newPropType.text = ""
@@ -82,83 +82,20 @@ SplitView {
             newPropReset.checked = defaultResetFunction.checked
             newPropNotify.checked = defaultNotifyFunction.checked
             newPropPrivate.checked = defaultPrivateClass.checked
+            editBrief.setFocus()
+            addedPropertyTimer.start()
         }
     }
 
-    function setEditorValues() {
-        var rowIndex = propertyTable.currentRow
-        editName.init(propModel.getData("name", rowIndex))
-        editType.init(propModel.getData("type", rowIndex))
-        editRead.init(propModel.getData("read", rowIndex))
-        editWrite.init(propModel.getData("write", rowIndex))
-        editMember.init(propModel.getData("member", rowIndex))
-        editReset.init(propModel.getData("reset", rowIndex))
-        editNotify.init(propModel.getData("notify", rowIndex))
-        editRevision.init(propModel.getData("revision", rowIndex))
-        editDesignable.init(propModel.getData("designable", rowIndex))
-        editScriptable.init(propModel.getData("scriptable", rowIndex))
-        editStored.init(propModel.getData("stored", rowIndex))
-        editUser.init(propModel.getData("user", rowIndex))
-        editConstant.init(propModel.getData("constant", rowIndex))
-        editFinal.init(propModel.getData("final", rowIndex))
-        editPrivate.init(propModel.getData("private", rowIndex))
-        editPointer.init(propModel.getData("pointer", rowIndex))
-        editArgsByRef.init(propModel.getData("argsByRef", rowIndex))
-        editDefaultValue.init(propModel.getData("default", rowIndex))
-        editBrief.init(propModel.getData("brief", rowIndex))
-        editComment.initialText = propModel.getData("comment", rowIndex)
-        editComment.text = propModel.getData("comment", rowIndex)
-        editName.focus = true;
-        editName.forceActiveFocus()
-    }
-
-    function updateProperty() {
-        var rowIndex = propertyTable.currentRow
-        propModel.updateData("name", rowIndex, editName.apply())
-        propModel.updateData("type", rowIndex, editType.apply())
-        propModel.updateData("read", rowIndex, editRead.apply())
-        propModel.updateData("write", rowIndex, editWrite.apply())
-        propModel.updateData("member", rowIndex, editMember.apply())
-        propModel.updateData("reset", rowIndex, editReset.apply())
-        propModel.updateData("notify", rowIndex, editNotify.apply())
-        propModel.updateData("revision", rowIndex, parseInt(editRevision.apply()))
-        propModel.updateData("designable", rowIndex, editDesignable.apply())
-        propModel.updateData("scriptable", rowIndex, editScriptable.apply())
-        propModel.updateData("stored", rowIndex, editStored.apply())
-        propModel.updateData("user", rowIndex, editUser.apply())
-        propModel.updateData("constant", rowIndex, editConstant.apply())
-        propModel.updateData("final", rowIndex, editFinal.apply())
-        propModel.updateData("private", rowIndex, editPrivate.apply())
-        propModel.updateData("pointer", rowIndex, editPointer.apply())
-        propModel.updateData("argsByRef", rowIndex, editArgsByRef.apply())
-        propModel.updateData("default", rowIndex, editDefaultValue.apply())
-        propModel.updateData("brief", rowIndex, editBrief.apply())
-        propModel.updateData("comment", rowIndex, editComment.text)
-        editComment.initialText = editComment.text
-        editComment.changed = false;
-    }
-
-    function resetProperty() {
-        editName.reset()
-        editType.reset()
-        editRead.reset()
-        editWrite.reset()
-        editMember.reset()
-        editReset.reset()
-        editNotify.reset()
-        editRevision.reset()
-        editDesignable.reset()
-        editScriptable.reset()
-        editStored.reset()
-        editUser.reset()
-        editConstant.reset()
-        editFinal.reset()
-        editPrivate.reset()
-        editPointer.reset()
-        editArgsByRef.reset()
-        editDefaultValue.reset()
-        editBrief.reset()
-        editComment.text = editComment.initialText
+    Timer {
+        id: addedPropertyTimer
+        interval: 200
+        onTriggered: {
+            propertyTable.selection.clear()
+            propertyTable.selection.select(propertyTable.rowCount-1)
+            propertyTable.currentRow = propertyTable.rowCount-1
+            propertyTable.positionViewAtRow(propertyTable.rowCount-1)
+        }
     }
 
     RegExpValidator {
@@ -175,130 +112,156 @@ SplitView {
         onRowCountChanged: {
             anagiwahst.rowCount = propertyTable.rowCount
             resizeColumnsToContents()
-            if (propertyTable.rowCount > 0) {
-                propertyTable.selection.clear()
-                propertyTable.selection.select(propertyTable.rowCount-1)
-                propertyTable.currentRow = propertyTable.rowCount-1
-                propertyTable.positionViewAtRow(propertyTable.rowCount-1)
-                editBrief.setFocus()
-            }
         }
+
         onCurrentRowChanged: {
             anagiwahst.currentRow = propertyTable.currentRow
             if (currentRow > -1) {
-                setEditorValues(currentRow)
+                editBox.prop = propModel.getItemByIndex(currentRow)
+            } else {
+                editBox.prop = null
             }
         }
 
         TableViewColumn {
-            role: "name"
+            role: "item"
             title: qsTr("Name")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.name : ""
+            }
         }
 
         TableViewColumn {
-            role: "type"
+            role: "item"
             title: qsTr("Type")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.type : ""
+            }
         }
 
         TableViewColumn {
-            role: "read"
+            role: "item"
             title: qsTr("Read")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.read : ""
+            }
         }
 
         TableViewColumn {
-            role: "write"
+            role: "item"
             title: qsTr("Write")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.write : ""
+            }
         }
 
         TableViewColumn {
-            role: "member"
+            role: "item"
             title: qsTr("Member")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.member : ""
+            }
         }
 
         TableViewColumn {
-            role: "reset"
+            role: "item"
             title: qsTr("Reset")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.reset : ""
+            }
         }
 
         TableViewColumn {
-            role: "notify"
+            role: "item"
             title: qsTr("Notify")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.notify : ""
+            }
         }
 
         TableViewColumn {
-            role: "revision"
+            role: "item"
             title: qsTr("Revision")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.revision : ""
+            }
         }
 
         TableViewColumn {
-            role: "designable"
+            role: "item"
             title: qsTr("Designable")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.designable : ""
+            }
         }
 
         TableViewColumn {
-            role: "scriptable"
+            role: "item"
             title: qsTr("Scriptable")
+            delegate: TableText {
+                text: styleData.value ? styleData.value.scriptable : ""
+            }
         }
 
         TableViewColumn {
-            role: "stored"
+            role: "item"
             title: qsTr("Stored")
             delegate: CheckBox {
-                checked: styleData.value
+                checked: styleData.value ? styleData.value.stored : false
                 enabled: false
             }
         }
 
         TableViewColumn {
-            role: "user"
+            role: "item"
             title: qsTr("User")
             delegate: CheckBox {
-                checked: styleData.value
+                checked: styleData.value ? styleData.value.user : false
                 enabled: false
             }
         }
 
         TableViewColumn {
-            role: "constant"
+            role: "item"
             title: qsTr("Constant")
             delegate: CheckBox {
-                checked: styleData.value
+                checked: styleData.value ? styleData.value.constant : false
                 enabled: false
             }
         }
 
         TableViewColumn {
-            role: "final"
+            role: "item"
             title: qsTr("Final")
             delegate: CheckBox {
-                checked: styleData.value
+                checked: styleData.value ? styleData.value.final : false
                 enabled: false
             }
         }
 
         TableViewColumn {
-            role: "private"
+            role: "item"
             title: qsTr("Private")
             delegate: CheckBox {
-                checked: styleData.value
+                checked: styleData.value ? styleData.value.privateClass : false
                 enabled: false
             }
         }
 
         TableViewColumn {
-            role: "pointer"
+            role: "item"
             title: qsTr("Pointer")
             delegate: CheckBox {
-                checked: styleData.value
+                checked: styleData.value ? styleData.value.pointer : false
                 enabled: false
             }
         }
         
         TableViewColumn {
-            role: "argsByRef"
+            role: "item"
             title: qsTr("Args by Ref")
             delegate: CheckBox {
-                checked: styleData.value
+                checked: styleData.value ? styleData.value.argsByRef : false
                 enabled: false
             }
         }
@@ -326,10 +289,19 @@ SplitView {
                     placeholderText: qsTr("Class name")
                     Layout.fillWidth: true
                     text: propModel.className
-                    onTextChanged: tabRoot.parent.title = text
+                    onTextChanged: { tabRoot.parent.title = text; anagiwahst.title = text }
                 }
 
                 Binding { target: propModel; property: "className"; value: className.text }
+
+                TextField {
+                    id: namespaceList
+                    placeholderText: qsTr("Comma separated namespace list")
+                    Layout.fillWidth: true
+                    text: propModel.naespaces
+                }
+
+                Binding { target: propModel; property: "namespaces"; value: namespaceList.text }
 
                 GroupBox {
                     title: qsTr("Defaults")
@@ -507,9 +479,12 @@ SplitView {
 
                 GroupBox {
                     id: editBox
+                    property Property prop: null
                     title: qsTr("Edit property")
                     Layout.fillWidth: true
-                    visible: propertyTable.currentRow > -1
+                    visible: prop
+
+
 
                     ColumnLayout {
                         width: parent.width
@@ -522,37 +497,56 @@ SplitView {
                                 id: editName
                                 label: qsTr("Name")
                                 validator: nameTypeValidator
+                                text: editBox.prop ? editBox.prop.name : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.name = text }
                             }
 
                             LabeledTextField {
                                 id: editType
                                 label: qsTr("Type")
                                 validator: nameTypeValidator
+                                text: editBox.prop ? editBox.prop.type : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.type = text }
                             }
 
                             LabeledTextField {
                                 id: editRead
                                 label: qsTr("Read")
+                                validator: nameTypeValidator
+                                text: editBox.prop ? editBox.prop.read : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.read = text }
                             }
 
                             LabeledTextField {
                                 id: editWrite
                                 label: qsTr("Write")
+                                validator: nameTypeValidator
+                                text: editBox.prop ? editBox.prop.write : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.write = text }
                             }
 
                             LabeledTextField {
                                 id: editNotify
                                 label: qsTr("Notify")
+                                validator: nameTypeValidator
+                                text: editBox.prop ? editBox.prop.notify : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.notify = text }
                             }
 
                             LabeledTextField{
                                 id: editMember
                                 label: qsTr("Member")
+                                validator: nameTypeValidator
+                                text: editBox.prop ? editBox.prop.member : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.member = text }
                             }
 
                             LabeledTextField {
                                 id: editReset
                                 label: qsTr("Reset")
+                                validator: nameTypeValidator
+                                text: editBox.prop ? editBox.prop.reset : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.reset = text }
                             }
 
                             LabeledTextField {
@@ -560,55 +554,75 @@ SplitView {
                                 label: qsTr("Revision")
                                 inputMethodHints: Qt.ImhDigitsOnly
                                 validator: IntValidator { bottom: 0; top: 255 }
+                                onTextChanged: if (editBox.prop) { editBox.prop.revision = parseInt(text) }
                             }
 
                             LabeledTextField {
                                 id: editDesignable
                                 label: qsTr("Designable")
+                                text: editBox.prop ? editBox.prop.designable : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.designable = text }
                             }
 
                             LabeledTextField {
                                 id: editScriptable
                                 label: qsTr("Scriptable")
+                                text: editBox.prop ? editBox.prop.scriptable : ""
+                                onTextChanged: if (editBox.prop) { editBox.prop.scriptable = text }
                             }
                         }
 
                         GridLayout {
                             columns: editorView.width > 600 ? 6 : 3
 
-                            CheckBoxWithReset {
+                            CheckBox {
                                 id: editStored
                                 text: qsTr("Stored")
+                                checked: editBox.prop ? editBox.prop.stored : true
+                                onCheckedChanged: if (editBox.prop) { editBox.prop.stored = checked }
                             }
 
-                            CheckBoxWithReset {
+                            CheckBox {
                                 id: editUser
                                 text: qsTr("User")
+                                checked: editBox.prop ? editBox.prop.user : true
+                                onCheckedChanged: if (editBox.prop) { editBox.prop.user = checked }
                             }
 
-                            CheckBoxWithReset {
+
+                            CheckBox {
                                 id: editConstant
                                 text: qsTr("Constant")
+                                checked: editBox.prop ? editBox.prop.constant : true
+                                onCheckedChanged: if (editBox.prop) { editBox.prop.constant = checked }
                             }
 
-                            CheckBoxWithReset {
+                            CheckBox {
                                 id: editFinal
                                 text: qsTr("Final")
+                                checked: editBox.prop ? editBox.prop.final : true
+                                onCheckedChanged: if (editBox.prop) { editBox.prop.final = checked }
                             }
 
-                            CheckBoxWithReset {
+                            CheckBox {
                                 id: editPrivate
                                 text: qsTr("Private")
+                                checked: editBox.prop ? editBox.prop.privateClass : true
+                                onCheckedChanged: if (editBox.prop) { editBox.prop.privateClass = checked }
                             }
 
-                            CheckBoxWithReset {
+                            CheckBox {
                                 id: editPointer
                                 text: qsTr("Pointer")
+                                checked: editBox.prop ? editBox.prop.pointer : true
+                                onCheckedChanged: if (editBox.prop) { editBox.prop.pointer = checked }
                             }
                             
-                            CheckBoxWithReset {
+                            CheckBox {
                                 id: editArgsByRef
                                 text: qsTr("Args by Ref")
+                                checked: editBox.prop ? editBox.prop.argsByRef : true
+                                onCheckedChanged: if (editBox.prop) { editBox.prop.argsByRef = checked }
                             }
 
                         }
@@ -617,12 +631,16 @@ SplitView {
                             id: editDefaultValue
                             label: qsTr("Default value")
                             Layout.fillWidth: true
+                            text: editBox.prop ? editBox.prop.defaultValue : ""
+                            onTextChanged: if (editBox.prop) { editBox.prop.defaultValue = text }
                         }
 
                         LabeledTextField {
                             id: editBrief
                             label: qsTr("Brief description")
                             Layout.fillWidth: true
+                            text: editBox.prop ? editBox.prop.brief : ""
+                            onTextChanged: if (editBox.prop) { editBox.prop.brief = text }
                         }
 
                         Label {
@@ -637,41 +655,24 @@ SplitView {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 300
                             selectByMouse: true
-                            text: ""
+                            text: editBox.prop ? editBox.prop.comment : ""
                             onTextChanged: editCommentTimer.restart()
 
                             Timer {
                                 id: editCommentTimer
                                 interval: 500
                                 onTriggered: {
-                                    editComment.changed = editComment.initialText !== editComment.text
+                                    if (editBox.prop) { editBox.prop.comment = editComment.text }
                                 }
                             }
                         }
 
-                        RowLayout {
-
-                            Button {
-                                text: qsTr("Reset")
-                                iconName: "edit-undo"
-                                enabled: tabRoot.editChanged
-                                onClicked: resetProperty()
-                            }
-
-                            Button {
-                                text: qsTr("Cancel")
-                                iconName: "dialog-cancel"
-                                onClicked: {
-                                    propertyTable.selection.clear()
-                                    propertyTable.currentRow = -1
-                                }
-                            }
-
-                            Button {
-                                text: qsTr("Apply")
-                                iconName: "dialog-ok-apply"
-                                enabled: tabRoot.editChanged
-                                onClicked: updateProperty()
+                        Button {
+                            text: qsTr("Cancel")
+                            iconName: "dialog-cancel"
+                            onClicked: {
+                                propertyTable.selection.clear()
+                                propertyTable.currentRow = -1
                             }
                         }
                     }
