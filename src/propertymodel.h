@@ -93,7 +93,7 @@ public:
     void setNamespaces(const QString &namespaces);
 
     void loadData();
-    Q_INVOKABLE Property *addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false);
+    Q_INVOKABLE Property *addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false, bool d = true);
     Q_INVOKABLE void deleteProperty(int idx);
     Q_INVOKABLE QString createOutput(ResultFileType type) const;
     Q_INVOKABLE bool saveToDirectory(ResultFileType type, const QString &directory) const;

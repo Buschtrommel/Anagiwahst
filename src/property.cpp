@@ -15,7 +15,7 @@ Property::Property(QObject *parent) :
 /*!
  * \overload
  */
-Property::Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, bool privateClass, const QString &defaultValue, bool argsByRef, bool pointer, QObject *parent) :
+Property::Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, bool privateClass, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, QObject *parent) :
     QObject(parent), d_ptr(new PropertyPrivate)
 {
     Q_D(Property);
@@ -31,6 +31,7 @@ Property::Property(int id, const QString &name, const QString &type, const QStri
     d->defaultValue = defaultValue;
     d->argsByRef = argsByRef;
     d->pointer = pointer;
+    d->documentMethods = docMethods;
 }
 
 
@@ -39,7 +40,7 @@ Property::Property(int id, const QString &name, const QString &type, const QStri
  */
 Property::~Property()
 {
-    delete d_ptr;
+
 }
 
 
@@ -856,3 +857,37 @@ void Property::setArgsByRef(bool nArgsByRef)
 
 
 
+/*!
+ * \property Property::documentMethods
+ * \brief The documentMethods property.
+ *
+ * \par Access functions:
+ * <TABLE><TR><TD>bool</TD><TD>documentMethods() const</TD></TR><TR><TD>void</TD><TD>setDocumentMethods(bool nDocumentMethods)</TD></TR></TABLE>
+ * \par Notifier signal:
+ * <TABLE><TR><TD>void</TD><TD>documentMethodsChanged(bool documentMethods)</TD></TR></TABLE>
+ */
+
+/*!
+ * \fn void Property::documentMethodsChanged(bool documentMethods)
+ * \brief Part of the \link Property::documentMethods documentMethods \endlink property.
+ */
+
+/*!
+ * \brief Part of the \link Property::documentMethods documentMethods \endlink property.
+ */
+bool Property::documentMethods() const { Q_D(const Property); return d->documentMethods; }
+
+/*!
+ * \brief Part of the \link Property::documentMethods documentMethods \endlink property.
+ */
+void Property::setDocumentMethods(bool nDocumentMethods)
+{
+    Q_D(Property);
+    if (nDocumentMethods != d->documentMethods) {
+        d->documentMethods = nDocumentMethods;
+#ifdef QT_DEBUG
+        qDebug() << "Changed documentMethods to" << d->documentMethods;
+#endif
+        emit documentMethodsChanged(documentMethods());
+    }
+}

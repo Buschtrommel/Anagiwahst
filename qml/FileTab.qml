@@ -18,7 +18,6 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.3
-// import QtQuick.Controls.Styles 1.3
 import QtQuick.Layouts 1.1
 import Buschtrommel.Anagiwahst 1.0
 import Buschtrommel.Anagiwahst.Models 1.0
@@ -70,7 +69,7 @@ SplitView {
     }
 
     function addProperty() {
-        editBox.prop = propModel.addProperty(newPropName.text, newPropType.text, newPropRead.checked, newPropWrite.checked, newPropMember.checked, newPropReset.checked, newPropNotify.checked, newPropPrivate.checked)
+        editBox.prop = propModel.addProperty(newPropName.text, newPropType.text, newPropRead.checked, newPropWrite.checked, newPropMember.checked, newPropReset.checked, newPropNotify.checked, newPropPrivate.checked, defaultDocMethods.checked)
 
         if (editBox.prop) {
             newPropBox.visible = false
@@ -279,29 +278,40 @@ SplitView {
             id: editorFlick
             contentHeight: editorMainCol.height
 
-            ColumnLayout {
+            GridLayout {
                 id: editorMainCol
-                spacing: 7
-                width: parent.width
+                columnSpacing: 7
+                rowSpacing: 7
+                columns: 1
+                anchors { left: parent.left; right: parent.right }
 
-                TextField {
-                    id: className
-                    placeholderText: qsTr("Class name")
+                GroupBox {
+                    title: qsTr("Class")
                     Layout.fillWidth: true
-                    text: propModel.className
-                    onTextChanged: { tabRoot.parent.title = text; anagiwahst.title = text }
+
+                    ColumnLayout {
+                        anchors { left: parent.left; right: parent.right }
+
+                        LabeledTextField {
+                            id: className
+                            label: qsTr("Name")
+                            text: propModel.className
+                            onTextChanged: { tabRoot.parent.title = text; anagiwahst.title = text }
+                        }
+
+                        Binding { target: propModel; property: "className"; value: className.text }
+
+                        LabeledTextField {
+                            id: namespaceList
+                            label: qsTr("Comma separated namespace list")
+                            text: propModel.namespaces
+                        }
+
+                        Binding { target: propModel; property: "namespaces"; value: namespaceList.text }
+
+                    }
+
                 }
-
-                Binding { target: propModel; property: "className"; value: className.text }
-
-                TextField {
-                    id: namespaceList
-                    placeholderText: qsTr("Comma separated namespace list")
-                    Layout.fillWidth: true
-                    text: propModel.naespaces
-                }
-
-                Binding { target: propModel; property: "namespaces"; value: namespaceList.text }
 
                 GroupBox {
                     title: qsTr("Defaults")
@@ -309,8 +319,8 @@ SplitView {
 
                     GridLayout {
                         id: defaultsGrid
-                        columns: editorView.width > 600 ? 6 : 3
-                        width: parent.width
+                        anchors { left: parent.left; right: parent.right }
+                        columns: width > 500 ? 6 : 3
 
                         CheckBox {
                             id: defaultReadFunction
@@ -354,10 +364,17 @@ SplitView {
                             id: defaultReadFuncName
                             text: qsTr("Use property name for Read")
                             checked: propModel.usePropertyName
-                            Layout.columnSpan: defaultsGrid.columns
+                            Layout.columnSpan: 3
                         }
                         
                         Binding { target: propModel; property: "usePropertyName"; value: defaultReadFuncName.checked }
+
+                        CheckBox {
+                            id: defaultDocMethods
+                            text: qsTr("Document methods")
+                            checked: true
+                            Layout.columnSpan: 3
+                        }
 
                     }
                     
@@ -379,77 +396,73 @@ SplitView {
                         }
                     }
 
-                    ColumnLayout {
-                        width: parent.width
+                    GridLayout {
+                        anchors { left: parent.left; right: parent.right }
+                        columns: newPropBox.width > 500 ? 6 : 3
 
-                        RowLayout {
 
-                            TextField {
-                                id: newPropName
-                                placeholderText: qsTr("Name")
-                                validator: nameTypeValidator
-                                Layout.fillWidth: true
-                                onAccepted: addProperty()
-                            }
-
-                            TextField {
-                                id: newPropType
-                                placeholderText: qsTr("Type")
-                                validator: nameTypeValidator
-                                Layout.fillWidth: true
-                                onAccepted: addProperty()
-                            }
-
+                        TextField {
+                            id: newPropName
+                            placeholderText: qsTr("Name")
+                            validator: nameTypeValidator
+                            Layout.columnSpan: 3
+                            Layout.fillWidth: true
+                            onAccepted: addProperty()
                         }
 
-                        GridLayout {
-                            columns: editorView.width > 600 ? 6 : 3
+                        TextField {
+                            id: newPropType
+                            placeholderText: qsTr("Type")
+                            validator: nameTypeValidator
+                            Layout.columnSpan: 3
+                            Layout.fillWidth: true
+                            onAccepted: addProperty()
+                        }
 
-                            CheckBox {
-                                id: newPropRead
-                                text: qsTr("Read")
-                                checked: defaultReadFunction.checked
-                            }
+                        CheckBox {
+                            id: newPropRead
+                            text: qsTr("Read")
+                            checked: defaultReadFunction.checked
+                        }
 
-                            CheckBox {
-                                id: newPropWrite
-                                text: qsTr("Write")
-                                checked: defaultWriteFunction.checked
-                            }
+                        CheckBox {
+                            id: newPropWrite
+                            text: qsTr("Write")
+                            checked: defaultWriteFunction.checked
+                        }
 
-                            CheckBox {
-                                id: newPropMember
-                                text: qsTr("Member")
-                                checked: defaultMemeberFunction.checked
-                            }
+                        CheckBox {
+                            id: newPropMember
+                            text: qsTr("Member")
+                            checked: defaultMemeberFunction.checked
+                        }
 
 
-                            CheckBox {
-                                id: newPropReset
-                                text: qsTr("Reset")
-                                checked: defaultResetFunction.checked
-                            }
+                        CheckBox {
+                            id: newPropReset
+                            text: qsTr("Reset")
+                            checked: defaultResetFunction.checked
+                        }
 
-                            CheckBox {
-                                id: newPropNotify
-                                text: qsTr("Notify")
-                                checked: defaultNotifyFunction.checked
-                            }
+                        CheckBox {
+                            id: newPropNotify
+                            text: qsTr("Notify")
+                            checked: defaultNotifyFunction.checked
+                        }
 
-                            CheckBox {
-                                id: newPropPrivate
-                                text: qsTr("Private class")
-                                checked: defaultPrivateClass.checked
-                                Layout.fillWidth: true
-                            }
-
+                        CheckBox {
+                            id: newPropPrivate
+                            text: qsTr("Private class")
+                            checked: defaultPrivateClass.checked
                         }
 
                         RowLayout {
+                            Layout.columnSpan: parent.columns
 
                             Button {
                                 iconName: "dialog-cancel"
                                 text: qsTr("Cancel")
+                                Layout.fillWidth: true
                                 onClicked: {
                                     newPropBox.visible = false
                                     newPropName.text = ""
@@ -467,9 +480,9 @@ SplitView {
                                 id: addPropertyButton
                                 iconName: "list-add"
                                 text: qsTr("Add")
+                                Layout.fillWidth: true
                                 onClicked: addProperty()
                             }
-
                         }
 
                     }
@@ -490,7 +503,6 @@ SplitView {
                         width: parent.width
 
                         GridLayout {
-                            Layout.fillWidth: true
                             columns: 2
 
                             LabeledTextField {
@@ -573,7 +585,7 @@ SplitView {
                         }
 
                         GridLayout {
-                            columns: editorView.width > 600 ? 6 : 3
+                            columns: parent.width > 500 ? 6 : 3
 
                             CheckBox {
                                 id: editStored
@@ -625,6 +637,14 @@ SplitView {
                                 onCheckedChanged: if (editBox.prop) { editBox.prop.argsByRef = checked }
                             }
 
+                            CheckBox {
+                                id: editDocMethods
+                                text: qsTr("Document methods")
+                                Layout.columnSpan: 2
+                                checked: editBox.prop ? editBox.prop.documentMethods : defaultDocMethods.checked
+                                onCheckedChanged: if (editBox.prop) { editBox.prop.documentMethods = checked }
+                            }
+
                         }
 
                         LabeledTextField {
@@ -674,6 +694,7 @@ SplitView {
                                 propertyTable.selection.clear()
                                 propertyTable.currentRow = -1
                             }
+                            Layout.fillWidth: true
                         }
                     }
                 }

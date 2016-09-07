@@ -32,9 +32,10 @@ class Property : public QObject
     Q_PROPERTY(QString defaultValue READ defaultValue WRITE setDefaultValue NOTIFY defaultValueChanged)
     Q_PROPERTY(bool pointer READ pointer WRITE setPointer NOTIFY pointerChanged)
     Q_PROPERTY(bool argsByRef READ argsByRef WRITE setArgsByRef NOTIFY argsByRefChanged)
+    Q_PROPERTY(bool documentMethods READ documentMethods WRITE setDocumentMethods NOTIFY documentMethodsChanged)
 public:
     explicit Property(QObject *parent = nullptr);
-    Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, bool privateClass, const QString &defaultValue, bool argsByRef, bool pointer, QObject *parent = nullptr);
+    Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, bool privateClass, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, QObject *parent = nullptr);
     ~Property();
 
     int id() const;
@@ -58,6 +59,7 @@ public:
     QString defaultValue() const;
     bool pointer() const;
     bool argsByRef() const;
+    bool documentMethods() const;
 
     void setId(int nId);
     void setName(const QString &nName);
@@ -80,7 +82,7 @@ public:
     void setDefaultValue(const QString &nDefaultValue);
     void setPointer(bool nPointer);
     void setArgsByRef(bool nArgsByRef);
-
+    void setDocumentMethods(bool nDocumentMethods);
 
 signals:
     void idChanged(int id);
@@ -104,10 +106,10 @@ signals:
     void defaultValueChanged(const QString &defaultValue);
     void pointerChanged(bool pointer);
     void argsByRefChanged(bool argsByRef);
+    void documentMethodsChanged(bool documentMethods);
 
 protected:
-    PropertyPrivate * const d_ptr;
-
+    const QScopedPointer<PropertyPrivate> d_ptr;
 
 private:
     Q_DISABLE_COPY(Property)

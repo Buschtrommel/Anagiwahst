@@ -265,7 +265,7 @@ void PropertyModel::loadData()
 
 
 
-Property *PropertyModel::addProperty(const QString &name, const QString &type, bool r, bool w, bool m, bool u, bool n, bool p)
+Property *PropertyModel::addProperty(const QString &name, const QString &type, bool r, bool w, bool m, bool u, bool n, bool p, bool d)
 {
     if (name.isEmpty() || type.isEmpty()) {
         return nullptr;
@@ -326,7 +326,7 @@ Property *PropertyModel::addProperty(const QString &name, const QString &type, b
         notify.append("Changed");
     }
 
-    Property *prop = new Property(m_lastAddedId + 1, propName, type, read, write, member, reset, notify, p, getDefaultValue(type, pointer), getArgsByRef(type, pointer), pointer, this);
+    Property *prop = new Property(m_lastAddedId + 1, propName, type, read, write, member, reset, notify, p, getDefaultValue(type, pointer), getArgsByRef(type, pointer), pointer, d, this);
 
     m_properties.append(prop);
 

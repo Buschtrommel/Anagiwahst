@@ -34,12 +34,12 @@ PropertyCreator::PropertyCreator(const QList<Property *> &properties, const QStr
 }
 
 
-// PropertyCreator::~PropertyCreator()
-// {
-// #ifdef QT_DEBUG
-//     qDebug() << "Destroying a PropertyCreator for class" << m_className;
-// #endif
-// }
+PropertyCreator::~PropertyCreator()
+{
+#ifdef QT_DEBUG
+    qDebug() << "Destroying a PropertyCreator for class" << m_className;
+#endif
+}
 
 
 QString PropertyCreator::createHeader()
@@ -273,10 +273,10 @@ QString PropertyCreator::createHeader()
 
         switch (m_type) {
         case PropertyModel::PrivateClass:
-            result += m_indent % m_className % QLatin1String("Private * const d_ptr;\n\n");
+            result += m_indent % QLatin1String("const QScopedPointer<") % m_className % QLatin1String("Private> d_ptr;\n");
             break;
         case PropertyModel::SharedData:
-            result += m_indent % QLatin1String("QSharedDataPointer<") % m_className % QLatin1String("Private> d;\n\n");
+            result += m_indent % QLatin1String("QSharedDataPointer<") % m_className % QLatin1String("Private> d;\n");
             break;
         default:
             break;
@@ -387,7 +387,7 @@ QString PropertyCreator::createPrivate()
 	QString x2Indent;
 	x2Indent += m_indent % m_indent;
 
-	result += m_indent % m_className % QLatin1String("Private(") % m_className % QLatin1String(" *parent = nullptr)");
+    result += m_indent % m_className % QLatin1String("Private()");
 
 	if (defaultValuePresent) {
 		result += QLatin1String(" :\n");
@@ -510,7 +510,7 @@ QString PropertyCreator::createCode()
     result += m_className % m_dc % m_className % QLatin1String("(QObject *parent) :\n") % m_indent % QLatin1String("QObject(parent)");
 
     if (privateClass && m_type == PropertyModel::PrivateClass) {
-        result += QLatin1String(", d_ptr(new ") % m_className % QLatin1String("Private(this))\n");
+        result += QLatin1String(", d_ptr(new ") % m_className % QLatin1String("Private)\n");
     } else {
         result += QLatin1String("\n");
     }
@@ -518,7 +518,7 @@ QString PropertyCreator::createCode()
     result += QLatin1String("{\n");
 
     if (privateClass && m_type == PropertyModel::SharedData) {
-        result += m_indent % QLatin1String("d = new ") % m_className % QLatin1String("Private(this);\n");
+        result += m_indent % QLatin1String("d = new ") % m_className % QLatin1String("Private;\n");
     }
 
     for (int i = 0; i < m_propertiesCount; ++i) {
@@ -538,10 +538,6 @@ QString PropertyCreator::createCode()
     result += QLatin1String("/*!\n * \\brief Deconstructs the ") % m_className % QLatin1String(" object.\n */\n");
 
     result += m_className % QLatin1String("::~") % m_className % QLatin1String("()\n{\n");
-
-    if (privateClass && m_type == PropertyModel::PrivateClass) {
-        result += m_indent % QLatin1String("delete d_ptr;\n");
-    }
 
     result += QLatin1String("}\n\n\n");
 
@@ -1020,7 +1016,11 @@ QString PropertyCreator::buildPartOfStatement(Property *prop)
 
 QString PropertyCreator::buildReadComment(Property *prop)
 {
-    QString result = QLatin1String("");
+    QString result;
+
+    if (!prop->documentMethods()) {
+        return result;
+    }
 
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent;
@@ -1048,7 +1048,11 @@ QString PropertyCreator::buildReadComment(Property *prop)
 
 QString PropertyCreator::buildWriteComment(Property *prop)
 {
-    QString result = QLatin1String("");
+    QString result;
+
+    if (!prop->documentMethods()) {
+        return result;
+    }
 
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent;
@@ -1069,7 +1073,11 @@ QString PropertyCreator::buildWriteComment(Property *prop)
 
 QString PropertyCreator::buildResetComment(Property *prop)
 {
-    QString result = QLatin1String("");
+    QString result;
+
+    if (!prop->documentMethods()) {
+        return result;
+    }
 
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent;
@@ -1089,7 +1097,11 @@ QString PropertyCreator::buildResetComment(Property *prop)
 
 QString PropertyCreator::buildNotifyComment(Property *prop)
 {
-    QString result = QLatin1String("");
+    QString result;
+
+    if (!prop->documentMethods()) {
+        return result;
+    }
 
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent % QLatin1String("/*!\n");

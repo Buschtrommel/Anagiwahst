@@ -33,7 +33,7 @@ class PropertyCreator
 {
 public:
     PropertyCreator(const QList<Property*> &properties, const QString &className, PropertyModel::ClassType type = PropertyModel::PrivateClass, int tabSize = 4, PropertyModel::CommentsPosition commentsPosition = PropertyModel::InCode, const QStringList &namespaces = QStringList());
-//     ~PropertyCreator();
+     ~PropertyCreator();
 
     QString createHeader();
     QString createPrivate();

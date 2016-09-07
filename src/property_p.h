@@ -17,7 +17,8 @@ public:
         final(false),
         privateClass(false),
         pointer(false),
-        argsByRef(false)
+        argsByRef(false),
+        documentMethods(true)
     {}
 
     ~PropertyPrivate() {}
@@ -43,6 +44,7 @@ public:
     QString defaultValue;
     bool pointer;
     bool argsByRef;
+    bool documentMethods;
 };
 
 #endif // PROPERTY_P_H
