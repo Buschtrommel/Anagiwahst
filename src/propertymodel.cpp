@@ -362,7 +362,14 @@ void PropertyModel::deleteProperty(int idx)
 
 QString PropertyModel::createOutput(ResultFileType type) const
 {
-    QStringList namespaces = m_namespaces.simplified().remove(QStringLiteral(" ")).split(QStringLiteral(","));
+    QStringList namespaces;
+    if (!m_namespaces.isEmpty()) {
+        QString ns = m_namespaces.simplified();
+        ns.remove(QStringLiteral(" "));
+        if (!ns.isEmpty()) {
+            namespaces = ns.split(QStringLiteral(","));
+        }
+    }
     PropertyCreator creator(m_properties, getClassName(), m_type, 4, m_commentsPosition, namespaces);
     switch(type) {
     case HeaderFile:
