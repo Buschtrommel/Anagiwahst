@@ -102,7 +102,6 @@ public:
     Q_INVOKABLE QVariant getData(const QString &role, int idx) const;
     Q_INVOKABLE Property *getItemById(int id);
     Q_INVOKABLE Property *getItemByIndex(int idx);
-//    Q_INVOKABLE bool updateData(const QString &role, int idx, const QVariant &value);
 
 signals:
     void fileUrlChanged(const QUrl &nFileUrl);
