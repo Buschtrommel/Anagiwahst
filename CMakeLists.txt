@@ -38,6 +38,8 @@ set (VERSION "${ANAGIWAHST_VERSION}")
 add_definitions("-DAPP_VERSION=\"${ANAGIWAHST_VERSION}\"")
 add_definitions("-DL10N_DIR=\"${L10N_DIR}\"")
 
+set (CMAKE_CXX_FLAGS_DEBUG "-Wall -fsanitize=address -ggdb")
+
 set (QT_DEBUG "-DQT_NO_DEBUG")
 option (DEBUG_ENABLED "Enabling debug output" OFF)
 if (DEBUG_ENABLED)
