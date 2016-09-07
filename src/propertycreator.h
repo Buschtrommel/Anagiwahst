@@ -70,8 +70,8 @@ private:
     int m_propertiesCount;
     QString m_className;
     QString m_indent;
-    int m_tabSize;
     PropertyModel::ClassType m_type;
+    int m_tabSize;
     PropertyModel::CommentsPosition m_commentsPosition;
     QString m_dc;
     QStringList m_namespaces;
