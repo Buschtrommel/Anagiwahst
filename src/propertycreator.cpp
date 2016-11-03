@@ -292,7 +292,7 @@ QString PropertyCreator::createHeader()
 
     // Start building the notify functions in the signal part of the header file.
 
-    result += QLatin1String("signals:\n");
+    result += QLatin1String("Q_SIGNALS:\n");
 
     for (const Property *p : m_properties) {
 
@@ -725,7 +725,7 @@ QString PropertyCreator::createCode()
 
                 result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Changed ") % p->name() % QLatin1String(" to\" << ") % varPrefix % p->name() % QLatin1String(";\n#endif\n");
 
-                result += doubleIndent % QLatin1String("emit ") % p->notify() % QLatin1String("(");
+                result += doubleIndent % QLatin1String("Q_EMIT ") % p->notify() % QLatin1String("(");
 
                 if (!p->read().isEmpty()) {
                     result += p->read() % QLatin1String("()");
@@ -775,7 +775,7 @@ QString PropertyCreator::createCode()
 
                 result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % p->name() % QLatin1String(" to its default value\" << ") % defValue % QLatin1String(";\n#endfi\n");
 
-                result += doubleIndent % QLatin1String("emit ") % p->notify() % QLatin1String("(");
+                result += doubleIndent % QLatin1String("Q_EMIT ") % p->notify() % QLatin1String("(");
 
                 if (!p->read().isEmpty()) {
                     result += p->read() % QLatin1String("()");
@@ -1240,7 +1240,7 @@ QString PropertyCreator::buildResetComment(const Property *prop)
         result += m_indent;
     }
     
-    result += QLatin1String(" * \\brief Resets the \\link ") % m_className % m_dc % prop->name() % QLatin1String(" ") % prop->name() % QLatin1String(" \\endlink property to the default value.\n";
+    result += QLatin1String(" * \\brief Resets the \\link ") % m_className % m_dc % prop->name() % QLatin1String(" ") % prop->name() % QLatin1String(" \\endlink property to the default value.\n");
     
     if (m_commentsPosition == PropertyModel::InHeader) {
         result += m_indent;
