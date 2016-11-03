@@ -38,6 +38,13 @@ public:
     QString createHeader();
     QString createPrivate();
     QString createCode();
+    
+    enum FunctionType {
+        Getter,
+        Setter,
+        Resetter,
+        Notifier
+    };
 
 private:
     void setIndent();
@@ -62,6 +69,7 @@ private:
     QString buildWriteComment(const Property *prop);
     QString buildResetComment(const Property *prop);
     QString buildNotifyComment(const Property *prop);
+    QString buildSeeAlsoComment(const Property *prop, FunctionType ftype);
     
     QString buildPartOfStatement(const Property *prop);
     QString buildFuncArg(const Property *prop, bool notify = false);

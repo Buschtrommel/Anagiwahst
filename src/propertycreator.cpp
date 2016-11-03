@@ -1145,8 +1145,19 @@ QString PropertyCreator::buildReadComment(const Property *prop)
 
         result += m_className % m_dc % prop->read() % QLatin1String("()\n");
     }
-
-    result += buildPartOfStatement(prop) % QLatin1String(" */\n");
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
+    
+    result += QLatin1String(" * \\brief Getter function for the \\link ") % m_className % m_dc % prop->name() % QLatin1String(" ") % prop->name() % QLatin1String(" \\endlink property.\n");
+    result += buildSeeAlsoComment(prop, Getter);
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
+    
+    result += QLatin1String(" */\n"); 
 
     return result;
 }
@@ -1170,8 +1181,37 @@ QString PropertyCreator::buildWriteComment(const Property *prop)
     if (m_commentsPosition == PropertyModel::InFronOfHeader) {
         result += QLatin1String(" * \\fn void ") % m_className % m_dc % prop->write() % buildFuncArg(prop) % QLatin1String("\n");
     }
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
 
-    result += buildPartOfStatement(prop) % QLatin1String(" */\n");
+    result += QLatin1String(" * \\brief Setter function for the \\link ") % m_className % m_dc % prop->name() % QLatin1String(" ") % prop->name() % QLatin1String(" \\endlink property.\n");
+    
+    if (!prop->notify().isEmpty()) {
+    
+        if (m_commentsPosition == PropertyModel::InHeader) {
+            result += m_indent;
+        }
+        
+        QString an = prop->name();
+        
+        if (prop->name() == prop->read()) {
+            an[0] = an[0].toUpper();
+            an.prepend(QChar('n'));
+        }
+        
+        result += QLatin1String(" * Emits the ") % prop->notify() % QLatin1String("() signal if \\a ") % an % QLatin1String(" is not equal to the stored value.\n");
+    
+    }
+    
+    result += buildSeeAlsoComment(prop, Setter);
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
+    
+    result += QLatin1String(" */\n"); 
 
     return result;
 }
@@ -1196,7 +1236,25 @@ QString PropertyCreator::buildResetComment(const Property *prop)
         result += QLatin1String(" * \\fn void ") % m_className % m_dc % prop->reset() % QLatin1String("()\n");
     }
 
-    result += buildPartOfStatement(prop) % QLatin1String(" */\n");
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
+    
+    result += QLatin1String(" * \\brief Resets the \\link ") % m_className % m_dc % prop->name() % QLatin1String(" ") % prop->name() % QLatin1String(" \\endlink property to the default value.\n";
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
+    
+    result += QLatin1String(" * If the default value is not euqal to the stored value, the ") % prop->notify() % QLatin1String("() signal will be emitted.\n");
+    
+    result += buildSeeAlsoComment(prop, Resetter);
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
+    
+    result += QLatin1String(" */\n"); 
 
     return result;
 }
@@ -1219,12 +1277,88 @@ QString PropertyCreator::buildNotifyComment(const Property *prop)
     if (m_commentsPosition != PropertyModel::InHeader) {
         result += QLatin1String(" * \\fn void ") % m_className % m_dc % prop->notify() % buildFuncArg(prop, true) % QLatin1String("\n");
     }
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
 
-    result += buildPartOfStatement(prop) % QLatin1String(" */\n");
+    result += QLatin1String(" * \\brief This is emitted if the value of the \\link ") % m_className % m_dc % prop->name() % QLatin1String(" ") % prop->name() % QLatin1String(" \\endlink property changes.\n");
+    
+    result += buildSeeAlsoComment(prop, Notifier);
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent;
+    }
+    
+    result += QLatin1String(" */\n"); 
 
     return result;
 }
 
+
+QString PropertyCreator::buildSeeAlsoComment(const Property *prop, FunctionType ftype)
+{
+    QString result;
+    
+    QStringList saList;
+    
+    for (FunctionType ft : QList<FunctionType>({Getter, Setter, Resetter, Notifier})) {
+        if (ft != ftype) {
+            QString s(m_className);
+            s += m_dc;
+            switch(ft) {
+                case Getter:
+                    s += prop->read();
+                    break;
+                case Setter:
+                    s += prop->write();
+                    break;
+                case Resetter:
+                    s += prop->reset();
+                    break;
+                case Notifier:
+                    s += prop->notify();
+                    break;
+            }
+            s += QLatin1String("()");
+            switch(ft) {
+                case Getter:
+                    if (!prop->read().isEmpty()) {
+                        saList.append(s);
+                    }
+                    break;
+                case Setter:
+                    if (!prop->write().isEmpty()) {
+                        saList.append(s);
+                    }
+                    break;
+                case Resetter:
+                    if (!prop->reset().isEmpty()) {
+                        saList.append(s);
+                    }
+                    break;
+                case Notifier:
+                    if (!prop->notify().isEmpty()) {
+                        saList.append(s);
+                    }
+                    break;
+            }
+            
+        }
+    }
+    
+    if (!saList.isEmpty()) {
+    
+        if (m_commentsPosition == PropertyModel::InHeader) {
+            result += m_indent;
+        }
+        
+        result += QLatin1String(" * \\sa ") % saList.join(QStringLiteral(", ")) % QLatin1String("\n");
+    
+    }
+    
+    return result;
+}
 
 
 
