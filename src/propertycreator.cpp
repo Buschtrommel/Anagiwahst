@@ -600,7 +600,7 @@ QString PropertyCreator::createCode()
     
     result += overloadArgs.join(QStringLiteral(", "));
     
-    result += QLatin1String(", QObject *parent = nullptr) :\n") % m_indent % QLatin1String("QObject(parent)");
+    result += QLatin1String(", QObject *parent) :\n") % m_indent % QLatin1String("QObject(parent)");
     
     if (m_privateClass && m_type == PropertyModel::PrivateClass) {
         result += QLatin1String(", d_ptr(new ") % m_className % QLatin1String("Private(");
