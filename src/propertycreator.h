@@ -47,26 +47,27 @@ private:
     QString buildTableRow(const QString &firstCol, const QString &secondCol);
     
     QString buildClassComment();
-    QString buildPropertyComment(Property *prop);
+    QString buildPropertyComment(const Property *prop);
     
-    QString buildReadFunction(Property *prop);
-    QString buildWriteFunction(Property *prop);
-    QString buildResetFunction(Property *prop);
+    QString buildReadFunction(const Property *prop);
+    QString buildWriteFunction(const Property *prop);
+    QString buildResetFunction(const Property *prop);
     
-    QString buildReadPrototype(Property *prop);
-    QString buildWritePrototype(Property *prop);
-    QString buildResetPrototype(Property *prop);
-    QString buildNotifyPrototype(Property *prop);
+    QString buildReadPrototype(const Property *prop);
+    QString buildWritePrototype(const Property *prop);
+    QString buildResetPrototype(const Property *prop);
+    QString buildNotifyPrototype(const Property *prop);
     
-    QString buildReadComment(Property *prop);
-    QString buildWriteComment(Property *prop);
-    QString buildResetComment(Property *prop);
-    QString buildNotifyComment(Property *prop);
+    QString buildReadComment(const Property *prop);
+    QString buildWriteComment(const Property *prop);
+    QString buildResetComment(const Property *prop);
+    QString buildNotifyComment(const Property *prop);
     
-    QString buildPartOfStatement(Property *prop);
-    QString buildFuncArg(Property *prop, bool notify = false);
+    QString buildPartOfStatement(const Property *prop);
+    QString buildFuncArg(const Property *prop, bool notify = false);
+    QString buildArg(const Property *prop, bool notify = false, bool forcePrefix = false);
 
-    QList<Property*> m_properties;
+    const QList<Property*> m_properties;
     int m_propertiesCount;
     QString m_className;
     QString m_indent;
@@ -74,7 +75,9 @@ private:
     int m_tabSize;
     PropertyModel::CommentsPosition m_commentsPosition;
     QString m_dc;
-    QStringList m_namespaces;
+    const QStringList m_namespaces;
+    QString m_headerProtector;
+    bool m_privateClass;
 };
 
 #endif // PROPERTYCREATOR_H

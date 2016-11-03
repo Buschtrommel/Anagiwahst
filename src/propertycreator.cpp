@@ -23,13 +23,30 @@
 #include <QRegularExpression>
 
 PropertyCreator::PropertyCreator(const QList<Property *> &properties, const QString &className, PropertyModel::ClassType type, int tabSize, PropertyModel::CommentsPosition commentsPosition, const QStringList &namespaces) :
-    m_properties(properties), m_className(className), m_type(type), m_tabSize(tabSize), m_commentsPosition(commentsPosition), m_namespaces(namespaces)
+    m_properties(properties), m_className(className), m_type(type), m_tabSize(tabSize), m_commentsPosition(commentsPosition), m_namespaces(namespaces), m_privateClass(false)
 {
 #ifdef QT_DEBUG
     qDebug() << "Constructing a PropertyCreator for class" << m_className << "with an indent of" << m_tabSize;
 #endif
     m_propertiesCount = m_properties.count();
     m_dc = QStringLiteral("::");
+    
+    if (!namespaces.isEmpty()) {
+        for (const QString &ns : namespaces) {
+            m_headerProtector.append(ns.toUpper());
+        }
+    }
+    m_headerProtector.append(className.toUpper());
+    
+    if (!properties.isEmpty()) {
+        for (const Property *p : properties) {
+            if (p->privateClass()) {
+                m_privateClass = true;
+                break;
+            }
+        }
+    }
+    
     setIndent();
 }
 
@@ -48,28 +65,11 @@ QString PropertyCreator::createHeader()
         return QString();
     }
 
-    Property *prop = nullptr;
-
-    bool privateClass = false;
-
-    for (int i = 0; i < m_propertiesCount; ++i) {
-
-        prop = m_properties.at(i);
-
-        if (prop->privateClass()) {
-            privateClass = true;
-            break;
-        }
-
-    }
-
     QString result;
-    QString uClassName = m_className.toUpper();
 
+    result += QLatin1String("#ifndef ") % m_headerProtector % QLatin1String("_H\n#define ") % m_headerProtector % QLatin1String("_H\n\n#include <QObject>\n");
 
-    result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_H\n#define ") % uClassName % QLatin1String("_H\n\n#include <QObject>\n");
-
-    if (m_type == PropertyModel::SharedData && privateClass) {
+    if (m_type == PropertyModel::SharedData && m_privateClass) {
         result += QLatin1String("#include <QSharedDataPointer>\n");
     }
 
@@ -87,26 +87,24 @@ QString PropertyCreator::createHeader()
 
         result += QLatin1String("\n\n") % buildClassComment() % QLatin1String("\n\n");
 
-        for (int i = 0; i < m_propertiesCount; ++i) {
+        for (const Property *p : m_properties) {
 
-            prop = m_properties.at(i);
+            result += buildPropertyComment(p);
 
-            result += buildPropertyComment(prop);
-
-            if (!prop->read().isEmpty()) {
-                result += buildReadComment(prop) % QLatin1String("\n");
+            if (!p->read().isEmpty()) {
+                result += buildReadComment(p) % QLatin1String("\n");
             }
 
-            if (!prop->write().isEmpty()) {
-                result += buildWriteComment(prop) % QLatin1String("\n");
+            if (!p->write().isEmpty()) {
+                result += buildWriteComment(p) % QLatin1String("\n");
             }
 
-            if (!prop->reset().isEmpty()) {
-                result += buildResetComment(prop) % QLatin1String("\n");
+            if (!p->reset().isEmpty()) {
+                result += buildResetComment(p) % QLatin1String("\n");
             }
 
-            if (!prop->notify().isEmpty()) {
-                result += buildNotifyComment(prop) % QLatin1String("\n");
+            if (!p->notify().isEmpty()) {
+                result += buildNotifyComment(p) % QLatin1String("\n");
             }
 
             result += QLatin1String("\n\n");
@@ -117,7 +115,7 @@ QString PropertyCreator::createHeader()
 
     result += QLatin1String("\n");
 
-    if (privateClass) {
+    if (m_privateClass) {
         result += QLatin1String("class ") % m_className % QLatin1String("Private;\n\n");
     }
 
@@ -127,86 +125,135 @@ QString PropertyCreator::createHeader()
 
     result += QLatin1String("class ") % m_className % QLatin1String(" : public QObject\n{\n") % m_indent % QLatin1String("Q_OBJECT\n");
 
-    for (int i = 0; i < m_propertiesCount; i++) {
-
-        prop = m_properties.at(i);
+    for (const Property *p : m_properties) {
 
         if (m_commentsPosition == PropertyModel::InHeader) {
-            result += buildPropertyComment(prop);
+            result += buildPropertyComment(p);
         }
 
-        result += m_indent % QLatin1String("Q_PROPERTY(") % prop->type() % QLatin1String(" ");
+        result += m_indent % QLatin1String("Q_PROPERTY(") % p->type() % QLatin1String(" ");
 
-        if (prop->pointer()) {
+        if (p->pointer()) {
             result += QLatin1String("*");
         }
 
-        result += prop->name();
+        result += p->name();
 
-        if (!prop->member().isEmpty()) {
-            result += QLatin1String(" MEMBER ") % prop->member();
+        if (!p->member().isEmpty()) {
+            result += QLatin1String(" MEMBER ") % p->member();
         }
 
-        if (!prop->read().isEmpty()) {
-            result += QLatin1String(" READ ") % prop->read();
+        if (!p->read().isEmpty()) {
+            result += QLatin1String(" READ ") % p->read();
         }
 
-        if (!prop->write().isEmpty()) {
-            result += QLatin1String(" WRITE ") % prop->write();
+        if (!p->write().isEmpty()) {
+            result += QLatin1String(" WRITE ") % p->write();
         }
 
-        if (!prop->reset().isEmpty()) {
-            result += QLatin1String(" RESET ") % prop->reset();
+        if (!p->reset().isEmpty()) {
+            result += QLatin1String(" RESET ") % p->reset();
         }
 
-        if (!prop->notify().isEmpty()) {
-            result += QLatin1String(" NOTIFY ") % prop->notify();
+        if (!p->notify().isEmpty()) {
+            result += QLatin1String(" NOTIFY ") % p->notify();
         }
 
-        if (prop->revision() > 0) {
-            result += QLatin1String(" REVISION ") % QString::number(prop->revision());
+        if (p->revision() > 0) {
+            result += QLatin1String(" REVISION ") % QString::number(p->revision());
         }
 
-        if (prop->designable() != QLatin1String("true")) {
-            result += QLatin1String(" DESIGNABLE ") % prop->designable();
+        if (p->designable() != QLatin1String("true")) {
+            result += QLatin1String(" DESIGNABLE ") % p->designable();
         }
 
-        if (prop->scriptable() != QLatin1String("true")) {
-            result += QLatin1String(" SCRIPTABLE ") % prop->scriptable();
+        if (p->scriptable() != QLatin1String("true")) {
+            result += QLatin1String(" SCRIPTABLE ") % p->scriptable();
         }
 
-        if (!prop->stored()) {
+        if (!p->stored()) {
             result += QLatin1String(" STORED false");
         }
 
-        if (prop->user()) {
+        if (p->user()) {
             result += QLatin1String(" USER true");
         }
 
-        if (prop->constant()) {
+        if (p->constant()) {
             result += QLatin1String(" CONSTANT");
         }
 
-        if (prop->final()) {
+        if (p->final()) {
             result += QLatin1String(" FINAL");
         }
 
         result += QLatin1String(")\n");
     }
 
-    result += QLatin1String("public:\n") % m_indent % QLatin1String("explicit ") % m_className % QLatin1String("(QObject *parent = nullptr);\n") % m_indent % QLatin1String("~") % m_className % QLatin1Literal("();\n\n");
+    result += QLatin1String("public:\n");
+    
+    
+    // build the default constructor
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent % QLatin1String("/*!\n") % m_indent % QLatin1String(" * \\brief Constructs a new ") % m_className % QLatin1String(" object with default values and the given \\a parent.\n") % m_indent % QLatin1String(" */\n");
+    }
+    
+    result += m_indent % QLatin1String("explicit ") % m_className % QLatin1String("(QObject *parent = nullptr);\n\n");
+    
+    
+    
+    
+    
+    // Start building an overloaded constructor with all properties as arguments.
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent % QLatin1String("/*!\n") % m_indent % QLatin1String(" * \\brief Constructs a new ") % m_className % QLatin1String(" object with the given arguments and \\a parent.\n") % m_indent % QLatin1String(" */\n");
+    }
+    
+    result += m_indent;
+    
+    if (m_properties.count() == 1) {
+        result += QLatin1String("explicit ");
+    }
+    
+    result += m_className % QLatin1String("(");
+    
+    QStringList overloadArgs;
+    
+    for (const Property *p : m_properties) {
+        overloadArgs.append(buildArg(p, true));
+    }
+    
+    result += overloadArgs.join(QStringLiteral(", "));
+    
+    result += QLatin1String(", QObject *parent = nullptr);\n\n");
+    
+    
+    
+    
+    
+    
+    // build the destrcutor
+    
+    if (m_commentsPosition == PropertyModel::InHeader) {
+        result += m_indent % QLatin1String("/*!\n") % m_indent % QLatin1String(" * \\brief Deconstructs the ") % m_className % QLatin1String(" object.\n") % m_indent % QLatin1String(" */\n");
+    }
+    
+    result += m_indent % QLatin1String("~") % m_className % QLatin1Literal("();\n\n");
+    
+    
+    
 
     // Start building the get funciton in the public part of the header file
 
-    for (int i = 0; i < m_propertiesCount; ++i) {
+    for (const Property *p : m_properties) {
 
-        prop = m_properties.at(i);
-
-        if (!prop->read().isEmpty()) {
+        if (!p->read().isEmpty()) {
             if (m_commentsPosition == PropertyModel::InHeader) {
-                result += buildReadComment(prop);
+                result += buildReadComment(p);
             }
-            result += buildReadPrototype(prop);
+            result += buildReadPrototype(p);
         }
 
     }
@@ -215,15 +262,13 @@ QString PropertyCreator::createHeader()
 
     // Start building the set function in the public part of the header file.
 
-    for (int i = 0; i < m_propertiesCount; ++i) {
+    for (const Property *p : m_properties) {
 
-        prop = m_properties.at(i);
-
-        if (!prop->write().isEmpty()) {
+        if (!p->write().isEmpty()) {
             if (m_commentsPosition == PropertyModel::InHeader) {
-                result += buildWriteComment(prop);
+                result += buildWriteComment(p);
             }
-            result += buildWritePrototype(prop);
+            result += buildWritePrototype(p);
 
         }
 
@@ -233,15 +278,13 @@ QString PropertyCreator::createHeader()
 
     // Start building the reset function in the public part of the header file.
 
-    for (int i = 0; i < m_propertiesCount; ++i) {
+    for (const Property *p : m_properties) {
 
-        prop = m_properties.at(i);
-
-        if (!prop->reset().isEmpty()) {
+        if (!p->reset().isEmpty()) {
             if (m_commentsPosition == PropertyModel::InHeader) {
-                result += buildResetComment(prop);
+                result += buildResetComment(p);
             }
-            result += buildResetPrototype(prop);
+            result += buildResetPrototype(p);
         }
     }
 
@@ -251,15 +294,13 @@ QString PropertyCreator::createHeader()
 
     result += QLatin1String("signals:\n");
 
-    for (int i = 0; i < m_propertiesCount; ++i) {
+    for (const Property *p : m_properties) {
 
-        prop = m_properties.at(i);
-
-        if (!prop->notify().isEmpty()) {
+        if (!p->notify().isEmpty()) {
             if (m_commentsPosition == PropertyModel::InHeader) {
-                result += buildNotifyComment(prop);
+                result += buildNotifyComment(p);
             }
-            result += buildNotifyPrototype(prop);
+            result += buildNotifyPrototype(p);
         }
 
     }
@@ -268,7 +309,7 @@ QString PropertyCreator::createHeader()
 
 	// Start building the protected member section.
 
-	if (privateClass) {
+	if (m_privateClass) {
 		result += QLatin1String("protected:\n");
 
         switch (m_type) {
@@ -289,22 +330,20 @@ QString PropertyCreator::createHeader()
 
     result += QLatin1String("private:\n") % m_indent % QLatin1String("Q_DISABLE_COPY(") % m_className % QLatin1String(")\n");
 
-	if (m_type == PropertyModel::PrivateClass && privateClass) {
+	if (m_type == PropertyModel::PrivateClass && m_privateClass) {
         result += m_indent % QLatin1String("Q_DECLARE_PRIVATE(") % m_className % QLatin1String(")\n");
     }
 
-    for (int i = 0; i < m_propertiesCount; ++i) {
+    for (const Property *p : m_properties) {
 
-        prop = m_properties.at(i);
-
-        if (!prop->privateClass()) {
-            result += m_indent % prop->type();
-            if (prop->pointer()) {
+        if (!p->privateClass()) {
+            result += m_indent % p->type();
+            if (p->pointer()) {
                 result += QLatin1String(" *m_");
             } else {
                 result += QLatin1String(" m_");
             }
-            result += prop->name() % QLatin1String(";\n");
+            result += p->name() % QLatin1String(";\n");
         }
     }
 
@@ -318,7 +357,7 @@ QString PropertyCreator::createHeader()
         }
     }
 
-    result += QLatin1String("\n\n#endif // ") % uClassName % QLatin1String("_H\n");
+    result += QLatin1String("\n\n#endif // ") % m_headerProtector % QLatin1String("_H\n");
 
     return result;
 }
@@ -329,39 +368,26 @@ QString PropertyCreator::createHeader()
 
 QString PropertyCreator::createPrivate()
 {
+    if (!m_privateClass) {
+        return QString();
+    }
+    
     if (m_properties.isEmpty()) {
         return QString();
     }
 
-    Property *prop = nullptr;
-
-    bool privateClass = false;
-	bool defaultValuePresent = false;
-
-    for (int i = 0; i < m_propertiesCount; ++i) {
-
-        prop = m_properties.at(i);
-
-        if (prop->privateClass()) {
-            privateClass = true;
+    bool defaultValuePresent = false;
+    
+    for (const Property *p : m_properties) {
+        if (!p->defaultValue().isEmpty()) {
+            defaultValuePresent = true;
+            break;
         }
-
-        if (!prop->defaultValue().isEmpty()) {
-			defaultValuePresent = true;
-		}
-
     }
-
-    if (!privateClass) {
-        return QString();
-    }
-
-    QString uClassName = m_className.toUpper();
-
 
     QString result = QLatin1String("");
 
-    result += QLatin1String("#ifndef ") % uClassName % QLatin1String("_P_H\n#define ") % uClassName % QLatin1String("_P_H\n\n");
+    result += QLatin1String("#ifndef ") % m_headerProtector % QLatin1String("_P_H\n#define ") % m_headerProtector % QLatin1String("_P_H\n\n");
 
     if (m_type == PropertyModel::SharedData) {
         result += QLatin1String("#include <QSharedData>\n");
@@ -384,64 +410,101 @@ QString PropertyCreator::createPrivate()
 
     result += QLatin1String("\n{\npublic:\n");
 
-	QString x2Indent;
-	x2Indent += m_indent % m_indent;
+    QString x2Indent;
+    x2Indent += m_indent % m_indent;
 
     result += m_indent % m_className % QLatin1String("Private()");
+    
+    
+    
 
-	if (defaultValuePresent) {
-		result += QLatin1String(" :\n");
-
-		for (int i = 0; i < m_propertiesCount; ++i) {
-
-            prop = m_properties.at(i);
-
-            if (prop->privateClass() && !prop->defaultValue().isEmpty()) {
-                result += x2Indent % prop->name() % QLatin1String("(") % prop->defaultValue() % QLatin1String("),\n");
-			}
+    if (defaultValuePresent) {
+        result += QLatin1String(" :\n");
+        
+        for (const Property *p : m_properties) {
+            
+            if (p->privateClass() && !p->defaultValue().isEmpty()) {
+                result += x2Indent % p->name() % QLatin1String("(") % p->defaultValue() % QLatin1String("),\n");
+            }
+            
         }
 
         result.chop(2);
         result += QLatin1String("\n") % m_indent % QLatin1String("{}\n\n");
 
-	} else {
-		result += QLatin1String(" {}\n\n");
-	}
+    } else {
+        result += QLatin1String(" {}\n\n");
+    }
+    
+    
+    
+    // create overloaded constructor containing all properties as arguments
+    
+    
+    result += m_indent;
+    
+    if (m_properties.count() == 1) {
+        result += QLatin1String("explicit ");
+    }
+    
+    result += m_className %  QLatin1String("Private(");
+    
+    QStringList overloadArgs;
+    
+    for (const Property *p : m_properties) {
+        if (p->privateClass()) {
+            overloadArgs.append(buildArg(p, false, true));
+        }
+    }
+    
+    result += overloadArgs.join(QStringLiteral(", "));
+    
+    result += QLatin1String(") :\n");
+    
+    for (const Property *p : m_properties) {
+        
+        if (p->privateClass()) {
+            QString un = p->name();
+            un[0] = un[0].toUpper();
+            result += x2Indent % p->name() % QLatin1String("(n") % un % QLatin1String("),\n");
+        }        
+    }
+    
+    result.chop(2);
+    result += QLatin1String("\n") % m_indent % QLatin1String("{}\n\n");
+    
 
     if (m_type == PropertyModel::SharedData) {
 
         result += m_indent % m_className % QLatin1String("Private(const ") % m_className % QLatin1String("Private &other) :\n") % x2Indent % QLatin1String("QSharedData(other),\n");
-
-        for (int i = 0; i < m_propertiesCount; ++i) {
-
-            prop = m_properties.at(i);
-
-            if (prop->privateClass()) {
-                result += x2Indent % prop->name() % QLatin1String("(other.") % prop->name() % QLatin1String("),\n");
+        
+        for (const Property *p : m_properties) {
+            
+            if (p->privateClass()) {
+                result += x2Indent % p->name() % QLatin1String("(other.") % p->name() % QLatin1String("),\n");
             }
-
+            
         }
 
         result.chop(2);
-		result += QLatin1String("\n") % m_indent % QLatin1String("{}\n\n");
+        result += QLatin1String("\n") % m_indent % QLatin1String("{}\n\n");
     }
 
     result += m_indent % QLatin1String("~") % m_className % QLatin1String("Private() {}\n\n");
-
-    for (int i = 0; i < m_propertiesCount; ++i) {
-
-		prop = m_properties.at(i);
-
-        if (prop->privateClass()) {
-            result += m_indent % prop->type() % QLatin1String(" ");
-
-            if (prop->pointer()) {
-				result += QLatin1String("*");
-			}
-
-            result += prop->name() % QLatin1String(";\n");
-		}
-	}
+    
+    for (const Property *p : m_properties) {
+        
+        if (p->privateClass()) {
+            result += m_indent % p->type() % QLatin1String(" ");
+            
+            if (p->pointer()) {
+                result += QLatin1String("*");
+            }
+            
+            result += p->name() % QLatin1String(";\n");
+        }
+        
+    }
 
     result += QLatin1String("};\n\n");
 
@@ -453,7 +516,7 @@ QString PropertyCreator::createPrivate()
         result += QLatin1String("\n");
     }
 
-    result += QLatin1String("#endif // ") % uClassName % QLatin1String("_P_H\n");
+    result += QLatin1String("#endif // ") % m_headerProtector % QLatin1String("_P_H\n");
 
     return result;
 }
@@ -469,28 +532,12 @@ QString PropertyCreator::createCode()
     }
 
 
-
-    Property *prop = nullptr;
-
-    bool privateClass = false;
-
-    for (int i = 0; i < m_propertiesCount; ++i) {
-
-        prop = m_properties.at(i);
-
-        if (prop->privateClass()) {
-            privateClass = true;
-            break;
-        }
-
-    }
-
     QString doubleIndent = m_indent % m_indent;
 
     QString result = QLatin1String("");
 
     result += QLatin1String("#include \"") % m_className.toLower();
-    if (privateClass) {
+    if (m_privateClass) {
         result += QLatin1String("_p.h\"\n");
     } else {
         result += QLatin1String(".h\"\n");
@@ -505,11 +552,13 @@ QString PropertyCreator::createCode()
         result += QLatin1String("\n");
     }
 
-    result += QLatin1String("/*!\n * \\brief Constructs a new ") % m_className % QLatin1String(" object.\n */\n");
+    if (m_commentsPosition == PropertyModel::InCode) {
+        result += QLatin1String("/*!\n * \\brief Constructs a new ") % m_className % QLatin1String(" object with default values and the given \\a parent.\n */\n");
+    }
 
     result += m_className % m_dc % m_className % QLatin1String("(QObject *parent) :\n") % m_indent % QLatin1String("QObject(parent)");
 
-    if (privateClass && m_type == PropertyModel::PrivateClass) {
+    if (m_privateClass && m_type == PropertyModel::PrivateClass) {
         result += QLatin1String(", d_ptr(new ") % m_className % QLatin1String("Private)\n");
     } else {
         result += QLatin1String("\n");
@@ -517,122 +566,180 @@ QString PropertyCreator::createCode()
 
     result += QLatin1String("{\n");
 
-    if (privateClass && m_type == PropertyModel::SharedData) {
+    if (m_privateClass && m_type == PropertyModel::SharedData) {
         result += m_indent % QLatin1String("d = new ") % m_className % QLatin1String("Private;\n");
     }
 
-    for (int i = 0; i < m_propertiesCount; ++i) {
+    for (const Property *p : m_properties) {
 
-        prop = m_properties.at(i);
 
-        if (!prop->privateClass() && !prop->defaultValue().isEmpty()) {
+        if (!p->privateClass() && !p->defaultValue().isEmpty()) {
 
-            result += m_indent % getVariablePrefix(prop->privateClass()) % prop->name() % QLatin1String(" = ") % prop->defaultValue() % QLatin1String(";\n");
+            result += m_indent % getVariablePrefix(p->privateClass()) % p->name() % QLatin1String(" = ") % p->defaultValue() % QLatin1String(";\n");
 
         }
 
     }
 
     result += QLatin1String("}\n\n\n");
-
-    result += QLatin1String("/*!\n * \\brief Deconstructs the ") % m_className % QLatin1String(" object.\n */\n");
+    
+    
+    // build an overloaded constructor
+    
+    if (m_commentsPosition == PropertyModel::InCode) {
+        result += QLatin1String("/*!\n * \\brief Constructs a new ") % m_className % QLatin1String(" object with the given arguments and \\a parent.\n */\n");
+    }
+    
+    result += m_className % m_dc % m_className % QLatin1String("(");
+    
+    QStringList overloadArgs;
+    
+    for (const Property *p : m_properties) {
+        overloadArgs.append(buildArg(p, true));
+    }
+    
+    result += overloadArgs.join(QStringLiteral(", "));
+    
+    result += QLatin1String(", QObject *parent = nullptr) :\n") % m_indent % QLatin1String("QObject(parent)");
+    
+    if (m_privateClass && m_type == PropertyModel::PrivateClass) {
+        result += QLatin1String(", d_ptr(new ") % m_className % QLatin1String("Private(");
+        
+        QStringList privInitList;
+        for (const Property *p : m_properties) {
+            if (p->privateClass()) {
+                privInitList.append(p->name());
+            }
+        }
+        
+        if (!privInitList.isEmpty()) {
+            result += privInitList.join(QStringLiteral(", ")) % QLatin1String(")");
+        }
+        
+        result += QLatin1String(")");
+    }
+    
+    QStringList localPrivs;
+    for (const Property *p : m_properties) {
+        if (!p->privateClass()) {
+            
+            QString s(QStringLiteral("m_"));
+            s += p->name() % QLatin1String("(") % p->name() % QLatin1String(")");
+            localPrivs.append(s);
+        }
+    }
+    
+    if (!localPrivs.isEmpty()) {
+        result += QLatin1String(", ");
+        result += localPrivs.join(", ");
+    }
+    
+    result += QLatin1String("\n{\n}\n\n\n");
+    
+    
+    
+    // build the destructor
+    
+    if (m_commentsPosition == PropertyModel::InCode) {
+        result += QLatin1String("/*!\n * \\brief Deconstructs the ") % m_className % QLatin1String(" object.\n */\n");
+    }
 
     result += m_className % QLatin1String("::~") % m_className % QLatin1String("()\n{\n");
 
     result += QLatin1String("}\n\n\n");
+    
+    
 
 
-    for (int i = 0; i < m_propertiesCount; ++i) {
-
-        prop = m_properties.at(i);
+    for (const Property *p : m_properties) {
 
         // prepared stuff
-        QLatin1String varPrefix = getVariablePrefix(prop->privateClass());
+        QLatin1String varPrefix = getVariablePrefix(p->privateClass());
 
 
         if (m_commentsPosition == PropertyModel::InCode) {
 
-            result += buildPropertyComment(prop);
+            result += buildPropertyComment(p);
 
         }
 
 
-        if (!prop->notify().isEmpty() && m_commentsPosition == PropertyModel::InCode) {
+        if (!p->notify().isEmpty() && m_commentsPosition == PropertyModel::InCode) {
 
-            result += buildNotifyComment(prop) % QLatin1String("\n");
+            result += buildNotifyComment(p) % QLatin1String("\n");
 
         }
 
 
-        if (!prop->read().isEmpty()) {
+        if (!p->read().isEmpty()) {
 
             if (m_commentsPosition == PropertyModel::InCode) {
-                result += buildReadComment(prop);
+                result += buildReadComment(p);
             }
 
 
-            result += prop->type();
+            result += p->type();
 
-            if (prop->pointer()) {
+            if (p->pointer()) {
                 result += QLatin1String(" *");
             } else {
                 result += QLatin1String(" ");
             }
 
 
-            result += m_className % m_dc % buildReadFunction(prop) % QLatin1String(" { ");
+            result += m_className % m_dc % buildReadFunction(p) % QLatin1String(" { ");
 
-            if (prop->privateClass() && m_type == PropertyModel::PrivateClass) {
+            if (p->privateClass() && m_type == PropertyModel::PrivateClass) {
                 result += getPointerMacro(true, false);
             }
 
-            result += QLatin1String("return ") % varPrefix % prop->name() % QLatin1String("; }\n\n");
+            result += QLatin1String("return ") % varPrefix % p->name() % QLatin1String("; }\n\n");
         }
 
 
 
-        if (!prop->write().isEmpty()) {
+        if (!p->write().isEmpty()) {
 
             if (m_commentsPosition == PropertyModel::InCode) {
-                result += buildWriteComment(prop);
+                result += buildWriteComment(p);
             }
 
-            QString argName = prop->name();
+            QString argName = p->name();
 
-            if (prop->name() == prop->read()) {
+            if (p->name() == p->read()) {
                 argName[0] = argName[0].toUpper();
                 argName.prepend(QLatin1String("n"));
             }
 
-            result += QLatin1String("void ") % m_className % m_dc % buildWriteFunction(prop) % QLatin1String("\n{\n");
+            result += QLatin1String("void ") % m_className % m_dc % buildWriteFunction(p) % QLatin1String("\n{\n");
 
-            if (prop->privateClass() && m_type == PropertyModel::PrivateClass) {
+            if (p->privateClass() && m_type == PropertyModel::PrivateClass) {
                 result += m_indent % getPointerMacro();
             }
 
-            if (!prop->notify().isEmpty()) {
+            if (!p->notify().isEmpty()) {
 
-                result += m_indent % QLatin1String("if (") % argName % QLatin1String(" != ") % varPrefix % prop->name() % QLatin1String(") {\n");
+                result += m_indent % QLatin1String("if (") % argName % QLatin1String(" != ") % varPrefix % p->name() % QLatin1String(") {\n");
 
-                result += doubleIndent % varPrefix % prop->name() % QLatin1String(" = ") % argName % QLatin1String(";\n");
+                result += doubleIndent % varPrefix % p->name() % QLatin1String(" = ") % argName % QLatin1String(";\n");
 
-                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Changed ") % prop->name() % QLatin1String(" to\" << ") % varPrefix % prop->name() % QLatin1String(";\n#endif\n");
+                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Changed ") % p->name() % QLatin1String(" to\" << ") % varPrefix % p->name() % QLatin1String(";\n#endif\n");
 
-                result += doubleIndent % QLatin1String("emit ") % prop->notify() % QLatin1String("(");
+                result += doubleIndent % QLatin1String("emit ") % p->notify() % QLatin1String("(");
 
-                if (!prop->read().isEmpty()) {
-                    result += prop->read() % QLatin1String("()");
+                if (!p->read().isEmpty()) {
+                    result += p->read() % QLatin1String("()");
                 } else {
-                    result += varPrefix % prop->name();
+                    result += varPrefix % p->name();
                 }
 
                 result += QLatin1String(");\n") % m_indent % QLatin1String("}\n");
 
             } else {
 
-                result += m_indent % varPrefix % prop->name() % QLatin1String(" = ") % prop->name() % QLatin1String(";\n");
+                result += m_indent % varPrefix % p->name() % QLatin1String(" = ") % p->name() % QLatin1String(";\n");
 
-                result += QLatin1String("#ifdef QT_DEBUG\n") % m_indent % QLatin1String("qDebug() << \" Set ") % prop->name() % QLatin1String(" to\" << ") % varPrefix % prop->name() % QLatin1String(";\n#endif\n");
+                result += QLatin1String("#ifdef QT_DEBUG\n") % m_indent % QLatin1String("qDebug() << \" Set ") % p->name() % QLatin1String(" to\" << ") % varPrefix % p->name() % QLatin1String(";\n#endif\n");
 
             }
 
@@ -645,35 +752,35 @@ QString PropertyCreator::createCode()
 
 
 
-        if (!prop->reset().isEmpty()) {
+        if (!p->reset().isEmpty()) {
 
             if (m_commentsPosition == PropertyModel::InCode) {
-                result += buildResetComment(prop);
+                result += buildResetComment(p);
             }
 
-            result += QLatin1String("void ") % m_className % m_dc % buildResetFunction(prop) % QLatin1String("\n{\n");
+            result += QLatin1String("void ") % m_className % m_dc % buildResetFunction(p) % QLatin1String("\n{\n");
 
-            if (prop->privateClass()) {
+            if (p->privateClass()) {
                 result += m_indent % getPointerMacro();
             }
 
-            QString defValue = prop->defaultValue().isEmpty() ? getDefaultValue(prop->type(), prop->pointer()) : prop->defaultValue();
+            QString defValue = p->defaultValue().isEmpty() ? getDefaultValue(p->type(), p->pointer()) : p->defaultValue();
 
 
-            if (!prop->notify().isEmpty()) {
+            if (!p->notify().isEmpty()) {
 
-                result += m_indent % QLatin1String("if (") % defValue % QLatin1String(" != ") % varPrefix % prop->name() % QLatin1String(") {\n");
+                result += m_indent % QLatin1String("if (") % defValue % QLatin1String(" != ") % varPrefix % p->name() % QLatin1String(") {\n");
 
-                result += doubleIndent % varPrefix % prop->name() % QLatin1String(" = ") % defValue % QLatin1String(";\n");
+                result += doubleIndent % varPrefix % p->name() % QLatin1String(" = ") % defValue % QLatin1String(";\n");
 
-                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % prop->name() % QLatin1String(" to its default value\" << ") % defValue % QLatin1String(";\n#endfi\n");
+                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % p->name() % QLatin1String(" to its default value\" << ") % defValue % QLatin1String(";\n#endfi\n");
 
-                result += doubleIndent % QLatin1String("emit ") % prop->notify() % QLatin1String("(");
+                result += doubleIndent % QLatin1String("emit ") % p->notify() % QLatin1String("(");
 
-                if (!prop->read().isEmpty()) {
-                    result += prop->read() % QLatin1String("()");
+                if (!p->read().isEmpty()) {
+                    result += p->read() % QLatin1String("()");
                 } else {
-                    result += varPrefix % prop->name();
+                    result += varPrefix % p->name();
                 }
 
                 result += QLatin1String(");\n") % m_indent % QLatin1String("}\n");
@@ -681,9 +788,9 @@ QString PropertyCreator::createCode()
 
             } else {
 
-                result += m_indent % varPrefix % prop->name() % QLatin1String(" = ") % defValue % QLatin1String(";\n");
+                result += m_indent % varPrefix % p->name() % QLatin1String(" = ") % defValue % QLatin1String(";\n");
 
-                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % prop->name() % QLatin1String(" to its default value\" << ") % defValue % QLatin1String(";\n#endfi\n");
+                result += QLatin1String("#ifdef QT_DEBUG\n") % doubleIndent % QLatin1String("qDebug() << \"Reset ") % p->name() % QLatin1String(" to its default value\" << ") % defValue % QLatin1String(";\n#endfi\n");
 
             }
 
@@ -808,7 +915,7 @@ QString PropertyCreator::buildClassComment()
 
 
 
-QString PropertyCreator::buildPropertyComment(Property *prop)
+QString PropertyCreator::buildPropertyComment(const Property *prop)
 {
     QString result = QLatin1String("");
 
@@ -966,7 +1073,7 @@ QString PropertyCreator::buildPropertyComment(Property *prop)
 
 
 
-QString PropertyCreator::buildReadFunction(Property *prop)
+QString PropertyCreator::buildReadFunction(const Property *prop)
 {
     QString readFunc = prop->read() % QLatin1String("() const");
 
@@ -975,7 +1082,7 @@ QString PropertyCreator::buildReadFunction(Property *prop)
 
 
 
-QString PropertyCreator::buildWriteFunction(Property *prop)
+QString PropertyCreator::buildWriteFunction(const Property *prop)
 {
     QString writeFunc;
 
@@ -992,7 +1099,7 @@ QString PropertyCreator::buildWriteFunction(Property *prop)
 
 
 
-QString PropertyCreator::buildResetFunction(Property *prop)
+QString PropertyCreator::buildResetFunction(const Property *prop)
 {
     QString resetFunc = prop->reset() % QLatin1String("()");
 
@@ -1001,7 +1108,7 @@ QString PropertyCreator::buildResetFunction(Property *prop)
 
 
 
-QString PropertyCreator::buildPartOfStatement(Property *prop)
+QString PropertyCreator::buildPartOfStatement(const Property *prop)
 {
     if (m_commentsPosition == PropertyModel::InHeader) {
         QString partOf = m_indent % QLatin1String(" * \\brief Part of the \\link ") % m_className % m_dc % prop->name() % QLatin1String(" ") % prop->name() % QLatin1String(" \\endlink property.\n") % m_indent;
@@ -1014,7 +1121,7 @@ QString PropertyCreator::buildPartOfStatement(Property *prop)
 
 
 
-QString PropertyCreator::buildReadComment(Property *prop)
+QString PropertyCreator::buildReadComment(const Property *prop)
 {
     QString result;
 
@@ -1046,7 +1153,7 @@ QString PropertyCreator::buildReadComment(Property *prop)
 
 
 
-QString PropertyCreator::buildWriteComment(Property *prop)
+QString PropertyCreator::buildWriteComment(const Property *prop)
 {
     QString result;
 
@@ -1071,7 +1178,7 @@ QString PropertyCreator::buildWriteComment(Property *prop)
 
 
 
-QString PropertyCreator::buildResetComment(Property *prop)
+QString PropertyCreator::buildResetComment(const Property *prop)
 {
     QString result;
 
@@ -1095,7 +1202,7 @@ QString PropertyCreator::buildResetComment(Property *prop)
 }
 
 
-QString PropertyCreator::buildNotifyComment(Property *prop)
+QString PropertyCreator::buildNotifyComment(const Property *prop)
 {
     QString result;
 
@@ -1121,7 +1228,7 @@ QString PropertyCreator::buildNotifyComment(Property *prop)
 
 
 
-QString PropertyCreator::buildWritePrototype(Property *prop)
+QString PropertyCreator::buildWritePrototype(const Property *prop)
 {
     QString result = m_indent % QLatin1String("void ") % prop->write() % buildFuncArg(prop) % QLatin1String(";\n");
 
@@ -1130,7 +1237,7 @@ QString PropertyCreator::buildWritePrototype(Property *prop)
 
 
 
-QString PropertyCreator::buildReadPrototype(Property *prop)
+QString PropertyCreator::buildReadPrototype(const Property *prop)
 {
     QString result;
 
@@ -1146,7 +1253,7 @@ QString PropertyCreator::buildReadPrototype(Property *prop)
 }
 
 
-QString PropertyCreator::buildResetPrototype(Property *prop)
+QString PropertyCreator::buildResetPrototype(const Property *prop)
 {
     QString result = m_indent % QLatin1String("void ") % prop->reset() % QLatin1String("();\n");
 
@@ -1154,7 +1261,7 @@ QString PropertyCreator::buildResetPrototype(Property *prop)
 }
 
 
-QString PropertyCreator::buildNotifyPrototype(Property *prop)
+QString PropertyCreator::buildNotifyPrototype(const Property *prop)
 {
     QString result = m_indent % QLatin1String("void ") % prop->notify() % buildFuncArg(prop, true) % QLatin1String(";\n");
 
@@ -1164,10 +1271,49 @@ QString PropertyCreator::buildNotifyPrototype(Property *prop)
 
 
 
-QString PropertyCreator::buildFuncArg(Property *prop, bool notify)
+QString PropertyCreator::buildFuncArg(const Property *prop, bool notify)
 {
     QString result = QStringLiteral("(");
+    
+    result.append(buildArg(prop, notify));
+    
+    result.append(QStringLiteral(")"));
+    
+    
 
+//     if (!prop->pointer() && prop->argsByRef()) {
+//         result += QLatin1String("const ");
+//     }
+// 
+//     result += prop->type();
+// 
+//     if (!prop->pointer()) {
+//         if (!prop->argsByRef()) {
+//             result += ' ';
+//         } else {
+//             result += QLatin1String(" &");
+//         }
+//     } else {
+//         result += QLatin1String(" *");
+//     }
+// 
+//     if ((prop->name() != prop->read()) || notify) {
+//         result += prop->name() % QLatin1String(")");
+//     } else {
+//         QString name = prop->name();
+//         name[0] = name[0].toUpper();
+//         name.prepend(QLatin1String("n"));
+//         result += name % QLatin1String(")");
+//     }
+
+    return result;
+}
+
+
+QString PropertyCreator::buildArg(const Property *prop, bool notify, bool forcePrefix)
+{
+    QString result;
+    
     if (!prop->pointer() && prop->argsByRef()) {
         result += QLatin1String("const ");
     }
@@ -1183,18 +1329,15 @@ QString PropertyCreator::buildFuncArg(Property *prop, bool notify)
     } else {
         result += QLatin1String(" *");
     }
-
-    if ((prop->name() != prop->read()) || notify) {
-        result += prop->name() % QLatin1String(")");
-    } else {
+    
+    if (((prop->name() == prop->read()) && !notify) || forcePrefix) {
         QString name = prop->name();
         name[0] = name[0].toUpper();
         name.prepend(QLatin1String("n"));
-        result += name % QLatin1String(")");
+        result += name;
+    } else {
+        result += prop->name();
     }
-
+    
     return result;
 }
-
-
-
