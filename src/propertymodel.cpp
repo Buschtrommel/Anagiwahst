@@ -23,26 +23,17 @@
 #include <QtDebug>
 #include <QStringList>
 
+const QStringList PropertyModel::m_ints = QStringList({QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")});
+
+const QStringList PropertyModel::m_floats = QStringList({QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")});
+
+const QStringList PropertyModel::m_hasDefaultConstructor = QStringList({QStringLiteral("QString"), QStringLiteral("QStringList"), QStringLiteral("QUrl"), QStringLiteral("QDateTime")});
+
 /*!
  * \brief Constructs an empty PropertyModel object.
  */
 PropertyModel::PropertyModel(QObject *parent) : QAbstractListModel(parent)
 {
-    m_privateClass = false;
-    m_type = PrivateClass;
-    m_commentsPosition = InCode;
-    m_usePropertyName = false;
-    m_lastAddedId = -1;
-
-    m_ints = QStringList({QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")});
-
-    m_floats = QStringList({QStringLiteral("float"), QStringLiteral("double"), QStringLiteral("long double"), QStringLiteral("qreal")});
-
-	m_hasDefaultConstructor = QStringList({QStringLiteral("QString"), QStringLiteral("QStringList"), QStringLiteral("QUrl"), QStringLiteral("QDateTime")});
-
-#ifdef QT_DEBUG
-    qDebug() << "Constructed PropertyModel" << this;
-#endif
 }
 
 
@@ -51,10 +42,6 @@ PropertyModel::PropertyModel(QObject *parent) : QAbstractListModel(parent)
  */
 PropertyModel::~PropertyModel()
 {
-
-#ifdef QT_DEBUG
-    qDebug() << "Deconstucted PropertyModel" << this;
-#endif
 }
 
 
@@ -88,176 +75,17 @@ QModelIndex PropertyModel::index(int row, int column, const QModelIndex &parent)
 
 QVariant PropertyModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid()) {
-        return QVariant();
-    }
+    QVariant retVal;
 
-    if (index.row() > (m_properties.size()-1)) {
-        return QVariant();
+    if (!index.isValid() || (index.row() > (m_properties.size()-1))) {
+        return retVal;
     }
-
-    Property *prop = m_properties.at(index.row());
 
     if (role == Item) {
-        return QVariant::fromValue<Property*>(prop);
-    } else {
-        return QVariant();
+        retVal.setValue<Property*>(m_properties.at(index.row()));
     }
-}
 
-
-
-
-
-void PropertyModel::loadData()
-{
-//    QFile file(getFileUrl().toLocalFile());
-
-//    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-//        qCritical() << "Failed to open file:" << getFileUrl();
-//        return;
-//    }
-
-//    setClassName(QStringLiteral(""));
-//    QTextStream in(&file);
-
-//    int id = 0;
-
-//    while (!in.atEnd()) {
-
-//        QString line = in.readLine();
-//        QString trimmed = line.trimmed();
-
-//        if (trimmed.startsWith(QLatin1String("class"), Qt::CaseInsensitive) && !trimmed.endsWith(QLatin1String(";"))) {
-
-//            QStringList classPartList = trimmed.split(' ');
-
-//            if (!classPartList.isEmpty()) {
-
-//                for (int i = 0; i < classPartList.size(); ++i) {
-
-//                    if (classPartList.at(i) == QLatin1String(":")) {
-//                        setClassName(classPartList.at(i-1));
-//                    }
-
-//                }
-//            }
-
-//            if (getClassName().isEmpty()) {
-//                setClassName(classPartList.last());
-//            }
-//        }
-
-
-//        if (trimmed.startsWith(QLatin1String("Q_DECLARE_PRIVATE"))) {
-//            QString privDecl = trimmed;
-//            privDecl.remove(0,18);
-//            privDecl.chop(1);
-
-//            setPrivateClass(privDecl == getClassName());
-//        }
-
-
-//        if (trimmed.startsWith(QLatin1String("Q_PROPERTY"), Qt::CaseInsensitive)) {
-
-//            id++;
-
-//            trimmed.remove(0,11);
-//            trimmed.chop(1);
-
-//            QString lastPart = QLatin1String("");
-
-//            QStringList propertyParts = trimmed.split(' ');
-//            quint8 propertyPartsCount = propertyParts.size();
-//            QString type = propertyParts.at(0);
-//            QString name = propertyParts.at(1);
-//            QString read = QLatin1String("");
-//            QString write = QLatin1String("");
-//            QString member = QLatin1String("");
-//            QString reset = QLatin1String("");
-//            QString notify = QLatin1String("");
-//            quint8 revision = 0;
-//            QString designable = QStringLiteral("true");
-//            QString scriptable = QStringLiteral("true");
-//            bool stored = true;
-//            bool user = false;
-//            bool constant = false;
-//            bool final = false;
-//            QString brief = QStringLiteral("This property holds");
-//            QString comment = QLatin1String("");
-//            bool pointer = false;
-
-
-//            for (quint8 i = 2; i < propertyPartsCount; i++) {
-
-//                QString part = propertyParts.at(i);
-
-//                if (lastPart == QLatin1String("READ")) {
-//                    read = part;
-//                } else if (lastPart == QLatin1String("WRITE")) {
-//                    write = part;
-//                } else if (lastPart == QLatin1String("MEMBER")) {
-//                    member = part;
-//                } else if (lastPart == QLatin1String("RESET")) {
-//                    reset = part;
-//                } else if (lastPart == QLatin1String("NOTIFY")) {
-//                    notify = part;
-//                } else if (lastPart == QLatin1String("REVISION")) {
-//                    revision = part.toInt();
-//                } else if (lastPart == QLatin1String("DESIGNABLE")) {
-//                    designable = part;
-//                } else if (lastPart == QLatin1String("SCRIPTABLE")) {
-//                    scriptable = part;
-//                } else if (lastPart == QLatin1String("STORED")) {
-//                    stored = part == QLatin1String("true");
-//                } else if (lastPart == QLatin1String("USER")) {
-//                    user = part == QLatin1String("true");
-//                }
-
-//                if (part == QLatin1String("CONSTANT")) {
-//                    constant = true;
-//                }
-
-//                if (part == QLatin1String("FINAL")) {
-//                    final = true;
-//                }
-
-//                lastPart = part;
-//            }
-
-//            beginInsertRows(QModelIndex(), rowCount(), rowCount());
-
-
-//            Property *prop = new Property;
-//            prop->id = id;
-//            prop->name = name;
-//            prop->type = type;
-//            prop->read = read;
-//            prop->write = write;
-//            prop->member = member;
-//            prop->reset = reset;
-//            prop->notify = notify;
-//            prop->revision = revision;
-//            prop->designable = designable;
-//            prop->scriptable = scriptable;
-//            prop->stored = stored;
-//            prop->user = user;
-//            prop->constant = constant;
-//            prop->final = final;
-//            prop->brief = brief;
-//            prop->comment = comment;
-//            prop->privateClass = isPrivateClass();
-//            prop->defaultValue = QStringLiteral("");
-//            prop->pointer = pointer;
-
-//            m_properties.append(prop);
-
-//            endInsertRows();
-//        }
-
-//    }
-
-//    file.close();
+    return retVal;
 }
 
 
@@ -267,8 +95,10 @@ void PropertyModel::loadData()
 
 Property *PropertyModel::addProperty(const QString &name, const QString &type, bool r, bool w, bool m, bool u, bool n, bool p, bool d)
 {
+    Property *prop = nullptr;
+
     if (name.isEmpty() || type.isEmpty()) {
-        return nullptr;
+        return prop;
     }
 
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
@@ -292,12 +122,12 @@ Property *PropertyModel::addProperty(const QString &name, const QString &type, b
             read[0] = read[0].toUpper();
             if (type == QLatin1String("bool")) {
                 if (name.contains(QStringLiteral("enabled"), Qt::CaseInsensitive)) {
-                    read.prepend(QStringLiteral("is"));
+                    read.prepend(QLatin1String("is"));
                 } else {
-                    read.prepend(QStringLiteral("has"));
+                    read.prepend(QLatin1String("has"));
                 }
             } else {
-                read.prepend(QStringLiteral("get"));
+                read.prepend(QLatin1String("get"));
             }
         }
     }
@@ -305,28 +135,28 @@ Property *PropertyModel::addProperty(const QString &name, const QString &type, b
     if (w) {
         write = propName;
         write[0] = write[0].toUpper();
-        write.prepend("set");
+        write.prepend(QLatin1String("set"));
     }
 
 
     if (m) {
         member = propName;
-        member.prepend(QStringLiteral("m_"));
+        member.prepend(QLatin1String("m_"));
     }
 
     if (u) {
         reset = propName;
         reset[0] = reset[0].toUpper();
-        reset.prepend(QStringLiteral("unset"));
+        reset.prepend(QLatin1String("unset"));
     }
 
 
     if (n) {
         notify = propName;
-        notify.append("Changed");
+        notify.append(QLatin1String("Changed"));
     }
 
-    Property *prop = new Property(m_lastAddedId + 1, propName, type, read, write, member, reset, notify, p, getDefaultValue(type, pointer), getArgsByRef(type, pointer), pointer, d, this);
+    prop = new Property(m_lastAddedId + 1, propName, type, read, write, member, reset, notify, p, getDefaultValue(type, pointer), getArgsByRef(type, pointer), pointer, d, this);
 
     m_properties.append(prop);
 
@@ -343,17 +173,14 @@ Property *PropertyModel::addProperty(const QString &name, const QString &type, b
 
 void PropertyModel::deleteProperty(int idx)
 {
-    if (idx < 0) {
-        return;
-    }
-
-    if (idx > (rowCount()-1)) {
+    if ((idx < 0) || (idx > (rowCount()-1))) {
         return;
     }
 
     beginRemoveRows(QModelIndex(), idx, idx);
 
-    delete m_properties.takeAt(idx);
+    qDeleteAll(m_properties);
+    m_properties.clear();
 
     endRemoveRows();
 }
@@ -362,6 +189,8 @@ void PropertyModel::deleteProperty(int idx)
 
 QString PropertyModel::createOutput(ResultFileType type) const
 {
+    QString out;
+
     QStringList namespaces;
     if (!m_namespaces.isEmpty()) {
         QString ns = m_namespaces.simplified();
@@ -373,14 +202,19 @@ QString PropertyModel::createOutput(ResultFileType type) const
     PropertyCreator creator(m_properties, getClassName(), m_type, 4, m_commentsPosition, namespaces);
     switch(type) {
     case HeaderFile:
-        return creator.createHeader();
+        out = creator.createHeader();
+        break;
     case PrivateHeaderFile:
-        return creator.createPrivate();
+        out = creator.createPrivate();
+        break;
     case CodeFile:
-        return creator.createCode();
+        out = creator.createCode();
+        break;
     default:
-        return QString();
+        break;
     }
+
+    return out;
 }
 
 
@@ -389,7 +223,7 @@ QString PropertyModel::createOutput(ResultFileType type) const
 
 bool PropertyModel::saveToDirectory(ResultFileType type, const QString &directory) const
 {
-    QString data = createOutput(type);
+    const QString data = createOutput(type);
 
     if (data.isEmpty()) {
         return true;
@@ -413,7 +247,7 @@ bool PropertyModel::saveToDirectory(ResultFileType type, const QString &director
 
 bool PropertyModel::saveToFile(ResultFileType type, const QUrl &file) const
 {
-    QString data = createOutput(type);
+    const QString data = createOutput(type);
 
     return PropertyWriter::writeFile(file.toLocalFile(), data);
 }
@@ -424,21 +258,19 @@ bool PropertyModel::saveToFile(ResultFileType type, const QUrl &file) const
 
 bool PropertyModel::saveAll(const QUrl &directory) const
 {
-    QString path = directory.toLocalFile();
+    bool retVal = false;
+
+    const QString path = directory.toLocalFile();
 
     if (saveToDirectory(HeaderFile, path)) {
         if(saveToDirectory(PrivateHeaderFile, path)) {
             if (saveToDirectory(CodeFile, path)) {
-                return true;
-            } else {
-                return false;
+                retVal = true;
             }
-        } else {
-            return false;
         }
-    } else {
-        return false;
     }
+
+    return retVal;
 }
 
 
@@ -492,7 +324,6 @@ void PropertyModel::setFileUrl(const QUrl &nFileUrl)
 #endif
         emit fileUrlChanged(getFileUrl());
         emit fileNameChanged(getFileUrl().fileName());
-        loadData();
     }
 }
 
@@ -733,84 +564,81 @@ void PropertyModel::setUsePropertyName(bool usePropertyName)
 
 QString PropertyModel::getDefaultValue(const QString &type, bool pointer)
 {
+    QString retVal;
+
     if (pointer) {
-        return QStringLiteral("nullptr");
+        retVal = QStringLiteral("nullptr");
+    } else {
+        if (m_ints.contains(type, Qt::CaseInsensitive)) {
+            retVal = QStringLiteral("0");
+        } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
+            retVal = QStringLiteral("0.0");
+        } else if (type == QLatin1String("bool")) {
+            retVal = QStringLiteral("false");
+        } else if (m_hasDefaultConstructor.contains(type, Qt::CaseInsensitive)) {
+            retVal = QString();
+        } else {
+            retVal = type;
+            retVal.append(QStringLiteral("()"));
+        }
     }
 
-    if (m_ints.contains(type, Qt::CaseInsensitive)) {
-        return QStringLiteral("0");
-    } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
-        return QStringLiteral("0.0");
-    } else if (type == QLatin1String("bool")) {
-        return QStringLiteral("false");
-	} else if (m_hasDefaultConstructor.contains(type, Qt::CaseInsensitive)) {
-		return QString();
-    } else {
-        QString result = type;
-        result.append(QStringLiteral("()"));
-        return result;
-    }
+    return retVal;
 }
 
 
 bool PropertyModel::getArgsByRef(const QString &type, bool pointer)
 {
-    if (pointer) {
-        return false;
+    bool retVal = false;
+
+    if (!pointer) {
+        if (type == QLatin1String("bool")) {
+            retVal = false;
+        } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
+            retVal = false;
+        } else if (m_ints.contains(type, Qt::CaseInsensitive)) {
+            retVal = false;
+        } else {
+            retVal = true;
+        }
     }
 
-    if (type == QLatin1String("bool")) {
-        return false;
-    } else if (m_floats.contains(type, Qt::CaseInsensitive)) {
-        return false;
-    } else if (m_ints.contains(type, Qt::CaseInsensitive)) {
-        return false;
-    } else {
-        return true;
-    }
+    return retVal;
 }
 
 
 
 
-Property *PropertyModel::getItemById(int id)
+Property *PropertyModel::getItemById(int id) const
 {
-    if (id < 0) {
-        return nullptr;
-    }
+    Property *prop = nullptr;
 
-    if (rowCount() <= 0) {
-        return nullptr;
+    if ((id < 0) || (rowCount() <= 0)) {
+        return prop;
     }
-
-    int idx = -1;
 
     for (int i = 0; i < m_properties.count(); ++i) {
-        if (m_properties.at(i)->id() == id) {
-            idx = i;
+        prop = m_properties.at(i);
+        if (prop->id() == id) {
             break;
         }
     }
 
-    if (idx > -1) {
-        return m_properties.at(idx);
-    } else {
-        return nullptr;
-    }
+    return prop;
 }
 
 
-Property *PropertyModel::getItemByIndex(int idx)
+Property *PropertyModel::getItemByIndex(int idx) const
 {
-    if (idx < 0) {
-        return nullptr;
+    Property *prop = nullptr;
+
+    if ((idx < 0) || (idx >= rowCount())) {
+        return prop;
     }
 
-    if (idx >= rowCount()) {
-        return nullptr;
-    }
+    prop = m_properties.at(idx);
 
-    return m_properties.at(idx);
+    return prop;
 }
 
 

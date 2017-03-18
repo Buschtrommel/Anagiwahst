@@ -92,7 +92,6 @@ public:
     void setUsePropertyName(bool usePropertyName);
     void setNamespaces(const QString &namespaces);
 
-    void loadData();
     Q_INVOKABLE Property *addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false, bool d = true);
     Q_INVOKABLE void deleteProperty(int idx);
     Q_INVOKABLE QString createOutput(ResultFileType type) const;
@@ -100,8 +99,8 @@ public:
     Q_INVOKABLE bool saveToFile(ResultFileType type, const QUrl &file) const;
     Q_INVOKABLE bool saveAll(const QUrl &directory) const;
     Q_INVOKABLE QVariant getData(const QString &role, int idx) const;
-    Q_INVOKABLE Property *getItemById(int id);
-    Q_INVOKABLE Property *getItemByIndex(int idx);
+    Q_INVOKABLE Property *getItemById(int id) const;
+    Q_INVOKABLE Property *getItemByIndex(int idx) const;
 
 signals:
     void fileUrlChanged(const QUrl &nFileUrl);
@@ -115,19 +114,19 @@ signals:
 
 private:
     QList<Property*> m_properties;
-    QStringList m_ints;
-    QStringList m_floats;
-	QStringList m_hasDefaultConstructor;
+    static const QStringList m_ints;
+    static const QStringList m_floats;
+    static const QStringList m_hasDefaultConstructor;
 
     QUrl m_fileUrl;
     QString m_className;
-    bool m_privateClass;
-    ClassType m_type;
-    CommentsPosition m_commentsPosition;
-    bool m_usePropertyName;
+    bool m_privateClass = false;
+    ClassType m_type = PrivateClass;
+    CommentsPosition m_commentsPosition = InCode;
+    bool m_usePropertyName = false;
     QString m_namespaces;
 
-    int m_lastAddedId;
+    int m_lastAddedId = -1;
 
     QString getDefaultValue(const QString &type, bool pointer = false);
     bool getArgsByRef(const QString &type, bool pointer = false);
