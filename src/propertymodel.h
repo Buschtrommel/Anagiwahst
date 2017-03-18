@@ -34,9 +34,6 @@ class QStringList;
 class PropertyModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_ENUMS(ResultFileType)
-    Q_ENUMS(ClassType)
-    Q_ENUMS(CommentsPosition)
     Q_PROPERTY(QUrl fileUrl READ getFileUrl WRITE setFileUrl NOTIFY fileUrlChanged)
     Q_PROPERTY(QString fileName READ getFileName NOTIFY fileNameChanged)
     Q_PROPERTY(QString className READ getClassName WRITE setClassName NOTIFY classNameChanged)
@@ -54,17 +51,20 @@ public:
         PrivateHeaderFile,
         CodeFile
     };
+    Q_ENUM(ResultFileType)
 
     enum ClassType {
         PrivateClass    = 0,
         SharedData      = 1
     };
+    Q_ENUM(ClassType)
 
     enum CommentsPosition {
         InCode          = 0,
         InHeader        = 1,
         InFronOfHeader  = 2
     };
+    Q_ENUM(CommentsPosition)
 
 	enum Roles {
 		Item	= Qt::UserRole + 1

@@ -22,6 +22,8 @@
 #include <QStringBuilder>
 #include <QRegularExpression>
 
+const QList<PropertyCreator::FunctionType> PropertyCreator::m_functionTypes = {PropertyCreator::Getter, PropertyCreator::Setter, PropertyCreator::Resetter, PropertyCreator::Notifier};
+
 PropertyCreator::PropertyCreator(const QList<Property *> &properties, const QString &className, PropertyModel::ClassType type, int tabSize, PropertyModel::CommentsPosition commentsPosition, const QStringList &namespaces) :
     m_properties(properties), m_className(className), m_type(type), m_tabSize(tabSize), m_commentsPosition(commentsPosition), m_namespaces(namespaces), m_privateClass(false)
 {
@@ -1302,7 +1304,7 @@ QString PropertyCreator::buildSeeAlsoComment(const Property *prop, FunctionType 
     
     QStringList saList;
     
-    for (FunctionType ft : QList<FunctionType>({Getter, Setter, Resetter, Notifier})) {
+    for (FunctionType ft : m_functionTypes) {
         if (ft != ftype) {
             QString s(m_className);
             s += m_dc;

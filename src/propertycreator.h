@@ -24,7 +24,7 @@
 #include <QStringList>
 #include "propertymodel.h"
 
-struct Property;
+class Property;
 
 /*!
  * \brief The PropertyCreator class
@@ -86,6 +86,7 @@ private:
     const QStringList m_namespaces;
     QString m_headerProtector;
     bool m_privateClass;
+    static const QList<FunctionType> m_functionTypes;
 };
 
 #endif // PROPERTYCREATOR_H
