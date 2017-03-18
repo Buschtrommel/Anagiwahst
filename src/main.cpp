@@ -41,11 +41,12 @@ int main(int argc, char *argv[])
     app.setOrganizationName(QStringLiteral("Buschtrommel"));
     app.setApplicationVersion(QStringLiteral(APP_VERSION));
 
-    QString locale = QLocale::system().name();
+    const QString locale = QLocale::system().name();
 
-    QTranslator *translator = new QTranslator;
+//    QTranslator *translator = new QTranslator;
+    QScopedPointer<QTranslator> translator(new QTranslator);
     if (translator->load(QStringLiteral("anagiwahst_")+locale, QStringLiteral(L10N_DIR))) {
-        app.installTranslator(translator);
+        app.installTranslator(translator.data());
     }
 
     if (argc > 1) {
