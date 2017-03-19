@@ -9,21 +9,21 @@ Precompiled packages are available in the openSUSE Build Service: https://softwa
 ### How to compile
 #### Install dependencies
 
-Install cmake, gcc, g++, git, Qt5Core, Qt5Gui, Qt5Qml, Qt5Quick and Qt5Widgets. For translations install lrelease.
+Install cmake, gcc, g++, git, Qt5Core, Qt5Gui, Qt5Qml, Qt5Quick, Qt5Widgets and grantlee. For translations install lrelease.
 
 On openSUSE:
 
-    sudo zypper install gcc gcc-c++ cmake git libQt5Gui-devel libqt5-qtdeclarative-devel libqt5-qtquickcontrols libqt5-linguist
+    sudo zypper install gcc gcc-c++ cmake git libQt5Gui-devel libqt5-qtdeclarative-devel libqt5-qtquickcontrols libqt5-linguist grantlee5-devel
     
     
 On Fedora:
 
-    yum install qt5-qtbase qt5-qtbase-devel qt5-qtdeclarative qt5-qtdeclarative-devel qt5-qtdeclarative-static qt5-qtquickcontrols
+    yum install qt5-qtbase qt5-qtbase-devel qt5-qtdeclarative qt5-qtdeclarative-devel qt5-qtdeclarative-static qt5-qtquickcontrols grantlee-qt5-devel
 
 
 On Ubuntu:
 
-    sudo apt-get install g++ gcc git qtbase5-dev libqt5qml5 libqt5qml-quickcontrols qtdeclarative5-dev libqt5quick5
+    sudo apt-get install g++ gcc git qtbase5-dev libqt5qml5 libqt5qml-quickcontrols qtdeclarative5-dev libqt5quick5 libgrantlee5-dev
     
 
 #### Get source code from git repository
