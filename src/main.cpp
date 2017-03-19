@@ -60,9 +60,6 @@ int main(int argc, char *argv[])
         clparser.addPositionalArgument(QStringLiteral("<type>"), QCoreApplication::translate("main", "Default type for all properties or list of related data types."));
         clparser.addPositionalArgument(QStringLiteral("<property>"), QCoreApplication::translate("main", "The name of the property or list of properties."));
 
-        QCommandLineOption privateOption(QStringList() << QStringLiteral("p") << QStringLiteral("private"), QCoreApplication::translate("main", "The class has a private section in a separate file."));
-        clparser.addOption(privateOption);
-
         QCommandLineOption noReadOption(QStringLiteral("no-read"), QCoreApplication::translate("main", "Do not create a read accessor function."));
         clparser.addOption(noReadOption);
 
@@ -114,12 +111,11 @@ int main(int argc, char *argv[])
 
             const QString outputDir = clparser.value(outputOption);
 
-            bool privateClass = clparser.isSet(privateOption);
-            bool read = !clparser.isSet(noReadOption);
-            bool write = !clparser.isSet(noWriteOption);
-            bool notify = !clparser.isSet(noNotifyOption);
+            const bool read = !clparser.isSet(noReadOption);
+            const bool write = !clparser.isSet(noWriteOption);
+            const bool notify = !clparser.isSet(noNotifyOption);
+            const bool unset = clparser.isSet(unsetOption);
             bool member = clparser.isSet(memberOption);
-            bool unset = clparser.isSet(unsetOption);
 
             if (!read) {
                 member = true;
@@ -134,7 +130,7 @@ int main(int argc, char *argv[])
 
             for (int i = 0; i < props.size(); ++i) {
 
-                propModel.addProperty(props.at(i),types.at(i), read, write, member, unset, notify, privateClass);
+                propModel.addProperty(props.at(i),types.at(i), read, write, member, unset, notify);
 
             }
 
@@ -146,14 +142,16 @@ int main(int argc, char *argv[])
                 out << propModel.createOutput(PropertyModel::HeaderFile) << "\n";
                 out.flush();
 
-                if (privateClass) {
+                const QString privData = propModel.createOutput(PropertyModel::PrivateHeaderFile);
+                if (!privData.isEmpty()) {
                     out << "\n\n\n";
                     out << "=========================================================================\n";
                     out << "||                         Private header file                          ||\n";
                     out << "=========================================================================\n";
-                    out << propModel.createOutput(PropertyModel::PrivateHeaderFile) << "\n";
+                    out << privData << "\n";
                     out.flush();
                 }
+
                 out << "\n\n\n";
                 out << "=========================================================================\n";
                 out << "||                            Code file                                ||\n";
@@ -163,13 +161,14 @@ int main(int argc, char *argv[])
 
             } else {
 
-                bool force = clparser.isSet(forceOption);
+                const bool force = clparser.isSet(forceOption);
 
                 if (!PropertyWriter::write(PropertyWriter::HeaderFile, outputDir, className, propModel.createOutput(PropertyModel::HeaderFile), force)) {
                     return 2;
                 }
-                if (privateClass) {
-                    PropertyWriter::write(PropertyWriter::PrivateHeaderFile, outputDir, className, propModel.createOutput(PropertyModel::PrivateHeaderFile), force);
+                const QString privData = propModel.createOutput(PropertyModel::PrivateHeaderFile);
+                if (!privData.isEmpty()) {
+                    PropertyWriter::write(PropertyWriter::PrivateHeaderFile, outputDir, className, privData, force);
                 }
                 PropertyWriter::write(PropertyWriter::CodeFile, outputDir, className, propModel.createOutput(PropertyModel::CodeFile), force);
 
