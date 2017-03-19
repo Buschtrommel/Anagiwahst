@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="de" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
 <context>
     <name>Configuration</name>
     <message>
@@ -12,122 +10,116 @@
 <context>
     <name>FileTab</name>
     <message>
-        <location filename="../qml/FileTab.qml" line="+127"/>
-        <location line="+170"/>
-        <location line="+109"/>
-        <location line="+104"/>
+        <location filename="../qml/FileTab.qml" line="+126"/>
+        <location line="+161"/>
+        <location line="+101"/>
+        <location line="+97"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location line="-375"/>
-        <location line="+280"/>
-        <location line="+103"/>
+        <location line="-351"/>
+        <location line="+263"/>
+        <location line="+96"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location line="-375"/>
-        <location line="+184"/>
-        <location line="+97"/>
-        <location line="+102"/>
+        <location line="-351"/>
+        <location line="+175"/>
+        <location line="+89"/>
+        <location line="+95"/>
         <source>Read</source>
         <translation>Read</translation>
     </message>
     <message>
-        <location line="-375"/>
-        <location line="+182"/>
+        <location line="-351"/>
+        <location line="+173"/>
+        <location line="+89"/>
         <location line="+97"/>
-        <location line="+104"/>
         <source>Write</source>
         <translation>Write</translation>
     </message>
     <message>
-        <location line="-375"/>
-        <location line="+180"/>
-        <location line="+97"/>
-        <location line="+114"/>
+        <location line="-351"/>
+        <location line="+171"/>
+        <location line="+89"/>
+        <location line="+107"/>
         <source>Member</source>
         <translation>Member</translation>
     </message>
     <message>
-        <location line="-383"/>
-        <location line="+178"/>
-        <location line="+98"/>
-        <location line="+115"/>
+        <location line="-359"/>
+        <location line="+169"/>
+        <location line="+90"/>
+        <location line="+108"/>
         <source>Reset</source>
         <translation>Reset</translation>
     </message>
     <message>
-        <location line="-383"/>
-        <location line="+176"/>
-        <location line="+98"/>
-        <location line="+93"/>
+        <location line="-359"/>
+        <location line="+167"/>
+        <location line="+90"/>
+        <location line="+86"/>
         <source>Notify</source>
         <translation>Notify</translation>
     </message>
     <message>
-        <location line="-359"/>
-        <location line="+383"/>
+        <location line="-335"/>
+        <location line="+359"/>
         <source>Revision</source>
         <translation>Revision</translation>
     </message>
     <message>
-        <location line="-375"/>
-        <location line="+383"/>
+        <location line="-351"/>
+        <location line="+359"/>
         <source>Designable</source>
         <translation>Designable</translation>
     </message>
     <message>
-        <location line="-375"/>
-        <location line="+382"/>
+        <location line="-351"/>
+        <location line="+358"/>
         <source>Scriptable</source>
         <translation>Scriptable</translation>
     </message>
     <message>
-        <location line="-374"/>
-        <location line="+385"/>
+        <location line="-350"/>
+        <location line="+361"/>
         <source>Stored</source>
         <translation>Stored</translation>
     </message>
     <message>
-        <location line="-376"/>
-        <location line="+383"/>
+        <location line="-352"/>
+        <location line="+359"/>
         <source>User</source>
         <translation>User</translation>
     </message>
     <message>
-        <location line="-374"/>
-        <location line="+382"/>
+        <location line="-350"/>
+        <location line="+358"/>
         <source>Constant</source>
         <translation>Constant</translation>
     </message>
     <message>
-        <location line="-373"/>
-        <location line="+380"/>
+        <location line="-349"/>
+        <location line="+356"/>
         <source>Final</source>
         <translation>Final</translation>
     </message>
     <message>
-        <location line="-371"/>
-        <location line="+378"/>
-        <source>Private</source>
-        <translation>Privat</translation>
-    </message>
-    <message>
-        <location line="-369"/>
-        <location line="+376"/>
+        <location line="-347"/>
+        <location line="+354"/>
         <source>Pointer</source>
         <translation>Zeiger</translation>
     </message>
     <message>
-        <location line="-367"/>
-        <location line="+374"/>
+        <location line="-345"/>
+        <location line="+352"/>
         <source>Args by Ref</source>
         <translation>Args via Ref</translation>
     </message>
     <message>
-        <location line="-346"/>
+        <location line="-324"/>
         <source>Class</source>
         <translation>Klasse</translation>
     </message>
@@ -143,34 +135,28 @@
     </message>
     <message>
         <location line="+40"/>
-        <location line="+98"/>
-        <source>Private class</source>
-        <translation>Private Klasse</translation>
-    </message>
-    <message>
-        <location line="-90"/>
         <source>Use property name for Read</source>
         <translation>Property-Name für Read nutzen</translation>
     </message>
     <message>
         <location line="+9"/>
-        <location line="+268"/>
+        <location line="+255"/>
         <source>Document methods</source>
         <translation>Methoden dokumentieren</translation>
     </message>
     <message>
-        <location line="-255"/>
+        <location line="-242"/>
         <source>Add property</source>
         <translation>Property hinzufügen</translation>
     </message>
     <message>
-        <location line="+77"/>
-        <location line="+227"/>
+        <location line="+71"/>
+        <location line="+220"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location line="-209"/>
+        <location line="-203"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
@@ -180,7 +166,7 @@
         <translation>Property bearbeiten</translation>
     </message>
     <message>
-        <location line="+156"/>
+        <location line="+150"/>
         <source>Default value</source>
         <translation>Standardwert</translation>
     </message>
@@ -252,11 +238,6 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Private class (d_ptr)</source>
-        <translation>Private Klasse (d_ptr)</translation>
-    </message>
-    <message>
-        <location line="+11"/>
         <source>In the code</source>
         <translation>Im Code</translation>
     </message>
@@ -390,7 +371,7 @@
         <translation>Header-Dateien (*.h *.hpp)</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="+54"/>
+        <location filename="../src/main.cpp" line="+56"/>
         <source>Anagiwahst is a Qt property creator/editor.</source>
         <translation>Anagiwahst ist ein Qt-Property-Editor.</translation>
     </message>
