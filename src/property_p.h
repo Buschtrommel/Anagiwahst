@@ -9,13 +9,10 @@ public:
     PropertyPrivate() :
         id(0),
         revision(0),
-        designable(QStringLiteral("true")),
-        scriptable(QStringLiteral("true")),
         stored(true),
         user(false),
         constant(false),
         final(false),
-        privateClass(false),
         pointer(false),
         argsByRef(false),
         documentMethods(true)
@@ -40,7 +37,6 @@ public:
     bool final;
     QString brief;
     QString comment;
-    bool privateClass;
     QString defaultValue;
     bool pointer;
     bool argsByRef;

@@ -22,11 +22,14 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QUrl>
-#include <QFile>
-#include <QTextStream>
+#include <grantlee5/grantlee/templateloader.h>
 
 class Property;
 class QStringList;
+
+namespace Grantlee {
+class Engine;
+}
 
 /*!
  * \brief The PropertyModel class
@@ -92,7 +95,7 @@ public:
     void setUsePropertyName(bool usePropertyName);
     void setNamespaces(const QString &namespaces);
 
-    Q_INVOKABLE Property *addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool p = false, bool d = true);
+    Q_INVOKABLE Property *addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool d = true);
     Q_INVOKABLE void deleteProperty(int idx);
     Q_INVOKABLE QString createOutput(ResultFileType type) const;
     Q_INVOKABLE bool saveToDirectory(ResultFileType type, const QString &directory) const;
@@ -130,6 +133,9 @@ private:
 
     QString getDefaultValue(const QString &type, bool pointer = false);
     bool getArgsByRef(const QString &type, bool pointer = false);
+
+    Grantlee::Engine *m_tmpl_engine;
+    QSharedPointer<Grantlee::FileSystemTemplateLoader> m_tmpl_loader;
 };
 
 #endif // PROPERTYMODEL_H

@@ -26,6 +26,8 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QQmlContext>
+#include <QStandardPaths>
+#include <QDir>
 
 #include "property.h"
 #include "propertymodel.h"
@@ -36,17 +38,16 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationDisplayName(QStringLiteral("Anagiwahst"));
-    app.setApplicationName(QStringLiteral("Anagiwahst"));
-    app.setOrganizationDomain(QStringLiteral("buschmann23.de"));
-    app.setOrganizationName(QStringLiteral("Buschtrommel"));
+    app.setApplicationName(QStringLiteral("anagiwahst"));
     app.setApplicationVersion(QStringLiteral(APP_VERSION));
 
-    const QString locale = QLocale::system().name();
-
-//    QTranslator *translator = new QTranslator;
     QScopedPointer<QTranslator> translator(new QTranslator);
-    if (translator->load(QStringLiteral("anagiwahst_")+locale, QStringLiteral(L10N_DIR))) {
+    if (translator->load(QStringLiteral("anagiwahst_") + QLocale::system().name(), QStringLiteral(L10N_DIR))) {
         app.installTranslator(translator.data());
+    }
+
+    if (!QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::DataLocation).append(QLatin1String("/templates")))) {
+        qFatal("Failed to create user template directory: %s", qUtf8Printable(QStandardPaths::writableLocation(QStandardPaths::DataLocation).append(QLatin1String("/templates"))));
     }
 
     if (argc > 1) {
@@ -111,7 +112,7 @@ int main(int argc, char *argv[])
 
             }
 
-            QString outputDir = clparser.value(outputOption);
+            const QString outputDir = clparser.value(outputOption);
 
             bool privateClass = clparser.isSet(privateOption);
             bool read = !clparser.isSet(noReadOption);

@@ -17,11 +17,14 @@
  */
 
 #include "propertymodel.h"
-#include "propertycreator.h"
 #include "propertywriter.h"
 #include "property.h"
 #include <QtDebug>
 #include <QStringList>
+#include <grantlee5/grantlee/engine.h>
+#include <grantlee5/grantlee/template.h>
+#include <grantlee5/grantlee/context.h>
+#include <QStandardPaths>
 
 const QStringList PropertyModel::m_ints = QStringList({QStringLiteral("unsigned char"), QStringLiteral("signed char"), QStringLiteral("short"), QStringLiteral("short int"), QStringLiteral("signed short"), QStringLiteral("signed short int"), QStringLiteral("unsigned short"), QStringLiteral("unsigned short int"), QStringLiteral("int"), QStringLiteral("signed"), QStringLiteral("signed int"), QStringLiteral("unsigned int"), QStringLiteral("long"), QStringLiteral("long int"), QStringLiteral("signed long"), QStringLiteral("signed long int"), QStringLiteral("unsigned long"), QStringLiteral("unsigned long int"), QStringLiteral("long long"), QStringLiteral("long long int"), QStringLiteral("signed long long"), QStringLiteral("signed long long int"), QStringLiteral("unsigned long long"), QStringLiteral("unsigned long long int"), QStringLiteral("qint8"), QStringLiteral("qint16"), QStringLiteral("qint32"), QStringLiteral("qint64"), QStringLiteral("qintptr"), QStringLiteral("qlonglong"), QStringLiteral("quint8"), QStringLiteral("quint16"), QStringLiteral("quint32"), QStringLiteral("quint64"), QStringLiteral("quintptr"), QStringLiteral("qulonglong"), QStringLiteral("uchar"), QStringLiteral("uint"), QStringLiteral("ulong"), QStringLiteral("ushort")});
 
@@ -34,6 +37,12 @@ const QStringList PropertyModel::m_hasDefaultConstructor = QStringList({QStringL
  */
 PropertyModel::PropertyModel(QObject *parent) : QAbstractListModel(parent)
 {
+    m_tmpl_loader = QSharedPointer<Grantlee::FileSystemTemplateLoader>(new Grantlee::FileSystemTemplateLoader);
+    m_tmpl_loader->setTemplateDirs({QStandardPaths::writableLocation(QStandardPaths::DataLocation).append(QLatin1String("/templates")), QStringLiteral(TMPL_DIR)});
+
+    m_tmpl_engine = new Grantlee::Engine(this);
+    m_tmpl_engine->setSmartTrimEnabled(true);
+    m_tmpl_engine->addTemplateLoader(m_tmpl_loader);
 }
 
 
@@ -93,7 +102,7 @@ QVariant PropertyModel::data(const QModelIndex &index, int role) const
 
 
 
-Property *PropertyModel::addProperty(const QString &name, const QString &type, bool r, bool w, bool m, bool u, bool n, bool p, bool d)
+Property *PropertyModel::addProperty(const QString &name, const QString &type, bool r, bool w, bool m, bool u, bool n, bool d)
 {
     Property *prop = nullptr;
 
@@ -156,7 +165,7 @@ Property *PropertyModel::addProperty(const QString &name, const QString &type, b
         notify.append(QLatin1String("Changed"));
     }
 
-    prop = new Property(m_lastAddedId + 1, propName, type, read, write, member, reset, notify, p, getDefaultValue(type, pointer), getArgsByRef(type, pointer), pointer, d, this);
+    prop = new Property(m_lastAddedId + 1, propName, type, read, write, member, reset, notify, getDefaultValue(type, pointer), getArgsByRef(type, pointer), pointer, d, this);
 
     m_properties.append(prop);
 
@@ -199,19 +208,42 @@ QString PropertyModel::createOutput(ResultFileType type) const
             namespaces = ns.split(QStringLiteral(","));
         }
     }
-    PropertyCreator creator(m_properties, getClassName(), m_type, 4, m_commentsPosition, namespaces);
+
+    QStringList parentClasses = {QStringLiteral("QObject")};
+
+    m_tmpl_loader->setTheme(QStringLiteral("default_qobject"));
+
+    QString tmplFile;
+
     switch(type) {
     case HeaderFile:
-        out = creator.createHeader();
+        tmplFile = QStringLiteral("header.tpl");
         break;
     case PrivateHeaderFile:
-        out = creator.createPrivate();
+        tmplFile = QStringLiteral("private.tpl");
         break;
     case CodeFile:
-        out = creator.createCode();
+        tmplFile = QStringLiteral("code.tpl");
         break;
     default:
         break;
+    }
+
+    Grantlee::Template t = m_tmpl_engine->loadByName(tmplFile);
+
+    QVariantHash mapping;
+    mapping.insert(QStringLiteral("props"), QVariant::fromValue<QList<Property*>>(m_properties));
+    mapping.insert(QStringLiteral("class"), getClassName());
+    mapping.insert(QStringLiteral("parentclasses"), parentClasses);
+    mapping.insert(QStringLiteral("commentposition"), m_commentsPosition);
+    mapping.insert(QStringLiteral("namespaces"), namespaces);
+    mapping.insert(QStringLiteral("debugout"), true);
+
+    Grantlee::Context c(mapping);
+    out = t->render(&c);
+
+    if (t->error() != Grantlee::NoError) {
+        out = t->errorString();
     }
 
     return out;

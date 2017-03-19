@@ -28,14 +28,14 @@ class Property : public QObject
     Q_PROPERTY(bool final READ final WRITE setFinal NOTIFY finalChanged)
     Q_PROPERTY(QString brief READ brief WRITE setBrief NOTIFY briefChanged)
     Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
-    Q_PROPERTY(bool privateClass READ privateClass WRITE setPrivateClass NOTIFY privateClassChanged)
     Q_PROPERTY(QString defaultValue READ defaultValue WRITE setDefaultValue NOTIFY defaultValueChanged)
     Q_PROPERTY(bool pointer READ pointer WRITE setPointer NOTIFY pointerChanged)
     Q_PROPERTY(bool argsByRef READ argsByRef WRITE setArgsByRef NOTIFY argsByRefChanged)
     Q_PROPERTY(bool documentMethods READ documentMethods WRITE setDocumentMethods NOTIFY documentMethodsChanged)
+    Q_PROPERTY(QStringList commentParts READ commentParts)
 public:
     explicit Property(QObject *parent = nullptr);
-    Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, bool privateClass, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, QObject *parent = nullptr);
+    Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, QObject *parent = nullptr);
     ~Property();
 
     int id() const;
@@ -55,11 +55,11 @@ public:
     bool final() const;
     QString brief() const;
     QString comment() const;
-    bool privateClass() const;
     QString defaultValue() const;
     bool pointer() const;
     bool argsByRef() const;
     bool documentMethods() const;
+    QStringList commentParts() const;
 
     void setId(int nId);
     void setName(const QString &nName);
@@ -78,7 +78,6 @@ public:
     void setFinal(const bool &nFinal);
     void setBrief(const QString &nBrief);
     void setComment(const QString &nComment);
-    void setPrivateClass(bool nPrivateClass);
     void setDefaultValue(const QString &nDefaultValue);
     void setPointer(bool nPointer);
     void setArgsByRef(bool nArgsByRef);
@@ -102,7 +101,6 @@ signals:
     void finalChanged(const bool &final);
     void briefChanged(const QString &brief);
     void commentChanged(const QString &comment);
-    void privateClassChanged(bool privateClass);
     void defaultValueChanged(const QString &defaultValue);
     void pointerChanged(bool pointer);
     void argsByRefChanged(bool argsByRef);

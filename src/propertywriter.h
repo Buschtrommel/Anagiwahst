@@ -28,10 +28,9 @@
 class PropertyWriter
 {
     Q_DECLARE_TR_FUNCTIONS(PropertyWriter)
-
 public:
-    explicit PropertyWriter();
-//     ~PropertyWriter();
+    PropertyWriter();
+     ~PropertyWriter();
 
     enum WriteFileType {
         HeaderFile,

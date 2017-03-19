@@ -1,4 +1,5 @@
 #include "property_p.h"
+#include <QRegularExpression>
 #ifdef QT_DEBUG
 #include <QtDebug>
 #endif
@@ -15,7 +16,7 @@ Property::Property(QObject *parent) :
 /*!
  * \overload
  */
-Property::Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, bool privateClass, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, QObject *parent) :
+Property::Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, QObject *parent) :
     QObject(parent), d_ptr(new PropertyPrivate)
 {
     Q_D(Property);
@@ -27,7 +28,6 @@ Property::Property(int id, const QString &name, const QString &type, const QStri
     d->member = member;
     d->reset = reset;
     d->notify = notify;
-    d->privateClass = privateClass;
     d->defaultValue = defaultValue;
     d->argsByRef = argsByRef;
     d->pointer = pointer;
@@ -705,43 +705,6 @@ void Property::setComment(const QString &nComment)
 
 
 
-/*!
- * \property Property::privateClass
- * \brief True if this property should be part of a private class.
- *
- * \par Access functions:
- * <TABLE><TR><TD>bool</TD><TD>privateClass() const</TD></TR><TR><TD>void</TD><TD>setPrivateClass(bool nPrivateClass)</TD></TR></TABLE>
- * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>privateClassChanged(bool privateClass)</TD></TR></TABLE>
- */
-
-/*!
- * \fn void Property::privateClassChanged(bool privateClass)
- * \brief Part of the \link Property::privateClass privateClass \endlink property.
- */
-
-/*!
- * \brief Part of the \link Property::privateClass privateClass \endlink property.
- */
-bool Property::privateClass() const { Q_D(const Property); return d->privateClass; }
-
-/*!
- * \brief Part of the \link Property::privateClass privateClass \endlink property.
- */
-void Property::setPrivateClass(bool nPrivateClass)
-{
-    Q_D(Property); 
-    if (nPrivateClass != d->privateClass) {
-        d->privateClass = nPrivateClass;
-#ifdef QT_DEBUG
-        qDebug() << "Changed privateClass to" << d->privateClass;
-#endif
-        emit privateClassChanged(privateClass());
-    }
-}
-
-
-
 
 /*!
  * \property Property::defaultValue
@@ -890,4 +853,45 @@ void Property::setDocumentMethods(bool nDocumentMethods)
 #endif
         emit documentMethodsChanged(documentMethods());
     }
+}
+
+
+
+QStringList Property::commentParts() const
+{
+    QStringList parts;
+
+    QString c = comment().trimmed();
+
+    if (!c.isEmpty()) {
+        if (c.size() > 100) {
+            const QStringList paragraphs = c.split(QRegularExpression(QStringLiteral("\\n+")));
+            if (Q_LIKELY(!paragraphs.isEmpty())) {
+                for (const QString &paragraph : paragraphs) {
+                    const QStringList wordParts = paragraph.split(QRegularExpression(QStringLiteral("\\s+")), QString::SkipEmptyParts);
+                    if (Q_LIKELY(!wordParts.isEmpty())) {
+                        QString partString;
+                        for (const QString &part : wordParts) {
+                            if (partString.size() < 100) {
+                                partString.append(part);
+                                partString.append(QLatin1String(" "));
+                            } else {
+                                parts << partString.trimmed();
+                                partString.clear();
+                            }
+                        }
+                        if (!partString.trimmed().isEmpty()) {
+                            parts << partString.trimmed();
+                        }
+                    }
+                    parts << QString();
+                }
+                parts.removeLast();
+            }
+        } else {
+            parts << c;
+        }
+    }
+
+    return parts;
 }

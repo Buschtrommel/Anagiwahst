@@ -25,7 +25,7 @@ import Buschtrommel.Anagiwahst.Models 1.0
 Dialog {
     id: dialogRoot
     title: qsTr("Result of property generation")
-    standardButtons: StandardButton.Save | StandardButton.Close
+//    standardButtons: StandardButton.Save | StandardButton.Close
 
     width: 640
     height: 480
@@ -128,17 +128,6 @@ Dialog {
                     fd.title = qsTr("Save all to folder")
                     fd.open()
                 }
-            }
-            
-            ComboBox {
-                id: privTypeChooser
-                currentIndex: 0
-                model: ListModel {
-                    id: classTypeValues
-                    ListElement { value: PropertyModel.PrivateClass; text: qsTr("Private class (d_ptr)") }
-                    ListElement { value: PropertyModel.SharedData; text: "QSharedPointer/Data" }
-                }
-                Binding { target: propsModel; property: "type"; value: classTypeValues.get(privTypeChooser.currentIndex).value }
             }
             
             ComboBox {

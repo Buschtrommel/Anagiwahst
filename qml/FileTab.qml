@@ -69,7 +69,7 @@ SplitView {
     }
 
     function addProperty() {
-        editBox.prop = propModel.addProperty(newPropName.text, newPropType.text, newPropRead.checked, newPropWrite.checked, newPropMember.checked, newPropReset.checked, newPropNotify.checked, newPropPrivate.checked, defaultDocMethods.checked)
+        editBox.prop = propModel.addProperty(newPropName.text, newPropType.text, newPropRead.checked, newPropWrite.checked, newPropMember.checked, newPropReset.checked, newPropNotify.checked, defaultDocMethods.checked)
 
         if (editBox.prop) {
             newPropBox.visible = false
@@ -80,7 +80,6 @@ SplitView {
             newPropMember.checked = defaultMemeberFunction.checked
             newPropReset.checked = defaultResetFunction.checked
             newPropNotify.checked = defaultNotifyFunction.checked
-            newPropPrivate.checked = defaultPrivateClass.checked
             editBrief.setFocus()
             addedPropertyTimer.start()
         }
@@ -240,15 +239,6 @@ SplitView {
 
         TableViewColumn {
             role: "item"
-            title: qsTr("Private")
-            delegate: CheckBox {
-                checked: styleData.value ? styleData.value.privateClass : false
-                enabled: false
-            }
-        }
-
-        TableViewColumn {
-            role: "item"
             title: qsTr("Pointer")
             delegate: CheckBox {
                 checked: styleData.value ? styleData.value.pointer : false
@@ -353,14 +343,6 @@ SplitView {
                         }
 
                         CheckBox {
-                            id: defaultPrivateClass
-                            text: qsTr("Private class")
-                            checked: propModel.privateClass
-                        }
-
-                        Binding { target: propModel; property: "privateClass"; value: defaultPrivateClass.checked }
-                        
-                        CheckBox {
                             id: defaultReadFuncName
                             text: qsTr("Use property name for Read")
                             checked: propModel.usePropertyName
@@ -450,12 +432,6 @@ SplitView {
                             checked: defaultNotifyFunction.checked
                         }
 
-                        CheckBox {
-                            id: newPropPrivate
-                            text: qsTr("Private class")
-                            checked: defaultPrivateClass.checked
-                        }
-
                         RowLayout {
                             Layout.columnSpan: parent.columns
 
@@ -472,7 +448,6 @@ SplitView {
                                     newPropMember.checked = defaultMemeberFunction.checked
                                     newPropReset.checked = defaultResetFunction.checked
                                     newPropNotify.checked = defaultNotifyFunction.checked
-                                    newPropPrivate.checked = defaultPrivateClass.checked
                                 }
                             }
 
@@ -617,13 +592,6 @@ SplitView {
                             }
 
                             CheckBox {
-                                id: editPrivate
-                                text: qsTr("Private")
-                                checked: editBox.prop ? editBox.prop.privateClass : true
-                                onCheckedChanged: if (editBox.prop) { editBox.prop.privateClass = checked }
-                            }
-
-                            CheckBox {
                                 id: editPointer
                                 text: qsTr("Pointer")
                                 checked: editBox.prop ? editBox.prop.pointer : true
@@ -633,6 +601,7 @@ SplitView {
                             CheckBox {
                                 id: editArgsByRef
                                 text: qsTr("Args by Ref")
+                                Layout.columnSpan: 2
                                 checked: editBox.prop ? editBox.prop.argsByRef : true
                                 onCheckedChanged: if (editBox.prop) { editBox.prop.argsByRef = checked }
                             }

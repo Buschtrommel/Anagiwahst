@@ -14,7 +14,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(PkgConfig REQUIRED)
-find_package(Qt5 5.2.0 COMPONENTS
+find_package(Grantlee5 REQUIRED)
+find_package(Qt5 5.5.0 COMPONENTS
     Qml
     Quick
     Widgets
@@ -32,11 +33,13 @@ set (DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 set (ICONS_DIR "${DATADIR}/icons")
 set (DESKTOPFILE_DIR "${DATADIR}/applications")
 set (APP_DIR "${DATADIR}/anagiwahst")
-set (L10N_DIR "${APP_DIR}/l10n")
+set (L10N_DIR "${APP_DIR}/l10n" CACHE PATH "Directory to install translations")
+set (TMPL_DIR "${APP_DIR}/templates" CACHE PATH "Directory to install templates")
 set (VERSION "${ANAGIWAHST_VERSION}")
 
 add_definitions("-DAPP_VERSION=\"${ANAGIWAHST_VERSION}\"")
 add_definitions("-DL10N_DIR=\"${L10N_DIR}\"")
+add_definitions("-DTMPL_DIR=\"${TMPL_DIR}\"")
 
 set (CMAKE_CXX_FLAGS_DEBUG "-Wall -fsanitize=address -ggdb")
 

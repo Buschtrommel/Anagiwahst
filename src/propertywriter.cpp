@@ -10,10 +10,10 @@ PropertyWriter::PropertyWriter()
 }
 
 
-// PropertyWriter::~PropertyWriter()
-// {
-// 
-// }
+PropertyWriter::~PropertyWriter()
+{
+
+}
 
 
 
