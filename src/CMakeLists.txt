@@ -14,7 +14,6 @@ set (anagiwahst_SRCS
 
 set (anagiwahst_HEADERS
     property.h
-    property_p.h
     propertymodel.h
     propertywriter.h
     configuration.h

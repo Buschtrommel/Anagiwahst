@@ -3,8 +3,6 @@
 
 #include <QObject>
 
-class PropertyPrivate;
-
 /*!
  * \brief The Property class.
  */
@@ -106,13 +104,30 @@ signals:
     void argsByRefChanged(bool argsByRef);
     void documentMethodsChanged(bool documentMethods);
 
-protected:
-    const QScopedPointer<PropertyPrivate> d_ptr;
-
 private:
-    Q_DISABLE_COPY(Property)
-    Q_DECLARE_PRIVATE(Property)
+    int m_id = 0;
+    QString m_name;
+    QString m_type;
+    QString m_read;
+    QString m_write;
+    QString m_member;
+    QString m_reset;
+    QString m_notify;
+    quint8 m_revision = 0;
+    QString m_designable;
+    QString m_scriptable;
+    bool m_stored = true;
+    bool m_user = false;
+    bool m_constant = false;
+    bool m_final = false;
+    QString m_brief;
+    QString m_comment;
+    QString m_defaultValue;
+    bool m_argsByRef = false;
+    bool m_pointer = false;
+    bool m_documentMethods = true;
 
+    Q_DISABLE_COPY(Property)
 };
 
 #endif // PROPERTY_H
