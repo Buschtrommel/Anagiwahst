@@ -41,7 +41,7 @@ using namespace {{ ns }};
 {% endwith %}
 {% endif %}
 {% if prop.read %}
-{% if commentposition == 0 and prop.documentMethods %}{% include "readcomment.tpl" %}{% endif %}{{ prop.type }} {% if prop.pointer %}*{% endif %}{{ class }}::{{ prop.read }}() const; { return m_{{ prop.name }}; }
+{% if commentposition == 0 and prop.documentMethods %}{% include "readcomment.tpl" %}{% endif %}{{ prop.type }} {% if prop.pointer %}*{% endif %}{{ class }}::{{ prop.read }}() const { return m_{{ prop.name }}; }
 {% endif %}
 
 {% if prop.write %}
