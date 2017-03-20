@@ -1,6 +1,6 @@
 /* Anagiwahst - A Qt Property Editor/Creator
  *
- * Copyright (c) 2015 Buschtrommel/Matthias Fehring <kontakt@buschmann23.de>
+ * Copyright (c) 2015-2017 Buschtrommel/Matthias Fehring <kontakt@buschmann23.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
