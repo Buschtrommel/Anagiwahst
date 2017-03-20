@@ -19,6 +19,7 @@ find_package(Qt5 5.5.0 COMPONENTS
     Qml
     Quick
     Widgets
+    Sql
     REQUIRED
 )
 

@@ -33,6 +33,7 @@
 #include "propertymodel.h"
 #include "propertywriter.h"
 #include "configuration.h"
+#include "dbmanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +50,8 @@ int main(int argc, char *argv[])
     if (!QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::DataLocation).append(QLatin1String("/templates")))) {
         qFatal("Failed to create user template directory: %s", qUtf8Printable(QStandardPaths::writableLocation(QStandardPaths::DataLocation).append(QLatin1String("/templates"))));
     }
+
+    DBManager::check();
 
     if (argc > 1) {
 

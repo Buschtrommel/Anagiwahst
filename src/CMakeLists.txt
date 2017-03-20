@@ -10,6 +10,7 @@ set (anagiwahst_SRCS
     propertymodel.cpp
     propertywriter.cpp
     configuration.cpp
+    dbmanager.cpp
 )
 
 set (anagiwahst_HEADERS
@@ -17,6 +18,7 @@ set (anagiwahst_HEADERS
     propertymodel.h
     propertywriter.h
     configuration.h
+    dbmanager.h
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CSS_FLAGS} -std=gnu++11")
@@ -28,5 +30,6 @@ target_link_libraries(anagiwahst
     Qt5::Widgets
     Qt5::Qml
     Qt5::Quick
+    Qt5::Sql
     Grantlee5::Templates)
 install(TARGETS anagiwahst DESTINATION ${BINDIR})
