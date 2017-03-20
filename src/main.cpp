@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         qFatal("Failed to create user template directory: %s", qUtf8Printable(QStandardPaths::writableLocation(QStandardPaths::DataLocation).append(QLatin1String("/templates"))));
     }
 
-    DBManager::check();
+//    DBManager::check();
 
     if (argc > 1) {
 
