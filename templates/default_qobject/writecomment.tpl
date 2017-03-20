@@ -1,6 +1,6 @@
 /*!
 {% if showdesignator %}
-{% if indent %}     *{% else %} *{% endif %} \fn void  {{ class }}::{{ prop.write }}({% if prop.argsByRef %}const {% endif %}{{ prop.type }} {%if prop.argsByRef %}&{% endif %}{% if prop.pointer %}*{% endif %}{{ prop.name }})
+{% if indent %}     *{% else %} *{% endif %} \fn void  {{ class }}::{{ prop.write }}({% if prop.argsByRef %}const {% endif %}{{ prop.type }} {%if prop.argsByRef %}&{% endif %}{% if prop.pointer %}*{% endif %}n{{ prop.name|capfirst }})
 {% endif %}
 {% if indent %}     *{% else %} *{% endif %} \brief Setter function for the \link {{ class }}::{{ prop.name }} {{ prop.name }} \endlink property.
 {% if prop.read or prop.reset or prop.notify %}

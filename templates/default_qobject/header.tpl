@@ -70,7 +70,7 @@ public:
 
 {% for prop in props %}
     {% if prop.write %}
-    {% if commentposition == 1 and prop.documentMethods %}{% with 1 as indent %}{% include "writecomment.tpl" %}{% endwith %}    {% endif %}void {{ prop.write }}({% if prop.argsByRef %}const {% endif %}{{ prop.type }} {% if prop.argsByRef %}&{% elif prop.pointer %}*{% endif %}{{ prop.name }});
+    {% if commentposition == 1 and prop.documentMethods %}{% with 1 as indent %}{% include "writecomment.tpl" %}{% endwith %}    {% endif %}void {{ prop.write }}({% if prop.argsByRef %}const {% endif %}{{ prop.type }} {% if prop.argsByRef %}&{% elif prop.pointer %}*{% endif %}n{{ prop.name|capfirst }});
     {% endif %}
 {% endfor %}
 
@@ -87,7 +87,7 @@ Q_SIGNALS:
     {% endif %}
 {% endfor %}
 
-private
+private:
 {% for prop in props %}
     {% if prop.stored %}{{ prop.type }} {% if prop.pointer %}*{% endif %}m_{{ prop.name }}{% if prop.defaultValue %} = {{ prop.defaultValue }}{% endif %};{% endif %}
 {% endfor %}

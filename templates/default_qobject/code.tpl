@@ -45,18 +45,18 @@ using namespace {{ ns }};
 {% endif %}
 
 {% if prop.write %}
-{% if commentposition == 0 and prop.documentMethods %}{% include "writecomment.tpl" %}{% endif %}void {{ class }}::{{ prop.write }}({% if prop.argsByRef %}const {% endif %}{{ prop.type }} {% if prop.argsByRef %}&{% elif prop.pointer %}*{% endif %}{{ prop.name }})
+{% if commentposition == 0 and prop.documentMethods %}{% include "writecomment.tpl" %}{% endif %}void {{ class }}::{{ prop.write }}({% if prop.argsByRef %}const {% endif %}{{ prop.type }} {% if prop.argsByRef %}&{% elif prop.pointer %}*{% endif %}n{{ prop.name|capfirst }})
 {
 {% if prop.notify %}
-    if ({{ prop.name }} != m_{{ prop.name }}) {
-        m_{{ prop.name }} = {{ prop.name }};
+    if (n{{ prop.name|capfirst }} != m_{{ prop.name }}) {
+        m_{{ prop.name }} = n{{ prop.name|capfirst }};
 {% if debugout %}#ifdef QT_DEBUG
         qDebug() << "Changed {{ prop.name }} to" << m_{{ prop.name }};
 #endif{% endif %}
         Q_EMIT {{ prop.notify }}({{ prop.read }}());
     }
 {% else %}
-    m_{{ prop.name }} = {{ prop.name }};
+    m_{{ prop.name }} = n{{ prop.name|capfirst }};
 {% if debugout %}#ifdef QT_DEBUG
     qDebug() << "Set {{ prop.name }} to" << m_{{ prop.name }};
 #endif{% endif %}

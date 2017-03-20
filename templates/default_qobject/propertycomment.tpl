@@ -18,7 +18,7 @@
 {% if indent %}     *{% else %} *{% endif %} \li {{ prop.type }} {% if prop.pointer %}*{% endif %}{{ prop.read }}() const
 {% endif %}
 {% if prop.write %}
-{% if indent %}     *{% else %} *{% endif %} \li void {{ prop.write }}({% if prop.argsByRef %}const {% endif %}{{ prop.type }} {%if prop.argsByRef %}&{% endif %}{% if prop.pointer %}*{% endif %}{{ prop.name }})
+{% if indent %}     *{% else %} *{% endif %} \li void {{ prop.write }}({% if prop.argsByRef %}const {% endif %}{{ prop.type }} {%if prop.argsByRef %}&{% endif %}{% if prop.pointer %}*{% endif %}n{{ prop.name|capfirst }})
 {% endif %}
 {% if prop.reset %}
 {% if indent %}     *{% else %} *{% endif %} \li void {{ prop.reset }}()
