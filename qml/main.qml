@@ -126,6 +126,7 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("Build class")
                 iconName: "run-build-file"
+                shortcut: qsTr("Ctrl+R")
                 enabled: stack.currentItem.objectName === "projectView" && stack.currentItem.currentUnit
             }
         }
