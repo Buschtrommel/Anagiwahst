@@ -16,181 +16,99 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Window 2.2
-import QtQuick.Layouts 1.1
+import QtQuick 2.5
+import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.2
 import QtQuick.Dialogs 1.2
-import Buschtrommel.Anagiwahst.Models 1.0
 
 ApplicationWindow {
     id: anagiwahst
     visible: true
     width: config.windowWidth
     height: config.windowHeight
-
-    property int rowCount: -1
-    property int currentRow: -1
+    minimumWidth: 600
+    minimumHeight: 600
 
     Component.onDestruction: {
         config.windowWidth = anagiwahst.width
         config.windowHeight = anagiwahst.height
     }
 
-    menuBar: MenuBar {
-        Menu {
-            title: qsTr("&File")
-
-            MenuItem {
-                text: qsTr("New tab")
-                shortcut: StandardKey.AddTab
-                iconName: "tab-new"
-                onTriggered: {
-                    var newTab = mainContent.addTab(qsTr("New class"))
-                    newTab.setSource("FileTab.qml", {file: ""})
-                    mainContent.currentIndex = mainContent.count-1
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Read from file")
-                shortcut: StandardKey.Open
-                iconName: "document-open"
-                onTriggered: openFileDialog.open()
-                visible: false
-            }
-
-            MenuSeparator {}
-
-            MenuItem {
-                text: anagiwahst.title !== "" ? qsTr("Close \"%1\"").arg(anagiwahst.title) : qsTr("Close")
-                shortcut: StandardKey.Close
-                iconName: "tab-close"
-                enabled: mainContent.count > 0
-                onTriggered: mainContent.removeTab(mainContent.currentIndex)
-            }
-
-            MenuItem {
-                text: qsTr("Close all")
-                shortcut: "Ctrl+Shift+W"
-                iconName: "tab-close"
-                enabled: mainContent.count > 1
-                onTriggered: {
-                    while(mainContent.count > 0) {
-                        mainContent.removeTab(0)
-                    }
-                }
-            }
-
-            MenuItem {
-                text: anagiwahst.title !== "" ? qsTr("Close all except \"%1\"").arg(anagiwahst.title) : qsTr("Close all except ...")
-                iconName: "tab-close-other"
-                enabled: mainContent.count > 1
-                onTriggered: {
-                    var current = mainContent.currentIndex
-                    mainContent.moveTab(current, 0)
-                    while(mainContent.count > 1) {
-                        mainContent.removeTab(1)
-                    }
-                }
-            }
-
-            MenuSeparator {}
-
-            MenuItem {
-                text: qsTr("Exit")
-                shortcut: StandardKey.Quit
-                iconName: "application-exit"
-                onTriggered: Qt.quit()
-            }
-        }
-
-        Menu {
-            title: qsTr("&Edit")
-            enabled: mainContent.count > 0
-
-            MenuItem {
-                text: qsTr("New property")
-                iconName: "document-new"
-                shortcut: StandardKey.New
-                onTriggered: mainContent.getTab(mainContent.currentIndex).item.newProperty()
-            }
-
-            MenuItem {
-                text: qsTr("Delete property")
-                enabled: anagiwahst.currentRow > -1
-                iconName: "edit-delete"
-                shortcut: StandardKey.Delete
-                onTriggered: mainContent.getTab(mainContent.currentIndex).item.deleteProperty()
-            }
-
-            MenuSeparator {}
-
-            MenuItem {
-                text: qsTr("Previous property")
-                enabled: anagiwahst.currentRow > 0
-                iconName: "go-previous"
-                shortcut: StandardKey.Back
-                onTriggered: mainContent.getTab(mainContent.currentIndex).item.previousProperty()
-            }
-
-            MenuItem {
-                text: qsTr("Next property")
-                enabled: anagiwahst.currentRow < anagiwahst.rowCount-1 && anagiwahst.rowCount > 0
-                iconName: "go-next"
-                shortcut: StandardKey.Forward
-                onTriggered: mainContent.getTab(mainContent.currentIndex).item.nextProperty()
-            }
-
-            MenuSeparator {}
-
-            MenuItem {
-                text: qsTr("Generate properties")
-                enabled: anagiwahst.rowCount > 0
-                iconName: "run-build"
-				shortcut: "Ctrl+R"
-                onTriggered: {
-                    var component = Qt.createComponent("ResultDialog.qml")
-                    if (component.status === Component.Ready) {
-                        var dialog = component.createObject(anagiwahst, {propsModel: mainContent.getTab(mainContent.currentIndex).item.model})
-                        dialog.open()
-                    }
-                }
-            }
-        }
-
-        Menu {
-            title: qsTr("&Settings")
-            visible: false
-
-            MenuItem {
-                text: qsTr("Confirgure Anagiwahst ...")
-                iconName: "configure"
-            }
-        }
-    }
-
-    TabView {
-        id: mainContent
+    StackView {
+        id: stack
         anchors.fill: parent
-        onCurrentIndexChanged: {
-            if (currentIndex > -1) {
-                anagiwahst.title = mainContent.getTab(mainContent.currentIndex).title
+        initialItem: ScrollView {
+            id: welcomeScroll
+            width: parent ? parent.width : anagiwahst.width
+            GridLayout {
+                columns: 2
+                width: parent.width
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignTop
+                    Layout.minimumWidth: 180
+                    Layout.preferredWidth: anagiwahst.width * 0.25
+                    Layout.margins: 9
+                    Button {
+                        text: qsTr("New project")
+                        iconName: "project-development-new-template"
+                        Layout.fillWidth: true
+                        onClicked: stack.push({item: Qt.resolvedUrl("ProjectEdit.qml"), replace: false})
+                    }
+                }
+
+                Column {
+                    Layout.minimumWidth: 360
+                    Layout.fillWidth: true
+                    Layout.margins: 9
+                    spacing: 9
+                    Repeater {
+                        model: filteredProjects
+                        delegate: prjGridDelegate
+                    }
+                }
             }
         }
-
     }
 
-    FileDialog {
-        id: openFileDialog
-        title: qsTr("Please choose a file")
-        selectMultiple: false
-        nameFilters: [qsTr("Header files (*.h *.hpp)")]
-        onAccepted: {
-            var fileName = openFileDialog.fileUrl.toString().split("/").pop()
-            var newTab = mainContent.addTab(fileName)
-            newTab.setSource("FileTab.qml", {file: openFileDialog.fileUrl})
-            mainContent.currentIndex = mainContent.count-1
+    Component {
+        id: prjGridDelegate
+        Rectangle {
+            width: parent ? parent.width : 0
+            height: prjItemCol.height
+            color: mousa.containsMouse ? "white" : "transparent"
+
+            MouseArea {
+                id: mousa
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: stack.push({item: Qt.resolvedUrl("ProjectView.qml"), replace: false, properties: {project: model.item}})
+            }
+
+            ColumnLayout {
+                id: prjItemCol
+                width: parent.width
+                Label {
+                    text: model.item.name
+                }
+
+                Label {
+                    text: qsTr("Last change: %1").arg(model.item.updatedAt.toLocaleString(Qt.locale(), Locale.ShortFormat))
+                }
+            }
+        }
+    }
+
+    MessageDialog {
+        id: delPrjDialog
+        property string name
+        property int projectId
+        title: qsTr("Delete project %1").arg(name)
+        text: qsTr("Do you really want delete this project? This will also delete all classes and properties.")
+        icon: StandardIcon.Warning
+        standardButtons: StandardButton.No | StandardButton.Yes
+        onYes: {
+            projects.deleteProject(projectId)
+            stack.pop()
         }
     }
 }

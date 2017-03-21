@@ -11,6 +11,9 @@ set (anagiwahst_SRCS
     propertywriter.cpp
     configuration.cpp
     dbmanager.cpp
+    project.cpp
+    projectmodel.cpp
+    projectfiltermodel.cpp
 )
 
 set (anagiwahst_HEADERS
@@ -19,12 +22,15 @@ set (anagiwahst_HEADERS
     propertywriter.h
     configuration.h
     dbmanager.h
+    project.h
+    projectmodel.h
+    projectfiltermodel.h
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CSS_FLAGS} -std=gnu++11")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
 
-add_executable(anagiwahst ${anagiwahst_SRCS} ${anagiwahst_HEADERS} ../qml.qrc)
+add_executable(anagiwahst ${anagiwahst_SRCS} ${anagiwahst_HEADERS})
 target_link_libraries(anagiwahst
     Qt5::Core
     Qt5::Widgets

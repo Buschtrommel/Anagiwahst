@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Layouts 1.1
+import QtQuick 2.5
+import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.2
 import Buschtrommel.Anagiwahst 1.0
 
 ColumnLayout {

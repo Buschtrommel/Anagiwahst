@@ -28,12 +28,16 @@
 #include <QQmlContext>
 #include <QStandardPaths>
 #include <QDir>
+#include <QString>
 
 #include "property.h"
 #include "propertymodel.h"
 #include "propertywriter.h"
 #include "configuration.h"
 #include "dbmanager.h"
+#include "project.h"
+#include "projectmodel.h"
+#include "projectfiltermodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -51,7 +55,7 @@ int main(int argc, char *argv[])
         qFatal("Failed to create user template directory: %s", qUtf8Printable(QStandardPaths::writableLocation(QStandardPaths::DataLocation).append(QLatin1String("/templates"))));
     }
 
-//    DBManager::check();
+    DBManager::check();
 
     if (argc > 1) {
 
@@ -182,15 +186,23 @@ int main(int argc, char *argv[])
     }
 
     Configuration configuration;
+    ProjectModel projects;
 
+    ProjectFilterModel lastUsedProjects(ProjectFilterModel::Updated);
+    lastUsedProjects.setSourceModel(&projects);
+
+    qmlRegisterType<Project>("Buschtrommel.Anagiwahst", 1, 0, "Project");
     qmlRegisterType<Property>("Buschtrommel.Anagiwahst", 1, 0, "Property");
-    qmlRegisterType<PropertyModel>("Buschtrommel.Anagiwahst.Models", 1, 0, "PropertyModel");
+    qmlRegisterType<PropertyModel>("Buschtrommel.Anagiwahst", 1, 0, "PropertyModel");
+    qmlRegisterUncreatableType<ProjectFilterModel>("Buschtrommel.Anagiwahst", 1, 0, "ProjectFilterModel", QStringLiteral("ProjectFilterModel can not be created!"));
 
     QQmlApplicationEngine engine;
 
     engine.rootContext()->setContextProperty(QStringLiteral("config"), &configuration);
+    engine.rootContext()->setContextProperty(QStringLiteral("projects"), &projects);
+    engine.rootContext()->setContextProperty(QStringLiteral("filteredProjects"), &lastUsedProjects);
 
-    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
+    engine.load(QUrl(QStringLiteral(QML_DIR) + QLatin1String("/main.qml")));
 
     return app.exec();
 }

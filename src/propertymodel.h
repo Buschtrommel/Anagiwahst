@@ -73,10 +73,10 @@ public:
 		Item	= Qt::UserRole + 1
     };
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE Q_DECL_FINAL;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE Q_DECL_FINAL;
-    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE Q_DECL_FINAL;
-    QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE Q_DECL_FINAL;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override final;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
+    QHash<int, QByteArray> roleNames() const override final;
+    QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override final;
 
     QUrl getFileUrl() const;
     QString getFileName() const;
