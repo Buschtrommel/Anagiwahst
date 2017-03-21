@@ -22,10 +22,12 @@ import QtQuick.Layouts 1.2
 import Buschtrommel.Anagiwahst 1.0
 
 Item {
-    id: prjEdit
+    id: unitEdit
     property Project project: null
+    property Unit unit: null
+    property UnitModel unitModel: null
 
-    objectName: "projectEdit"
+    objectName: "unitEdit"
 
     width: parent.width
     height: parent.height
@@ -35,26 +37,26 @@ Item {
         anchors.fill: parent
 
         Header {
-            text: project ? qsTr("Edit project") : qsTr("Create a new project")
+            text: unit ? qsTr("Edit class") : qsTr("Create a new class")
         }
 
         GroupBox {
             Layout.fillWidth: true
 
             GridLayout {
-                columns: prjEdit.width > 450 ? 2 : 1
+                columns: unitEdit.width > 450 ? 2 : 1
                 width: parent.width
 
                 LabeledTextField {
                     id: name
-                    label: qsTr("Project name")
-                    text: project ? project.name : ""
+                    label: qsTr("Class name")
+                    text: unit ? unit.name : ""
                 }
 
                 LabeledTextField {
                     id: namespaces
-                    label: qsTr("Default namespaces")
-                    text: project ? project.namespaces : ""
+                    label: qsTr("Namespaces")
+                    text: unit ? unit.namespaces : project.namespaces
                 }
             }
         }
@@ -65,25 +67,25 @@ Item {
 
             GridLayout {
                 width: parent.width
-                columns: prjEdit.width > 450 ? 3 : 1
+                columns: unitEdit.width > 450 ? 3 : 1
 
                 ColumnLayout {
                     CheckBox {
                         id: read
                         text: qsTr("Read")
-                        checked: project ? project.read : true
+                        checked: unit ? unit.read : project.read
                     }
 
                     CheckBox {
                         id: write
                         text: qsTr("Write")
-                        checked: project ? project.write: true
+                        checked: unit ? unit.write: project.write
                     }
 
                     CheckBox {
                         id: notify
                         text: qsTr("Notify")
-                        checked: project ? project.notify : true
+                        checked: unit ? unit.notify : project.notify
                     }
                 }
 
@@ -93,13 +95,13 @@ Item {
                     CheckBox {
                         id: member
                         text: qsTr("Member")
-                        checked: project ? project.member: false
+                        checked: unit ? unit.member: project.member
                     }
 
                     CheckBox {
                         id: reset
                         text: qsTr("Reset")
-                        checked: project ? project.reset: false
+                        checked: unit ? unit.reset: project.member
                     }
                 }
 
@@ -110,14 +112,14 @@ Item {
                         id: propread
                         text: qsTr("Use property name for Read")
                         Layout.columnSpan: 3
-                        checked: project ? project.propread : false
+                        checked: unit ? unit.propread : project.propread
                     }
 
                     CheckBox {
                         id: docmethod
                         text: qsTr("Document methods")
                         Layout.columnSpan: 3
-                        checked: project ? project.docmethod : true
+                        checked: unit ? unit.docmethod : project.docmethod
                     }
                 }
             }
@@ -133,7 +135,7 @@ Item {
                 width: parent.width
                 height: parent.height
                 textFormat: Text.PlainText
-                text: project ? project.license : ""
+                text: unit ? unit.license : project.license
             }
         }
 
@@ -141,8 +143,8 @@ Item {
             Layout.alignment: Qt.AlignBottom
 
             Button {
-                iconName: project ? "arrow-left" : "dialog-cancel"
-                text: project ? qsTr("Back") : qsTr("Cancel")
+                iconName: unit ? "arrow-left" : "dialog-cancel"
+                text: unit ? qsTr("Back") : qsTr("Cancel")
                 onClicked: stack.pop()
             }
 
@@ -152,16 +154,14 @@ Item {
 
             Button {
                 iconName: "dialog-ok-apply"
-                text: project ? qsTr("Update") : qsTr("Create")
+                text: unit ? qsTr("Update") : qsTr("Create")
                 onClicked: {
-                    if (prjEdit.project) {
-                        projects.updateProject(project.id, name.text, license.text, namespaces.text, read.checked, write.checked, member.checked, reset.checked, notify.checked, propread.checked, docmethod.checked, "default_qobject")
-                        stack.pop()
+                    if (unitEdit.unit) {
+                        unitModel.updateUnit(unit.id, name.text, license.text, namespaces.text, read.checked, write.checked, member.checked, reset.checked, notify.checked, propread.checked, docmethod.checked, "default_qobject")
                     } else {
-                        var prj = projects.createProject(name.text, license.text, namespaces.text, read.checked, write.checked, member.checked, reset.checked, notify.checked, propread.checked, docmethod.checked, "default_qobject")
-                        anagiwahst.title = name.text
-                        stack.push({item: Qt.resolvedUrl("ProjectView.qml"), replace: true, properties: {project: prj}})
+                        unitModel.createUnit(project.id, name.text, license.text, namespaces.text, read.checked, write.checked, member.checked, reset.checked, notify.checked, propread.checked, docmethod.checked, "default_qobject");
                     }
+                    stack.pop();
                 }
             }
         }

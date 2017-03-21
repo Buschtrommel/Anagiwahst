@@ -14,6 +14,9 @@ set (anagiwahst_SRCS
     project.cpp
     projectmodel.cpp
     projectfiltermodel.cpp
+    unit.cpp
+    unitmodel.cpp
+    unitfiltermodel.cpp
 )
 
 set (anagiwahst_HEADERS
@@ -25,6 +28,9 @@ set (anagiwahst_HEADERS
     project.h
     projectmodel.h
     projectfiltermodel.h
+    unit.h
+    unitmodel.h
+    unitfiltermodel.h
 )
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")

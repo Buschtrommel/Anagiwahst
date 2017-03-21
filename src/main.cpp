@@ -38,6 +38,8 @@
 #include "project.h"
 #include "projectmodel.h"
 #include "projectfiltermodel.h"
+#include "unit.h"
+#include "unitfiltermodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -192,9 +194,11 @@ int main(int argc, char *argv[])
     lastUsedProjects.setSourceModel(&projects);
 
     qmlRegisterType<Project>("Buschtrommel.Anagiwahst", 1, 0, "Project");
+    qmlRegisterUncreatableType<ProjectFilterModel>("Buschtrommel.Anagiwahst", 1, 0, "ProjectFilterModel", QStringLiteral("ProjectFilterModel can not be created!"));
+    qmlRegisterType<Unit>("Buschtrommel.Anagiwahst", 1, 0, "Unit");
+    qmlRegisterType<UnitFilterModel>("Buschtrommel.Anagiwahst", 1, 0, "UnitModel");
     qmlRegisterType<Property>("Buschtrommel.Anagiwahst", 1, 0, "Property");
     qmlRegisterType<PropertyModel>("Buschtrommel.Anagiwahst", 1, 0, "PropertyModel");
-    qmlRegisterUncreatableType<ProjectFilterModel>("Buschtrommel.Anagiwahst", 1, 0, "ProjectFilterModel", QStringLiteral("ProjectFilterModel can not be created!"));
 
     QQmlApplicationEngine engine;
 

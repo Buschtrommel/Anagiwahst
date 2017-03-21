@@ -83,7 +83,7 @@ void DBManager::check()
                                    "project INTEGER NOT NULL, "
                                    "name TEXT NOT NULL, "
                                    "license TEXT, "
-                                   "namespace TEXT, "
+                                   "namespaces TEXT, "
                                    "read INTEGER NOT NULL DEFAULT 1, "
                                    "write INTEGER NOT NULL DEFAULT 1, "
                                    "member INTEGER NOT NULL DEFAULT 0, "

@@ -30,86 +30,90 @@ SplitView {
     height: parent.height
 
     property Project project: null
+    property Unit currentUnit: null
+    property alias unitModel: um
+    readonly property int childMargins: 5
 
     Item {
         id: leftCol
         Layout.minimumWidth: 200
         Layout.preferredWidth: anagiwahst.width * 0.2
         Layout.fillWidth: false
-        readonly property int childMargins: 5
 
         ColumnLayout {
             width: parent.width
             height: parent.height
 
-            Label {
+            Header {
                 text: project ? project.name : ""
-                font.pointSize: 16
-                Layout.leftMargin: leftCol.childMargins
-                Layout.rightMargin: leftCol.childMargins
-            }
-
-            Button {
-                iconName: "configure_project"
-                text: qsTr("Configure project")
-                Layout.leftMargin: leftCol.childMargins
-                Layout.rightMargin: leftCol.childMargins
-                Layout.fillWidth: true
-                onClicked: stack.push({item: Qt.resolvedUrl("ProjectEdit.qml"), replace: false, properties: {project: projectView.project}})
-            }
-
-            Button {
-                iconName: "delete"
-                text: qsTr("Delete project")
-                Layout.leftMargin: leftCol.childMargins
-                Layout.rightMargin: leftCol.childMargins
-                Layout.fillWidth: true
-                onClicked: {
-                    delPrjDialog.name = projectView.project.name
-                    delPrjDialog.projectId = projectView.project.id
-                    delPrjDialog.open()
-                }
+                Layout.leftMargin: projectView.childMargins
+                Layout.rightMargin: projectView.childMargins
             }
 
             Button {
                 iconName: "project-development-close"
                 text: qsTr("Close project")
-                Layout.leftMargin: leftCol.childMargins
-                Layout.rightMargin: leftCol.childMargins
+                Layout.leftMargin: projectView.childMargins
+                Layout.rightMargin: projectView.childMargins
                 Layout.fillWidth: true
-                onClicked: stack.pop()
+                onClicked: {
+                    anagiwahst.title = ""
+                    stack.pop()
+                }
             }
 
             Button {
                 iconName: "list-add"
                 text: qsTr("Add class")
-                Layout.leftMargin: leftCol.childMargins
-                Layout.rightMargin: leftCol.childMargins
+                Layout.leftMargin: projectView.childMargins
+                Layout.rightMargin: projectView.childMargins
                 Layout.fillWidth: true
+                onClicked: stack.push({item: Qt.resolvedUrl("UnitEdit.qml"), replace: false, properties: {project: projectView.project, unitModel: um}})
             }
 
             TableView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                model: UnitModel { id: um; projectId: project ? project.id : -1 }
+
+                onCurrentRowChanged: {
+                    projectView.currentUnit = model.get(currentRow)
+                }
 
                 TableViewColumn {
                     role: "item"
                     title: qsTr("Classes")
                     delegate: TableText {
-                        text: styleData.value ? styleData.value.name : ""
+                        text: styleData.value ? styleData.value.displayName : ""
                     }
                 }
             }
         }
     }
 
-    ScrollView {
+    Item {
         Layout.fillWidth: true
+
+        ColumnLayout {
+            width: parent.width
+            height: parent.height
+
+            Header {
+                text: currentUnit ? currentUnit.displayName : ""
+                Layout.leftMargin: projectView.childMargins
+                Layout.rightMargin: projectView.childMargins
+            }
+
+            ListView {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+            }
+        }
     }
 
-    ScrollView {
-        Layout.minimumWidth: 200
-        Layout.preferredWidth: anagiwahst.width * 0.2
-        Layout.fillWidth: false
-    }
+//    ScrollView {
+//        Layout.minimumWidth: 200
+//        Layout.preferredWidth: anagiwahst.width * 0.2
+//        Layout.fillWidth: false
+//    }
 }
