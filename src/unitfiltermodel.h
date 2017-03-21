@@ -49,7 +49,7 @@ public:
     void setSortingRole(UnitFilterModel::SortingRole nSortingRole);
     void setSearch(const QString &nSearch);
 
-    Q_INVOKABLE Unit *createUnit(int projectId, const QString &name, const QString &license, const QString &namespaces, bool read, bool write, bool member, bool reset, bool notify, bool propread, bool docmethod, const QString &tmpl);
+    Q_INVOKABLE Unit *createUnit(const QString &name, const QString &license, const QString &namespaces, bool read, bool write, bool member, bool reset, bool notify, bool propread, bool docmethod, const QString &tmpl);
     Q_INVOKABLE bool updateUnit(int id, const QString &name, const QString &license, const QString &namespaces, bool read, bool write, bool member, bool reset, bool notify, bool propread, bool docmethod, const QString &tmpl);
     Q_INVOKABLE bool deleteUnit(int id);
 

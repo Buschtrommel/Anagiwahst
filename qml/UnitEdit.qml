@@ -159,7 +159,7 @@ Item {
                     if (unitEdit.unit) {
                         unitModel.updateUnit(unit.id, name.text, license.text, namespaces.text, read.checked, write.checked, member.checked, reset.checked, notify.checked, propread.checked, docmethod.checked, "default_qobject")
                     } else {
-                        unitModel.createUnit(project.id, name.text, license.text, namespaces.text, read.checked, write.checked, member.checked, reset.checked, notify.checked, propread.checked, docmethod.checked, "default_qobject");
+                        unitModel.createUnit(name.text, license.text, namespaces.text, read.checked, write.checked, member.checked, reset.checked, notify.checked, propread.checked, docmethod.checked, "default_qobject");
                     }
                     stack.pop();
                 }

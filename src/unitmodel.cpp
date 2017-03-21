@@ -175,9 +175,11 @@ QModelIndex UnitModel::indexById(int id) const
 }
 
 
-Unit *UnitModel::createUnit(int projectId, const QString &name, const QString &license, const QString &namespaces, bool read, bool write, bool member, bool reset, bool notify, bool propread, bool docmethod, const QString &tmpl)
+Unit *UnitModel::createUnit(const QString &name, const QString &license, const QString &namespaces, bool read, bool write, bool member, bool reset, bool notify, bool propread, bool docmethod, const QString &tmpl)
 {
     Unit *u = nullptr;
+
+    Q_ASSERT_X(projectId() > -1, "create new unit", "invalid project id");
 
     QSqlQuery q;
 
@@ -189,7 +191,7 @@ Unit *UnitModel::createUnit(int projectId, const QString &name, const QString &l
     const QDateTime currentUtc = QDateTime::currentDateTimeUtc();
     const QDateTime currentLocal = currentUtc.toLocalTime();
 
-    q.addBindValue(projectId);
+    q.addBindValue(projectId());
     q.addBindValue(name);
     q.addBindValue(license);
     q.addBindValue(namespaces);
@@ -209,7 +211,7 @@ Unit *UnitModel::createUnit(int projectId, const QString &name, const QString &l
         return u;
     }
 
-    u = new Unit(q.lastInsertId().toInt(), projectId, name, license, namespaces, read, write, member, reset, notify, propread, docmethod, tmpl, currentLocal, currentLocal, this);
+    u = new Unit(q.lastInsertId().toInt(), projectId(), name, license, namespaces, read, write, member, reset, notify, propread, docmethod, tmpl, currentLocal, currentLocal, this);
 
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
 

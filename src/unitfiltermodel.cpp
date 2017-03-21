@@ -184,9 +184,9 @@ bool UnitFilterModel::filterAcceptsRow(int source_row, const QModelIndex &source
 }
 
 
-Unit *UnitFilterModel::createUnit(int projectId, const QString &name, const QString &license, const QString &namespaces, bool read, bool write, bool member, bool reset, bool notify, bool propread, bool docmethod, const QString &tmpl)
+Unit *UnitFilterModel::createUnit(const QString &name, const QString &license, const QString &namespaces, bool read, bool write, bool member, bool reset, bool notify, bool propread, bool docmethod, const QString &tmpl)
 {
-    return m_unitModel.createUnit(projectId, name, license, namespaces, read, write, member, reset, notify, propread, docmethod, tmpl);
+    return m_unitModel.createUnit(name, license, namespaces, read, write, member, reset, notify, propread, docmethod, tmpl);
 }
 
 
