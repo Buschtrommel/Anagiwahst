@@ -115,6 +115,7 @@ ApplicationWindow {
                 text: qsTr("Delete class")
                 iconName: "delete"
                 enabled: stack.currentItem.objectName === "projectView" && stack.currentItem.currentUnit
+                shortcut: qsTr("Shift+Del")
                 onTriggered: {
                     delUnitDialog.name = stack.currentItem.currentUnit.name
                     delUnitDialog.unitId = stack.currentItem.currentUnit.id
