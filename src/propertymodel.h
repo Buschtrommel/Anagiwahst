@@ -41,7 +41,6 @@ class PropertyModel : public QAbstractListModel
     Q_PROPERTY(QString fileName READ getFileName NOTIFY fileNameChanged)
     Q_PROPERTY(QString className READ getClassName WRITE setClassName NOTIFY classNameChanged)
     Q_PROPERTY(bool privateClass READ isPrivateClass WRITE setPrivateClass NOTIFY privateClassChanged)
-    Q_PROPERTY(ClassType type READ getType WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(CommentsPosition commentsPosition READ getCommentsPosition WRITE setCommentsPosition NOTIFY commentsPositionChanged)
     Q_PROPERTY(bool usePropertyName READ hasUsePropertyName WRITE setUsePropertyName NOTIFY usePropertyNameChanged)
     Q_PROPERTY(QString namespaces READ getNamespaces WRITE setNamespaces NOTIFY namespacesChanged)
@@ -55,12 +54,6 @@ public:
         CodeFile
     };
     Q_ENUM(ResultFileType)
-
-    enum ClassType {
-        PrivateClass    = 0,
-        SharedData      = 1
-    };
-    Q_ENUM(ClassType)
 
     enum CommentsPosition {
         InCode          = 0,
@@ -82,7 +75,6 @@ public:
     QString getFileName() const;
     QString getClassName() const;
     bool isPrivateClass() const;
-    ClassType getType() const;
     CommentsPosition getCommentsPosition() const;
     bool hasUsePropertyName() const;
     QString getNamespaces() const;
@@ -90,7 +82,6 @@ public:
     void setFileUrl(const QUrl &nFileUrl);
     void setClassName(const QString &nClassName);
     void setPrivateClass(bool nPrivateClass);
-    void setType(ClassType type);
     void setCommentsPosition(CommentsPosition commentsPosition);
     void setUsePropertyName(bool usePropertyName);
     void setNamespaces(const QString &namespaces);
@@ -110,7 +101,6 @@ signals:
     void fileNameChanged(const QString &nFileName);
     void classNameChanged(const QString &nClassName);
     void privateClassChanged(bool nPrivateClass);
-    void typeChanged(ClassType type);
     void commentsPositionChanged(CommentsPosition commentsPosition);
     void usePropertyNameChanged(bool usePropertyName);
     void namespacesChanged(const QString &namespaces);
@@ -124,7 +114,6 @@ private:
     QUrl m_fileUrl;
     QString m_className;
     bool m_privateClass = false;
-    ClassType m_type = PrivateClass;
     CommentsPosition m_commentsPosition = InCode;
     bool m_usePropertyName = false;
     QString m_namespaces;

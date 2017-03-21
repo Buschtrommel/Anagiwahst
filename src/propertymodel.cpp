@@ -481,45 +481,6 @@ void PropertyModel::setPrivateClass(bool nPrivateClass)
 
 
 
-
-/*!
- * \property PropertyModel::type
- * \brief Sets the type of the class.
- *
- * The class type manages the style of the class parts.
- *
- * \par Access functions:
- * <TABLE><TR><TD>ClassType</TD><TD>getType() const</TD></TR><TR><TD>void</TD><TD>setType(ClassType type)</TD></TR></TABLE>
- * \par Notifier signal:
- * <TABLE><TR><TD>void</TD><TD>typeChanged(ClassType type)</TD></TR></TABLE>
- */
-
-/*!
- * \fn PropertyModel::typeChanged()
- * \brief Part of the \link PropertyModel::type type \endlink property.
- */
-
-/*!
- * \brief Part of the \link PropertyModel::type type \endlink property.
- */
-PropertyModel::ClassType PropertyModel::getType() const { return m_type; }
-
-/*!
- * \brief Part of the \link PropertyModel::type type \endlink property.
- */
-void PropertyModel::setType(ClassType type)
-{
-    if (type != m_type) {
-        m_type = type;
-#ifdef QT_DEBUG
-        qDebug() << "Changed type to " << m_type;
-#endif
-        emit typeChanged(getType());
-    }
-}
-
-
-
 /*!
  * \property PropertyModel::commentsPosition
  * \brief Defines where the comments will be inserted.
