@@ -8,6 +8,7 @@ set (anagiwahst_SRCS
     main.cpp
     property.cpp
     propertymodel.cpp
+    propertyfiltermodel.cpp
     propertywriter.cpp
     configuration.cpp
     dbmanager.cpp
@@ -22,6 +23,7 @@ set (anagiwahst_SRCS
 set (anagiwahst_HEADERS
     property.h
     propertymodel.h
+    propertyfiltermodel.h
     propertywriter.h
     configuration.h
     dbmanager.h

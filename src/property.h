@@ -20,6 +20,10 @@
 #define PROPERTY_H
 
 #include <QObject>
+#include <QDateTime>
+#include <QTimer>
+
+class QSqlQuery;
 
 /*!
  * \brief The Property class.
@@ -28,6 +32,7 @@ class Property : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int id READ id WRITE setId NOTIFY idChanged)
+    Q_PROPERTY(int unitId READ unitId WRITE setUnitId NOTIFY unitIdChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(QString read READ read WRITE setRead NOTIFY readChanged)
@@ -48,13 +53,21 @@ class Property : public QObject
     Q_PROPERTY(bool pointer READ pointer WRITE setPointer NOTIFY pointerChanged)
     Q_PROPERTY(bool argsByRef READ argsByRef WRITE setArgsByRef NOTIFY argsByRefChanged)
     Q_PROPERTY(bool documentMethods READ documentMethods WRITE setDocumentMethods NOTIFY documentMethodsChanged)
-    Q_PROPERTY(QStringList commentParts READ commentParts)
+    Q_PROPERTY(QDateTime createdAt READ createdAt WRITE setCreatedAt NOTIFY createdAtChanged)
+    Q_PROPERTY(QDateTime updatedAt READ updatedAt WRITE setUpdatedAt NOTIFY updatedAtChanged)
+    Q_PROPERTY(QStringList commentParts READ commentParts STORED false)
+    Q_PROPERTY(int order READ order NOTIFY orderChanged)
+    Q_PROPERTY(bool expanded READ expanded WRITE setExpanded NOTIFY expandedChanged)
 public:
     explicit Property(QObject *parent = nullptr);
-    Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, QObject *parent = nullptr);
+
+    Property(int id, int unitId, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, const QDateTime &createdAt, const QDateTime &updatedAt, int order, QObject *parent = nullptr);
+
+    Property(int id, int unitId, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, quint8 revision, const QString &designable, const QString &scriptable, bool stored, bool user, bool constant, bool final, const QString &brief, const QString &comment, const QString defVal, bool pointer, bool argsByRef, bool docMethods, const QDateTime &createdAt, const QDateTime &updatedAt, int order, QObject *parent = nullptr);
     ~Property();
 
     int id() const;
+    int unitId() const;
     QString name() const;
     QString type() const;
     QString read() const;
@@ -75,9 +88,14 @@ public:
     bool pointer() const;
     bool argsByRef() const;
     bool documentMethods() const;
+    QDateTime createdAt() const;
+    QDateTime updatedAt() const;
     QStringList commentParts() const;
+    int order() const;
+    bool expanded() const;
 
     void setId(int nId);
+    void setUnitId(int nUnitId);
     void setName(const QString &nName);
     void setType(const QString &nType);
     void setRead(const QString &nRead);
@@ -97,10 +115,17 @@ public:
     void setDefaultValue(const QString &nDefaultValue);
     void setPointer(bool nPointer);
     void setArgsByRef(bool nArgsByRef);
-    void setDocumentMethods(bool nDocumentMethods);
+    void setDocumentMethods(bool nDocumentMethods);    
+    void setCreatedAt(const QDateTime &nCreatedAt);
+    void setUpdatedAt(const QDateTime &nUpdatedAt);
+    void setOrder(int nOrder);
+    void setExpanded(bool nExpanded);
+
+    static Property *fromDb(const QSqlQuery *q, QObject *parent = nullptr);
 
 signals:
     void idChanged(int id);
+    void unitIdChanged(int unitId);
     void nameChanged(const QString &name);
     void typeChanged(const QString &type);
     void readChanged(const QString &read);
@@ -121,9 +146,17 @@ signals:
     void pointerChanged(bool pointer);
     void argsByRefChanged(bool argsByRef);
     void documentMethodsChanged(bool documentMethods);
+    void createdAtChanged(const QDateTime &createdAt);
+    void updatedAtChanged(const QDateTime &updatedAt);
+    void orderChanged(int order);
+    void expandedChanged(bool expaned);
+
+private Q_SLOTS:
+    void saveToDb();
 
 private:
-    int m_id = 0;
+    int m_id = -1;
+    int m_unitId = -1;
     QString m_name;
     QString m_type;
     QString m_read;
@@ -141,9 +174,17 @@ private:
     QString m_brief;
     QString m_comment;
     QString m_defaultValue;
-    bool m_argsByRef = false;
     bool m_pointer = false;
+    bool m_argsByRef = false;
     bool m_documentMethods = true;
+    QDateTime m_createdAt;
+    QDateTime m_updatedAt;
+    bool m_expanded = false;
+    int m_order = 0;
+
+    QTimer m_saveTimer;
+
+    void initTimer();
 
     Q_DISABLE_COPY(Property)
 };

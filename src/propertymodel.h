@@ -22,14 +22,14 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QUrl>
-#include <grantlee5/grantlee/templateloader.h>
+//#include <grantlee5/grantlee/templateloader.h>
 
 class Property;
-class QStringList;
+//class QStringList;
 
-namespace Grantlee {
-class Engine;
-}
+//namespace Grantlee {
+//class Engine;
+//}
 
 /*!
  * \brief The PropertyModel class
@@ -37,30 +37,30 @@ class Engine;
 class PropertyModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QUrl fileUrl READ getFileUrl WRITE setFileUrl NOTIFY fileUrlChanged)
-    Q_PROPERTY(QString fileName READ getFileName NOTIFY fileNameChanged)
-    Q_PROPERTY(QString className READ getClassName WRITE setClassName NOTIFY classNameChanged)
-    Q_PROPERTY(bool privateClass READ isPrivateClass WRITE setPrivateClass NOTIFY privateClassChanged)
-    Q_PROPERTY(CommentsPosition commentsPosition READ getCommentsPosition WRITE setCommentsPosition NOTIFY commentsPositionChanged)
-    Q_PROPERTY(bool usePropertyName READ hasUsePropertyName WRITE setUsePropertyName NOTIFY usePropertyNameChanged)
-    Q_PROPERTY(QString namespaces READ getNamespaces WRITE setNamespaces NOTIFY namespacesChanged)
+//    Q_PROPERTY(QUrl fileUrl READ getFileUrl WRITE setFileUrl NOTIFY fileUrlChanged)
+//    Q_PROPERTY(QString fileName READ getFileName NOTIFY fileNameChanged)
+//    Q_PROPERTY(QString className READ getClassName WRITE setClassName NOTIFY classNameChanged)
+//    Q_PROPERTY(bool privateClass READ isPrivateClass WRITE setPrivateClass NOTIFY privateClassChanged)
+//    Q_PROPERTY(CommentsPosition commentsPosition READ getCommentsPosition WRITE setCommentsPosition NOTIFY commentsPositionChanged)
+//    Q_PROPERTY(bool usePropertyName READ hasUsePropertyName WRITE setUsePropertyName NOTIFY usePropertyNameChanged)
+//    Q_PROPERTY(QString namespaces READ getNamespaces WRITE setNamespaces NOTIFY namespacesChanged)
 public:
     explicit PropertyModel(QObject *parent = nullptr);
     ~PropertyModel();
 
-    enum ResultFileType {
-        HeaderFile,
-        PrivateHeaderFile,
-        CodeFile
-    };
-    Q_ENUM(ResultFileType)
+//    enum ResultFileType {
+//        HeaderFile,
+//        PrivateHeaderFile,
+//        CodeFile
+//    };
+//    Q_ENUM(ResultFileType)
 
-    enum CommentsPosition {
-        InCode          = 0,
-        InHeader        = 1,
-        InFronOfHeader  = 2
-    };
-    Q_ENUM(CommentsPosition)
+//    enum CommentsPosition {
+//        InCode          = 0,
+//        InHeader        = 1,
+//        InFronOfHeader  = 2
+//    };
+//    Q_ENUM(CommentsPosition)
 
 	enum Roles {
 		Item	= Qt::UserRole + 1
@@ -71,39 +71,49 @@ public:
     QHash<int, QByteArray> roleNames() const override final;
     QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override final;
 
-    QUrl getFileUrl() const;
-    QString getFileName() const;
-    QString getClassName() const;
-    bool isPrivateClass() const;
-    CommentsPosition getCommentsPosition() const;
-    bool hasUsePropertyName() const;
-    QString getNamespaces() const;
+//    QUrl getFileUrl() const;
+//    QString getFileName() const;
+//    QString getClassName() const;
+//    bool isPrivateClass() const;
+//    CommentsPosition getCommentsPosition() const;
+//    bool hasUsePropertyName() const;
+//    QString getNamespaces() const;
 
-    void setFileUrl(const QUrl &nFileUrl);
-    void setClassName(const QString &nClassName);
-    void setPrivateClass(bool nPrivateClass);
-    void setCommentsPosition(CommentsPosition commentsPosition);
-    void setUsePropertyName(bool usePropertyName);
-    void setNamespaces(const QString &namespaces);
+//    void setFileUrl(const QUrl &nFileUrl);
+//    void setClassName(const QString &nClassName);
+//    void setPrivateClass(bool nPrivateClass);
+//    void setCommentsPosition(CommentsPosition commentsPosition);
+//    void setUsePropertyName(bool usePropertyName);
+//    void setNamespaces(const QString &namespaces);
 
-    Q_INVOKABLE Property *addProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool d = true);
-    Q_INVOKABLE void deleteProperty(int idx);
-    Q_INVOKABLE QString createOutput(ResultFileType type) const;
-    Q_INVOKABLE bool saveToDirectory(ResultFileType type, const QString &directory) const;
-    Q_INVOKABLE bool saveToFile(ResultFileType type, const QUrl &file) const;
-    Q_INVOKABLE bool saveAll(const QUrl &directory) const;
-    Q_INVOKABLE QVariant getData(const QString &role, int idx) const;
-    Q_INVOKABLE Property *getItemById(int id) const;
-    Q_INVOKABLE Property *getItemByIndex(int idx) const;
+    int unitId() const;
+    void setUnitId(int nUnitId);
+
+    Property *createProperty(const QString &name, const QString &type, bool r = true, bool w = true, bool m = false, bool u = false, bool n = true, bool d = true, bool usePropertyName = false);
+    bool updateProperty(Property *p) const;
+    void expandProperty(Property *p);
+    bool deleteProperty(Property *p);
+
+    QList<Property*> getProperties() const;
+//    Q_INVOKABLE QString createOutput(ResultFileType type) const;
+//    Q_INVOKABLE bool saveToDirectory(ResultFileType type, const QString &directory) const;
+//    Q_INVOKABLE bool saveToFile(ResultFileType type, const QUrl &file) const;
+//    Q_INVOKABLE bool saveAll(const QUrl &directory) const;
+//    Q_INVOKABLE QVariant getData(const QString &role, int idx) const;
+//    Q_INVOKABLE Property *getItemById(int id) const;
+//    Q_INVOKABLE Property *getItemByIndex(int idx) const;
+
+//signals:
+//    void fileUrlChanged(const QUrl &nFileUrl);
+//    void fileNameChanged(const QString &nFileName);
+//    void classNameChanged(const QString &nClassName);
+//    void privateClassChanged(bool nPrivateClass);
+//    void commentsPositionChanged(CommentsPosition commentsPosition);
+//    void usePropertyNameChanged(bool usePropertyName);
+//    void namespacesChanged(const QString &namespaces);
 
 signals:
-    void fileUrlChanged(const QUrl &nFileUrl);
-    void fileNameChanged(const QString &nFileName);
-    void classNameChanged(const QString &nClassName);
-    void privateClassChanged(bool nPrivateClass);
-    void commentsPositionChanged(CommentsPosition commentsPosition);
-    void usePropertyNameChanged(bool usePropertyName);
-    void namespacesChanged(const QString &namespaces);
+    void rowCountChanged(int rowCount);
 
 private:
     QList<Property*> m_properties;
@@ -111,20 +121,22 @@ private:
     static const QStringList m_floats;
     static const QStringList m_hasDefaultConstructor;
 
-    QUrl m_fileUrl;
-    QString m_className;
-    bool m_privateClass = false;
-    CommentsPosition m_commentsPosition = InCode;
-    bool m_usePropertyName = false;
-    QString m_namespaces;
+//    QUrl m_fileUrl;
+//    QString m_className;
+//    bool m_privateClass = false;
+//    CommentsPosition m_commentsPosition = InCode;
+//    bool m_usePropertyName = false;
+//    QString m_namespaces;
 
-    int m_lastAddedId = -1;
+    int m_unitId = -1;
 
-    QString getDefaultValue(const QString &type, bool pointer = false);
-    bool getArgsByRef(const QString &type, bool pointer = false);
+    static QString getDefaultValue(const QString &type, bool pointer = false);
+    static bool getArgsByRef(const QString &type, bool pointer = false);
 
-    Grantlee::Engine *m_tmpl_engine;
-    QSharedPointer<Grantlee::FileSystemTemplateLoader> m_tmpl_loader;
+//    Grantlee::Engine *m_tmpl_engine;
+//    QSharedPointer<Grantlee::FileSystemTemplateLoader> m_tmpl_loader;
+
+    void clear();
 };
 
 #endif // PROPERTYMODEL_H

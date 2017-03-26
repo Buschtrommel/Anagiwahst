@@ -132,6 +132,7 @@ void DBManager::check()
                                    "comment TEXT, "
                                    "created_at INTEGER NOT NULL DEFAULT 0, "
                                    "updated_at INTEGER NOT NULL DEFAULT 0, "
+                                   "ordering INTEGER NOT NULL, "
                                    "FOREIGN KEY (unit) REFERENCES units(id) ON DELETE CASCADE"
                                    ")"))) {
             qFatal("Failed to create properties table: %s", qUtf8Printable(q.lastError().text()));

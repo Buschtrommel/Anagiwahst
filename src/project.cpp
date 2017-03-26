@@ -628,7 +628,7 @@ Project *Project::fromDb(const QSqlQuery *q, QObject *parent)
 {
     Project *prj = nullptr;
 
-    Q_ASSERT_X(q, "construct Project from DB", "invalid query poiner");
+    Q_ASSERT_X(q, "construct Project from DB", "invalid query pointer");
 
     prj = new Project(q->value(0).toInt(),
                       q->value(1).toString(),

@@ -18,6 +18,8 @@
 
 #include "property.h"
 #include <QRegularExpression>
+#include <QSqlQuery>
+#include <QSqlError>
 #ifdef QT_DEBUG
 #include <QtDebug>
 #endif
@@ -27,16 +29,26 @@
  */
 Property::Property(QObject *parent) : QObject(parent)
 {
+    initTimer();
 }
 
 
 /*!
  * \overload
  */
-Property::Property(int id, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, QObject *parent) :
-    QObject(parent), m_id(id), m_name(name), m_type(type), m_read(read), m_write(write), m_member(member), m_reset(reset), m_notify(notify), m_defaultValue(defaultValue), m_argsByRef(argsByRef), m_pointer(pointer), m_documentMethods(docMethods)
+Property::Property(int id, int unitId, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, const QString &defaultValue, bool argsByRef, bool pointer, bool docMethods, const QDateTime &createdAt, const QDateTime &updatedAt, int order, QObject *parent) :
+    QObject(parent), m_id(id), m_unitId(unitId), m_name(name), m_type(type), m_read(read), m_write(write), m_member(member), m_reset(reset), m_notify(notify), m_defaultValue(defaultValue), m_pointer(pointer), m_argsByRef(argsByRef), m_documentMethods(docMethods), m_createdAt(createdAt), m_updatedAt(updatedAt), m_order(order)
 {
+    initTimer();
+}
 
+/*!
+ * \overload
+ */
+Property::Property(int id, int unitId, const QString &name, const QString &type, const QString &read, const QString &write, const QString &member, const QString &reset, const QString &notify, quint8 revision, const QString &designable, const QString &scriptable, bool stored, bool user, bool constant, bool final, const QString &brief, const QString &comment, const QString defVal, bool pointer, bool argsByRef, bool docMethods, const QDateTime &createdAt, const QDateTime &updatedAt, int order, QObject *parent) :
+    QObject(parent), m_id(id), m_unitId(unitId), m_name(name), m_type(type), m_read(read), m_write(write), m_member(member), m_reset(reset), m_notify(notify), m_revision(revision), m_designable(designable), m_scriptable(scriptable), m_stored(stored), m_user(user), m_constant(constant), m_final(final), m_brief(brief), m_comment(comment), m_defaultValue(defVal), m_pointer(pointer), m_argsByRef(argsByRef), m_documentMethods(docMethods), m_createdAt(createdAt), m_updatedAt(updatedAt), m_order(order)
+{
+    initTimer();
 }
 
 
@@ -51,7 +63,7 @@ Property::~Property()
 
 /*!
  * \property Property::id
- * \brief Internal ID of this property.
+ * \brief Database ID of this property.
  *
  * \par Access functions:
  * <TABLE><TR><TD>int</TD><TD>id() const</TD></TR><TR><TD>void</TD><TD>setId(int nId)</TD></TR></TABLE>
@@ -80,6 +92,47 @@ void Property::setId(int nId)
         qDebug() << "Changed id to" << m_id;
 #endif
         emit idChanged(id());
+    }
+}
+
+
+
+/*!
+ * \property Property::unitId
+ * \brief Database ID of the unit this property belongs to.
+ *
+ * \par Access functions:
+ * \li int unitId() const
+ * \li void setUnitId(int nUnitId)
+ *
+ * \par Notifier signal:
+ * \li void unitIdChanged(int unitId)
+ */
+
+/*!
+ * \fn void  Property::unitIdChanged(int unitId)
+ * \brief Notifier function for the \link Property::unitId unitId \endlink property.
+ * \sa Property::unitId() Property::setUnitId()
+ */
+
+/*!
+ * \brief Getter function for the \link Property::unitId unitId \endlink property.
+ * \sa Property::setUnitId() Property::unitIdChanged()
+ */
+int Property::unitId() const { return m_unitId; }
+
+/*!
+ * \brief Setter function for the \link Property::unitId unitId \endlink property.
+ * \sa Property::unitId() Property::unitIdChanged()
+ */
+void Property::setUnitId(int nUnitId)
+{
+    if (nUnitId != m_unitId) {
+        m_unitId = nUnitId;
+#ifdef QT_DEBUG
+        qDebug() << "Changed unitId to" << m_unitId;
+#endif
+        Q_EMIT unitIdChanged(unitId());
     }
 }
 
@@ -117,6 +170,7 @@ void Property::setName(const QString &nName)
         qDebug() << "Changed name to" << m_name;
 #endif
         emit nameChanged(name());
+        m_saveTimer.start();
     }
 }
 
@@ -154,6 +208,7 @@ void Property::setType(const QString &nType)
         qDebug() << "Changed type to" << m_type;
 #endif
         emit typeChanged(type());
+        m_saveTimer.start();
     }
 }
 
@@ -191,6 +246,7 @@ void Property::setRead(const QString &nRead)
         qDebug() << "Changed read to" << m_read;
 #endif
         emit readChanged(read());
+        m_saveTimer.start();
     }
 }
 
@@ -228,6 +284,7 @@ void Property::setWrite(const QString &nWrite)
         qDebug() << "Changed write to" << m_write;
 #endif
         emit writeChanged(write());
+        m_saveTimer.start();
     }
 }
 
@@ -265,6 +322,7 @@ void Property::setMember(const QString &nMember)
         qDebug() << "Changed member to" << m_member;
 #endif
         emit memberChanged(member());
+        m_saveTimer.start();
     }
 }
 
@@ -302,6 +360,7 @@ void Property::setReset(const QString &nReset)
         qDebug() << "Changed reset to" << m_reset;
 #endif
         emit resetChanged(reset());
+        m_saveTimer.start();
     }
 }
 
@@ -339,6 +398,7 @@ void Property::setNotify(const QString &nNotify)
         qDebug() << "Changed notify to" << m_notify;
 #endif
         emit notifyChanged(notify());
+        m_saveTimer.start();
     }
 }
 
@@ -376,6 +436,7 @@ void Property::setRevision(quint8 nRevision)
         qDebug() << "Changed revision to" << m_revision;
 #endif
         emit revisionChanged(revision());
+        m_saveTimer.start();
     }
 }
 
@@ -416,6 +477,7 @@ void Property::setDesignable(const QString &nDesignable)
         qDebug() << "Changed designable to" << m_designable;
 #endif
         emit designableChanged(designable());
+        m_saveTimer.start();
     }
 }
 
@@ -453,6 +515,7 @@ void Property::setScriptable(const QString &nScriptable)
         qDebug() << "Changed scriptable to" << m_scriptable;
 #endif
         emit scriptableChanged(scriptable());
+        m_saveTimer.start();
     }
 }
 
@@ -494,6 +557,7 @@ void Property::setStored(bool nStored)
         qDebug() << "Changed stored to" << m_stored;
 #endif
         emit storedChanged(stored());
+        m_saveTimer.start();
     }
 }
 
@@ -535,6 +599,7 @@ void Property::setUser(bool nUser)
         qDebug() << "Changed user to" << m_user;
 #endif
         emit userChanged(user());
+        m_saveTimer.start();
     }
 }
 
@@ -576,6 +641,7 @@ void Property::setConstant(bool nConstant)
         qDebug() << "Changed constant to" << m_constant;
 #endif
         emit constantChanged(constant());
+        m_saveTimer.start();
     }
 }
 
@@ -613,6 +679,7 @@ void Property::setFinal(const bool &nFinal)
         qDebug() << "Changed final to" << m_final;
 #endif
         emit finalChanged(final());
+        m_saveTimer.start();
     }
 }
 
@@ -650,6 +717,7 @@ void Property::setBrief(const QString &nBrief)
         qDebug() << "Changed brief to" << m_brief;
 #endif
         emit briefChanged(brief());
+        m_saveTimer.start();
     }
 }
 
@@ -687,6 +755,7 @@ void Property::setComment(const QString &nComment)
         qDebug() << "Changed comment to" << m_comment;
 #endif
         emit commentChanged(comment());
+        m_saveTimer.start();
     }
 }
 
@@ -725,6 +794,7 @@ void Property::setDefaultValue(const QString &nDefaultValue)
         qDebug() << "Changed defaultValue to" << m_defaultValue;
 #endif
         emit defaultValueChanged(defaultValue());
+        m_saveTimer.start();
     }
 }
 
@@ -762,6 +832,7 @@ void Property::setPointer(bool nPointer)
         qDebug() << "Changed pointer to" << m_pointer;
 #endif
         emit pointerChanged(pointer());
+        m_saveTimer.start();
     }
 }
 
@@ -799,6 +870,7 @@ void Property::setArgsByRef(bool nArgsByRef)
         qDebug() << "Changed argsByRef to" << m_argsByRef;
 #endif
         emit argsByRefChanged(argsByRef());
+        m_saveTimer.start();
     }
 }
 
@@ -836,9 +908,111 @@ void Property::setDocumentMethods(bool nDocumentMethods)
         qDebug() << "Changed documentMethods to" << m_documentMethods;
 #endif
         emit documentMethodsChanged(documentMethods());
+        m_saveTimer.start();
     }
 }
 
+
+/*!
+ * \property Property::createdAt
+ * \brief Date and time this property has been created.
+ *
+ * \par Access functions:
+ * \li QDateTime createdAt() const
+ * \li void setCreatedAt(const QDateTime &nCreatedAt)
+ *
+ * \par Notifier signal:
+ * \li void createdAtChanged(const QDateTime &createdAt)
+ */
+
+/*!
+ * \fn void  Property::createdAtChanged(const QDateTime &createdAt)
+ * \brief Notifier function for the \link Property::createdAt createdAt \endlink property.
+ * \sa Property::createdAt() Property::setCreatedAt()
+ */
+
+/*!
+ * \brief Getter function for the \link Property::createdAt createdAt \endlink property.
+ * \sa Property::setCreatedAt() Property::createdAtChanged()
+ */
+QDateTime Property::createdAt() const { return m_createdAt; }
+
+/*!
+ * \brief Setter function for the \link Property::createdAt createdAt \endlink property.
+ * \sa Property::createdAt() Property::createdAtChanged()
+ */
+void Property::setCreatedAt(const QDateTime &nCreatedAt)
+{
+    if (nCreatedAt != m_createdAt) {
+        m_createdAt = nCreatedAt;
+#ifdef QT_DEBUG
+        qDebug() << "Changed createdAt to" << m_createdAt;
+#endif
+        Q_EMIT createdAtChanged(createdAt());
+    }
+}
+
+
+/*!
+ * \property Property::updatedAt
+ * \brief Date and time this property has been updated.
+ *
+ * \par Access functions:
+ * \li QDateTime updatedAt() const
+ * \li void setUpdatedAt(const QDateTime &nUpdatedAt)
+ *
+ * \par Notifier signal:
+ * \li void updatedAtChanged(const QDateTime &updatedAt)
+ */
+
+/*!
+ * \fn void  Property::updatedAtChanged(const QDateTime &updatedAt)
+ * \brief Notifier function for the \link Property::updatedAt updatedAt \endlink property.
+ * \sa Property::updatedAt() Property::setUpdatedAt()
+ */
+
+/*!
+ * \brief Getter function for the \link Property::updatedAt updatedAt \endlink property.
+ * \sa Property::setUpdatedAt() Property::updatedAtChanged()
+ */
+QDateTime Property::updatedAt() const { return m_updatedAt; }
+
+/*!
+ * \brief Setter function for the \link Property::updatedAt updatedAt \endlink property.
+ * \sa Property::updatedAt() Property::updatedAtChanged()
+ */
+void Property::setUpdatedAt(const QDateTime &nUpdatedAt)
+{
+    if (nUpdatedAt != m_updatedAt) {
+        m_updatedAt = nUpdatedAt;
+#ifdef QT_DEBUG
+        qDebug() << "Changed updatedAt to" << m_updatedAt;
+#endif
+        Q_EMIT updatedAtChanged(updatedAt());
+    }
+}
+
+
+int Property::order() const { return m_order; }
+
+void Property::setOrder(int nOrder)
+{
+    if (nOrder != m_order) {
+        m_order = nOrder;
+        Q_EMIT orderChanged(m_order);
+    }
+}
+
+
+bool Property::expanded() const { return m_expanded; }
+
+void Property::setExpanded(bool nExpanded)
+{
+    if (nExpanded != m_expanded) {
+        m_expanded = nExpanded;
+        Q_EMIT expandedChanged(m_expanded);
+    }
+}
 
 
 QStringList Property::commentParts() const
@@ -878,4 +1052,99 @@ QStringList Property::commentParts() const
     }
 
     return parts;
+}
+
+
+
+Property *Property::fromDb(const QSqlQuery *q, QObject *parent)
+{
+    Property *p = nullptr;
+
+    Q_ASSERT_X(q, "construct Property from DB", "inavlid query pointer");
+
+    p = new Property(q->value(0).toInt(),
+                     q->value(1).toInt(),
+                     q->value(2).toString(),
+                     q->value(3).toString(),
+                     q->value(4).toString(),
+                     q->value(5).toString(),
+                     q->value(6).toString(),
+                     q->value(7).toString(),
+                     q->value(8).toString(),
+                     q->value(9).value<quint8>(),
+                     q->value(10).toString(),
+                     q->value(11).toString(),
+                     q->value(12).toBool(),
+                     q->value(13).toBool(),
+                     q->value(14).toBool(),
+                     q->value(15).toBool(),
+                     q->value(16).toString(),
+                     q->value(17).toString(),
+                     q->value(18).toString(),
+                     q->value(19).toBool(),
+                     q->value(20).toBool(),
+                     q->value(21).toBool(),
+                     QDateTime::fromTime_t(q->value(22).toUInt(), Qt::LocalTime),
+                     QDateTime::fromTime_t(q->value(23).toUInt(), Qt::LocalTime),
+                     q->value(24).toInt(),
+                     parent);
+
+    return p;
+}
+
+
+
+void Property::saveToDb()
+{
+    QSqlQuery q;
+
+    if (Q_UNLIKELY(!q.prepare(QStringLiteral("UPDATE properties SET name = ?, type = ?, read = ?, write = ?, notify = ?, member = ?, reset = ?, revision = ?, designable = ?, scriptable = ?, "
+                                             "stored = ?, user = ?, constant = ?, final = ?, pointer = ?, argsbyref = ?, docmethod = ?, defval = ?, brief = ?, comment = ?, updated_at = ? "
+                                             "WHERE id = ?")))) {
+        qCritical("Failed to prepare property update in database: %s", qUtf8Printable(q.lastError().text()));
+        return;
+    }
+
+    const QDateTime currentUtc = QDateTime::currentDateTimeUtc();
+    const QDateTime currentLocal = currentUtc.toLocalTime();
+
+    q.addBindValue(name());
+    q.addBindValue(type());
+    q.addBindValue(read());
+    q.addBindValue(write());
+    q.addBindValue(notify());
+    q.addBindValue(member());
+    q.addBindValue(reset());
+    q.addBindValue(revision());
+    q.addBindValue(designable());
+    q.addBindValue(scriptable());
+    q.addBindValue(stored());
+    q.addBindValue(user());
+    q.addBindValue(constant());
+    q.addBindValue(final());
+    q.addBindValue(pointer());
+    q.addBindValue(argsByRef());
+    q.addBindValue(documentMethods());
+    q.addBindValue(defaultValue());
+    q.addBindValue(brief());
+    q.addBindValue(comment());
+    q.addBindValue(currentUtc.toTime_t());
+    q.addBindValue(id());
+
+    if (Q_UNLIKELY(!q.exec())) {
+        qCritical("Failed to execute property update in database: %s", qUtf8Printable(q.lastError().text()));
+        return;
+    }
+
+    setUpdatedAt(currentLocal);
+}
+
+
+
+void Property::initTimer()
+{
+    m_saveTimer.setSingleShot(true);
+    m_saveTimer.setInterval(3000);
+    m_saveTimer.setTimerType(Qt::VeryCoarseTimer);
+    connect(&m_saveTimer, &QTimer::timeout, this, &Property::saveToDb);
 }

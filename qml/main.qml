@@ -20,6 +20,7 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
 import QtQuick.Dialogs 1.2
+import Buschtrommel.Anagiwahst 1.0
 
 ApplicationWindow {
     id: anagiwahst
@@ -29,11 +30,12 @@ ApplicationWindow {
     minimumWidth: 600
     minimumHeight: 600
 
-    function setTitle(prj) {
-        if (prj) {
-            anagiwahst.title = "Anagiwahst - " + prj
-        } else {
-            anagiwahst.title = "Anagiwahst"
+    function createProperty()
+    {
+        var component = Qt.createComponent("PropertyDialog.qml")
+        if (component.status === Component.Ready) {
+            var dialog = component.createObject(anagiwahst, {propsModel: stack.currentItem.propertyModel, unit: stack.currentItem.currentUnit})
+            dialog.open()
         }
     }
 
@@ -127,7 +129,21 @@ ApplicationWindow {
                 text: qsTr("Build class")
                 iconName: "run-build-file"
                 shortcut: qsTr("Ctrl+R")
+                enabled: stack.currentItem.objectName === "projectView" && stack.currentItem.currentUnit && stack.currentItem.propertyModel.count > 0
+                onTriggered: stack.push({item: Qt.resolvedUrl("ResultView.qml"), replace: false, properties: {unit: stack.currentItem.currentUnit, props: stack.currentItem.propertyModel}})
+            }
+        }
+
+        Menu {
+            title: qsTr("Property")
+            visible: stack.currentItem.objectName === "projectView"
+
+            MenuItem {
+                text: qsTr("Add new property");
+                shortcut: qsTr("Ctrl+N")
+                iconName: "list-add"
                 enabled: stack.currentItem.objectName === "projectView" && stack.currentItem.currentUnit
+                onTriggered: anagiwahst.createProperty()
             }
         }
     }
@@ -226,6 +242,25 @@ ApplicationWindow {
         onYes: {
             stack.currentItem.currentUnit = null
             stack.currentItem.unitModel.deleteUnit(unitId)
+        }
+    }
+
+    MessageDialog {
+        id: fileMsgDialog
+    }
+
+    FileDialog {
+        id: fileDialog
+        selectMultiple: false
+        onAccepted: {
+            if (fileDialog.selectFolder) {
+                if (!PropertyWriter.saveAll(fileDialog.fileUrl)) {
+                    fileMsgDialog.icon = StandardIcon.Warning
+                    fileMsgDialog.title = qsTr("Error")
+                    fileMsgDialog.text = qsTr("Could not save files to folder.")
+                    fileMsgDialog.visible = true
+                }
+            }
         }
     }
 }

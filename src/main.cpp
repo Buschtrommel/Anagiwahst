@@ -31,7 +31,7 @@
 #include <QString>
 
 #include "property.h"
-#include "propertymodel.h"
+#include "propertyfiltermodel.h"
 #include "propertywriter.h"
 #include "configuration.h"
 #include "dbmanager.h"
@@ -40,6 +40,15 @@
 #include "projectfiltermodel.h"
 #include "unit.h"
 #include "unitfiltermodel.h"
+
+static QObject *propertywriter_singleton_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+
+    PropertyWriter *pw = new PropertyWriter();
+    return pw;
+}
 
 int main(int argc, char *argv[])
 {
@@ -59,133 +68,133 @@ int main(int argc, char *argv[])
 
     DBManager::check();
 
-    if (argc > 1) {
+//    if (argc > 1) {
 
-        QCommandLineParser clparser;
-        clparser.setApplicationDescription(QCoreApplication::translate("main","Anagiwahst is a Qt property creator/editor."));
-        clparser.addHelpOption();
-        clparser.addVersionOption();
-        clparser.addPositionalArgument(QStringLiteral("<class name>"), QCoreApplication::translate("main", "The class name."));
-        clparser.addPositionalArgument(QStringLiteral("<type>"), QCoreApplication::translate("main", "Default type for all properties or list of related data types."));
-        clparser.addPositionalArgument(QStringLiteral("<property>"), QCoreApplication::translate("main", "The name of the property or list of properties."));
+//        QCommandLineParser clparser;
+//        clparser.setApplicationDescription(QCoreApplication::translate("main","Anagiwahst is a Qt property creator/editor."));
+//        clparser.addHelpOption();
+//        clparser.addVersionOption();
+//        clparser.addPositionalArgument(QStringLiteral("<class name>"), QCoreApplication::translate("main", "The class name."));
+//        clparser.addPositionalArgument(QStringLiteral("<type>"), QCoreApplication::translate("main", "Default type for all properties or list of related data types."));
+//        clparser.addPositionalArgument(QStringLiteral("<property>"), QCoreApplication::translate("main", "The name of the property or list of properties."));
 
-        QCommandLineOption noReadOption(QStringLiteral("no-read"), QCoreApplication::translate("main", "Do not create a read accessor function."));
-        clparser.addOption(noReadOption);
+//        QCommandLineOption noReadOption(QStringLiteral("no-read"), QCoreApplication::translate("main", "Do not create a read accessor function."));
+//        clparser.addOption(noReadOption);
 
-        QCommandLineOption noWriteOption(QStringLiteral("no-write"), QCoreApplication::translate("main", "Do not create a write accessor function."));
-        clparser.addOption(noWriteOption);
+//        QCommandLineOption noWriteOption(QStringLiteral("no-write"), QCoreApplication::translate("main", "Do not create a write accessor function."));
+//        clparser.addOption(noWriteOption);
 
-        QCommandLineOption noNotifyOption(QStringLiteral("no-notify"), QCoreApplication::translate("main", "Do not add a notify signal."));
-        clparser.addOption(noNotifyOption);
+//        QCommandLineOption noNotifyOption(QStringLiteral("no-notify"), QCoreApplication::translate("main", "Do not add a notify signal."));
+//        clparser.addOption(noNotifyOption);
 
-        QCommandLineOption memberOption(QStringList() << QStringLiteral("m") << QStringLiteral("member"), QCoreApplication::translate("main", "Use a member variable association."));
-        clparser.addOption(memberOption);
+//        QCommandLineOption memberOption(QStringList() << QStringLiteral("m") << QStringLiteral("member"), QCoreApplication::translate("main", "Use a member variable association."));
+//        clparser.addOption(memberOption);
 
-        QCommandLineOption unsetOption(QStringList() << QStringLiteral("u") << QStringLiteral("unset"), QCoreApplication::translate("main", "Create a reset/unset function."));
-        clparser.addOption(unsetOption);
+//        QCommandLineOption unsetOption(QStringList() << QStringLiteral("u") << QStringLiteral("unset"), QCoreApplication::translate("main", "Create a reset/unset function."));
+//        clparser.addOption(unsetOption);
 
-        QCommandLineOption outputOption(QStringList() << QStringLiteral("o") << QStringLiteral("output"), QCoreApplication::translate("main", "Write the output directly into files in <director>."), QCoreApplication::translate("main", "directory"));
-        clparser.addOption(outputOption);
+//        QCommandLineOption outputOption(QStringList() << QStringLiteral("o") << QStringLiteral("output"), QCoreApplication::translate("main", "Write the output directly into files in <director>."), QCoreApplication::translate("main", "directory"));
+//        clparser.addOption(outputOption);
 
-        QCommandLineOption forceOption(QStringList() << QStringLiteral("f") << QStringLiteral("force"), QCoreApplication::translate("main", "Force overwriting existing files. (If output directory is specified.)"));
-        clparser.addOption(forceOption);
+//        QCommandLineOption forceOption(QStringList() << QStringLiteral("f") << QStringLiteral("force"), QCoreApplication::translate("main", "Force overwriting existing files. (If output directory is specified.)"));
+//        clparser.addOption(forceOption);
 
-        clparser.process(app);
+//        clparser.process(app);
 
-        const QStringList args = clparser.positionalArguments();
+//        const QStringList args = clparser.positionalArguments();
 
-        if (args.size() < 3) {
-            clparser.showHelp(1);
-        }
+//        if (args.size() < 3) {
+//            clparser.showHelp(1);
+//        }
 
-        const QString className = args.at(0);
-        const QString typeString = args.at(1);
-        const QString propString = args.at(2);
+//        const QString className = args.at(0);
+//        const QString typeString = args.at(1);
+//        const QString propString = args.at(2);
 
-        QStringList types = typeString.split(' ');
-        const QStringList props = propString.split(' ');
+//        QStringList types = typeString.split(' ');
+//        const QStringList props = propString.split(' ');
 
-        if (!props.isEmpty()) {
+//        if (!props.isEmpty()) {
 
-            if (types.size() < props.size()) {
+//            if (types.size() < props.size()) {
 
-                quint8 diffSize = props.size() - types.size();
-                QString lastType = types.last();
+//                quint8 diffSize = props.size() - types.size();
+//                QString lastType = types.last();
 
-                for (quint8 i = 0; i < diffSize; ++i) {
-                    types.append(lastType);
-                }
+//                for (quint8 i = 0; i < diffSize; ++i) {
+//                    types.append(lastType);
+//                }
 
-            }
+//            }
 
-            const QString outputDir = clparser.value(outputOption);
+//            const QString outputDir = clparser.value(outputOption);
 
-            const bool read = !clparser.isSet(noReadOption);
-            const bool write = !clparser.isSet(noWriteOption);
-            const bool notify = !clparser.isSet(noNotifyOption);
-            const bool unset = clparser.isSet(unsetOption);
-            bool member = clparser.isSet(memberOption);
+//            const bool read = !clparser.isSet(noReadOption);
+//            const bool write = !clparser.isSet(noWriteOption);
+//            const bool notify = !clparser.isSet(noNotifyOption);
+//            const bool unset = clparser.isSet(unsetOption);
+//            bool member = clparser.isSet(memberOption);
 
-            if (!read) {
-                member = true;
-            }
+//            if (!read) {
+//                member = true;
+//            }
 
-            if (read && write) {
-                member = false;
-            }
+//            if (read && write) {
+//                member = false;
+//            }
 
-            PropertyModel propModel;
-            propModel.setClassName(className);
+//            PropertyModel propModel;
+//            propModel.setClassName(className);
 
-            for (int i = 0; i < props.size(); ++i) {
+//            for (int i = 0; i < props.size(); ++i) {
 
-                propModel.addProperty(props.at(i),types.at(i), read, write, member, unset, notify);
+//                propModel.addProperty(props.at(i),types.at(i), read, write, member, unset, notify);
 
-            }
+//            }
 
-            if (outputDir.isEmpty()) {
-                QTextStream out(stdout, QIODevice::WriteOnly);
-                out << "=========================================================================\n";
-                out << "||                          Header file                                ||\n";
-                out << "=========================================================================\n";
-                out << propModel.createOutput(PropertyModel::HeaderFile) << "\n";
-                out.flush();
+//            if (outputDir.isEmpty()) {
+//                QTextStream out(stdout, QIODevice::WriteOnly);
+//                out << "=========================================================================\n";
+//                out << "||                          Header file                                ||\n";
+//                out << "=========================================================================\n";
+//                out << propModel.createOutput(PropertyModel::HeaderFile) << "\n";
+//                out.flush();
 
-                const QString privData = propModel.createOutput(PropertyModel::PrivateHeaderFile);
-                if (!privData.isEmpty()) {
-                    out << "\n\n\n";
-                    out << "=========================================================================\n";
-                    out << "||                         Private header file                          ||\n";
-                    out << "=========================================================================\n";
-                    out << privData << "\n";
-                    out.flush();
-                }
+//                const QString privData = propModel.createOutput(PropertyModel::PrivateHeaderFile);
+//                if (!privData.isEmpty()) {
+//                    out << "\n\n\n";
+//                    out << "=========================================================================\n";
+//                    out << "||                         Private header file                          ||\n";
+//                    out << "=========================================================================\n";
+//                    out << privData << "\n";
+//                    out.flush();
+//                }
 
-                out << "\n\n\n";
-                out << "=========================================================================\n";
-                out << "||                            Code file                                ||\n";
-                out << "=========================================================================\n";
-                out << propModel.createOutput(PropertyModel::CodeFile) << "\n";
-                out.flush();
+//                out << "\n\n\n";
+//                out << "=========================================================================\n";
+//                out << "||                            Code file                                ||\n";
+//                out << "=========================================================================\n";
+//                out << propModel.createOutput(PropertyModel::CodeFile) << "\n";
+//                out.flush();
 
-            } else {
+//            } else {
 
-                const bool force = clparser.isSet(forceOption);
+//                const bool force = clparser.isSet(forceOption);
 
-                if (!PropertyWriter::write(PropertyWriter::HeaderFile, outputDir, className, propModel.createOutput(PropertyModel::HeaderFile), force)) {
-                    return 2;
-                }
-                const QString privData = propModel.createOutput(PropertyModel::PrivateHeaderFile);
-                if (!privData.isEmpty()) {
-                    PropertyWriter::write(PropertyWriter::PrivateHeaderFile, outputDir, className, privData, force);
-                }
-                PropertyWriter::write(PropertyWriter::CodeFile, outputDir, className, propModel.createOutput(PropertyModel::CodeFile), force);
+//                if (!PropertyWriter::write(PropertyWriter::HeaderFile, outputDir, className, propModel.createOutput(PropertyModel::HeaderFile), force)) {
+//                    return 2;
+//                }
+//                const QString privData = propModel.createOutput(PropertyModel::PrivateHeaderFile);
+//                if (!privData.isEmpty()) {
+//                    PropertyWriter::write(PropertyWriter::PrivateHeaderFile, outputDir, className, privData, force);
+//                }
+//                PropertyWriter::write(PropertyWriter::CodeFile, outputDir, className, propModel.createOutput(PropertyModel::CodeFile), force);
 
-            }
-        }
+//            }
+//        }
 
-        return 0;
-    }
+//        return 0;
+//    }
 
     Configuration configuration;
     ProjectModel projects;
@@ -198,7 +207,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<Unit>("Buschtrommel.Anagiwahst", 1, 0, "Unit");
     qmlRegisterType<UnitFilterModel>("Buschtrommel.Anagiwahst", 1, 0, "UnitModel");
     qmlRegisterType<Property>("Buschtrommel.Anagiwahst", 1, 0, "Property");
-    qmlRegisterType<PropertyModel>("Buschtrommel.Anagiwahst", 1, 0, "PropertyModel");
+    qmlRegisterType<PropertyFilterModel>("Buschtrommel.Anagiwahst", 1, 0, "PropertyModel");
+    qmlRegisterSingletonType<PropertyWriter>("Buschtrommel.Anagiwahst", 1, 0, "PropertyWriter", propertywriter_singleton_provider);
 
     QQmlApplicationEngine engine;
 
